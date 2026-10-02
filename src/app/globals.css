@@ -65,3 +65,51 @@ body {
 .btn-secondary {
   @apply bg-white text-blue-700 border border-blue-200 px-5 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-sm hover:bg-blue-50 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 dark:bg-slate-800 dark:text-blue-400 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600 dark:hover:shadow-blue-500/10;
 }
+
+/* Print Styles */
+@media print {
+  @page {
+    margin: 1cm;
+    size: landscape;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .print-no-border {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .print-header {
+    background: white !important;
+    color: black !important;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .print-bg-gray {
+    background: #f8fafc !important;
+  }
+  .print-no-shadow {
+    box-shadow: none !important;
+    border-color: #cbd5e1 !important;
+  }
+  .print-overflow-visible {
+    overflow: visible !important;
+  }
+  .print-no-sticky {
+    position: static !important;
+  }
+  nav, footer {
+    display: none !important;
+  }
+}
