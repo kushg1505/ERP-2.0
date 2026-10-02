@@ -225,77 +225,97 @@ export default function QuickSchedule() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-16 mb-24 glass-panel p-8 rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/50 dark:shadow-none animate-in slide-in-from-bottom-8 duration-700">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent inline-flex items-center gap-2">
-          <Calendar className="w-6 h-6 text-blue-600" /> Generate Quick Schedule
-        </h2>
-        <p className="text-slate-500 mt-2">No sign-up required. Just enter your details to view and download your timetable.</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-        <div className="space-y-4">
-          <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Year</label>
-            <select value={year} onChange={(e) => setYear(e.target.value)} className="input-field w-full">
-              <option value="1st">1st Year</option>
-              <option value="2nd">2nd Year</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Specialization</label>
-            <select value={spec} onChange={(e) => setSpec(e.target.value)} className="input-field w-full">
-              <option value="core">Core</option>
-              <option value="bfs">BFS</option>
-              <option value="dcp">DCP</option>
-            </select>
-          </div>
+    <div className="w-full max-w-6xl mx-auto mt-16 mb-16 grid lg:grid-cols-5 gap-8 items-stretch animate-in slide-in-from-bottom-8 duration-700 no-print">
+      
+      {/* Form Side */}
+      <div className="lg:col-span-3 glass-panel p-8 rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col justify-center">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent inline-flex items-center gap-2">
+            <Calendar className="w-6 h-6 text-blue-600" /> Generate Quick Schedule
+          </h2>
+          <p className="text-slate-500 mt-2">No sign-up required. Just enter your details to view and download your timetable.</p>
         </div>
 
-        <div className="space-y-4">
-          {(spec === "core" || spec === "dcp") ? (
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto w-full">
+          <div className="space-y-4">
             <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
-              <input 
-                type="text" 
-                value={rollNo}
-                onChange={(e) => setRollNo(e.target.value)}
-                placeholder="e.g. 2402001"
-                className="input-field w-full"
-                onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
-              />
-              <p className="text-xs text-slate-400 mt-2">Your courses will be automatically fetched from the master database.</p>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Year</label>
+              <select value={year} onChange={(e) => setYear(e.target.value)} className="input-field w-full">
+                <option value="1st">1st Year</option>
+                <option value="2nd">2nd Year</option>
+              </select>
             </div>
-          ) : (
-            <>
+            <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Specialization</label>
+              <select value={spec} onChange={(e) => setSpec(e.target.value)} className="input-field w-full">
+                <option value="core">Core</option>
+                <option value="bfs">BFS</option>
+                <option value="dcp">DCP</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {(spec === "core" || spec === "dcp") ? (
               <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
-                <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full">
-                   {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
-                </select>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
+                <input 
+                  type="text" 
+                  value={rollNo}
+                  onChange={(e) => setRollNo(e.target.value)}
+                  placeholder="e.g. 2402001"
+                  className="input-field w-full"
+                  onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+                />
+                <p className="text-xs text-slate-400 mt-2">Your courses will be automatically fetched from the master database.</p>
               </div>
-              <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Choose Elective</label>
-                <select value={bfsElective} onChange={(e) => setBfsElective(e.target.value)} className="input-field w-full">
-                   {BFS_ELECTIVE_COURSES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-            </>
-          )}
+            ) : (
+              <>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
+                  <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full">
+                     {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Choose Elective</label>
+                  <select value={bfsElective} onChange={(e) => setBfsElective(e.target.value)} className="input-field w-full">
+                     {BFS_ELECTIVE_COURSES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {error && <div className="mt-6 text-center text-red-500 font-medium text-sm bg-red-50 py-3 rounded-lg">{error}</div>}
+
+        <div className="mt-8 text-center">
+          <button 
+            onClick={handleGenerate}
+            disabled={loading}
+            className="btn-primary px-10 py-4 rounded-full font-bold text-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 w-full sm:w-auto inline-flex items-center justify-center gap-3 transition-all transform hover:scale-105 active:scale-95"
+          >
+            {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : "Generate My Timetable"}
+          </button>
         </div>
       </div>
 
-      {error && <div className="mt-6 text-center text-red-500 font-medium text-sm bg-red-50 py-3 rounded-lg">{error}</div>}
-
-      <div className="mt-8 text-center">
-        <button 
-          onClick={handleGenerate}
-          disabled={loading}
-          className="btn-primary px-10 py-4 rounded-full font-bold text-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 w-full sm:w-auto inline-flex items-center justify-center gap-3 transition-all transform hover:scale-105 active:scale-95"
-        >
-          {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : "Generate My Timetable"}
-        </button>
+      {/* CTA Side */}
+      <div className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-10 text-white shadow-2xl shadow-blue-900/20 flex flex-col justify-center items-start text-left gap-6 transform transition-all hover:scale-[1.01]">
+        <div className="space-y-4">
+          <h2 className="text-3xl font-extrabold leading-tight">
+            Unlock the Full Experience
+          </h2>
+          <p className="text-blue-100 text-lg leading-relaxed">
+            Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
+          </p>
+        </div>
+        <Link href="/dashboard" className="bg-white text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full justify-center">
+          Create Free Account <ArrowRight className="w-5 h-5" />
+        </Link>
       </div>
+
     </div>
   );
 }
