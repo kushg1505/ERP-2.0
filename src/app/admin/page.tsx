@@ -10,6 +10,7 @@ import { parseScheduleCSV } from "@/lib/parser";
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [selectedWeek, setSelectedWeek] = useState("week-5-2026");
+  const [selectedProgram, setSelectedProgram] = useState("2nd-core");
   const [timetableStatus, setTimetableStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [clashStatus, setClashStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
 
@@ -53,7 +54,7 @@ export default function AdminDashboard() {
           });
 
           const parsedClasses = parseScheduleCSV(rawData);
-          await saveMasterTimetable(selectedWeek, parsedClasses);
+          await saveMasterTimetable(selectedWeek, selectedProgram, parsedClasses);
           setTimetableStatus("success");
         } catch (error) {
           console.error(error);
@@ -140,17 +141,34 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold mb-2">Admin Portal</h1>
           <p className="text-slate-500">Upload the weekly Master Timetable and Clash Management schedules here.</p>
         </div>
-        <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700 min-w-[250px]">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Target Week</label>
-          <select 
-            value={selectedWeek}
-            onChange={(e) => setSelectedWeek(e.target.value)}
-            className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {Array.from({ length: 15 }, (_, i) => i + 1).map(num => (
-              <option key={num} value={`week-${num}-2026`}>Week {num}</option>
-            ))}
-          </select>
+        <div className="flex gap-4">
+          <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700 min-w-[200px]">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Target Program</label>
+            <select 
+              value={selectedProgram}
+              onChange={(e) => setSelectedProgram(e.target.value)}
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="1st-core">1st Year - Core</option>
+              <option value="1st-bfs">1st Year - BFS</option>
+              <option value="1st-dcp">1st Year - DCP</option>
+              <option value="2nd-core">2nd Year - Core</option>
+              <option value="2nd-bfs">2nd Year - BFS</option>
+              <option value="2nd-dcp">2nd Year - DCP</option>
+            </select>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-700 min-w-[150px]">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Target Week</label>
+            <select 
+              value={selectedWeek}
+              onChange={(e) => setSelectedWeek(e.target.value)}
+              className="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {Array.from({ length: 15 }, (_, i) => i + 1).map(num => (
+                <option key={num} value={`week-${num}-2026`}>Week {num}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

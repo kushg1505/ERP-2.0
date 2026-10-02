@@ -11,6 +11,7 @@ export interface ScheduleOverride {
 export interface StudentProfile {
   rollNo: string;
   name: string;
+  program?: string;
   courses: { courseCode: string; section: string }[];
   scheduleOverrides?: ScheduleOverride[];
 }
@@ -73,11 +74,11 @@ export async function saveStudentProfile(uid: string, profileData: Partial<Stude
   }
 }
 
-export async function fetchAvailableWeeks(): Promise<string[]> {
+export async function fetchAvailableWeeks(program: string = "2nd-core"): Promise<string[]> {
   try {
-    const colRef = collection(db, "master_schedules");
+    const colRef = collection(db, `master_schedules_${program}`);
     const snap = await getDocs(colRef);
-    const weeks = snap.docs.map(doc => doc.id).filter(id => id.includes("term-5"));
+    const weeks = snap.docs.map(doc => doc.id).filter(id => id.includes("term-5") || id.includes("week"));
     
     // Custom sort to ensure week-2 comes before week-10
     return weeks.sort((a, b) => {
@@ -91,9 +92,9 @@ export async function fetchAvailableWeeks(): Promise<string[]> {
   }
 }
 
-export async function saveMasterTimetable(weekId: string, data: any[]) {
+export async function saveMasterTimetable(weekId: string, program: string, data: any[]) {
   try {
-    const docRef = doc(db, "master_schedules", weekId);
+    const docRef = doc(db, `master_schedules_${program}`, weekId);
     await setDoc(docRef, { classes: data });
   } catch (error) {
     console.error("Error saving timetable", error);
@@ -101,9 +102,9 @@ export async function saveMasterTimetable(weekId: string, data: any[]) {
   }
 }
 
-export async function fetchMasterTimetable(weekId: string): Promise<any[]> {
+export async function fetchMasterTimetable(weekId: string, program: string = "2nd-core"): Promise<any[]> {
   try {
-    const docRef = doc(db, "master_schedules", weekId);
+    const docRef = doc(db, `master_schedules_${program}`, weekId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       return docSnap.data().classes || [];

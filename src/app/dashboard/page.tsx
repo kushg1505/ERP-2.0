@@ -64,8 +64,10 @@ export default function DashboardPage() {
       
       const p = await getStudentProfile(user.uid);
       setProfile(p);
+      
+      const userProgram = p?.program || "2nd-core";
 
-      const weeks = await fetchAvailableWeeks();
+      const weeks = await fetchAvailableWeeks(userProgram);
       setAvailableWeeks(weeks);
       
       let targetWeek = selectedWeek;
@@ -76,7 +78,7 @@ export default function DashboardPage() {
 
       if (p && p.courses.length > 0 && targetWeek) {
         // Fetch real data from Firestore
-        const master = await fetchMasterTimetable(targetWeek) as ParsedClass[];
+        const master = await fetchMasterTimetable(targetWeek, userProgram) as ParsedClass[];
         
         const att = await fetchAttendance(user.uid, targetWeek);
         setAttendance(att);
@@ -88,7 +90,7 @@ export default function DashboardPage() {
         let historicalSessions: any[] = [];
         
         await Promise.all(weeks.map(async (w) => {
-          const wMaster = await fetchMasterTimetable(w) as ParsedClass[];
+          const wMaster = await fetchMasterTimetable(w, userProgram) as ParsedClass[];
           let myWClasses = wMaster.filter(cls => 
             p.courses.some(c => 
               c.courseCode === cls.courseAbb && 
