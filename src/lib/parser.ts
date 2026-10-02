@@ -8,6 +8,7 @@ export interface ParsedClass {
   section: string;
   faculty: string;
   venue: string;
+  sessionNo?: string;
 }
 
 export function parseScheduleCSV(data: any[]): ParsedClass[] {
@@ -55,6 +56,7 @@ export function parseScheduleCSV(data: any[]): ParsedClass[] {
     }
     
     const venue = String(normalizedRow['venue'] || normalizedRow['room'] || "").trim();
+    const sessionNo = String(normalizedRow['sessionno.'] || normalizedRow['sessionno'] || "").trim();
 
     // Only add if it has a course abbreviation
     if (courseAbb) {
@@ -67,7 +69,8 @@ export function parseScheduleCSV(data: any[]): ParsedClass[] {
         courseName,
         section,
         faculty,
-        venue
+        venue,
+        sessionNo
       });
     }
   }
