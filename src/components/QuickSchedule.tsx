@@ -206,7 +206,7 @@ export default function QuickSchedule() {
                       <span className="text-xs text-slate-500">{day.split(',')[1]?.trim()}</span>
                     </td>
                     {(() => {
-                      const isSSRThursday = program === "2nd-core" && day.toLowerCase().includes("thursday");
+                      const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
                       const cells = [];
                       let ssrStarted = false;
                       const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
