@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { getStudentProfile, fetchMasterTimetable, StudentProfile, fetchAttendance, fetchAllAttendanceStats, markAttendance, fetchAvailableWeeks, updateStudentOverrides, ScheduleOverride } from "@/lib/db";
-import { Clock, MapPin, CheckCircle2, XCircle, Calendar, CheckSquare, List, Edit3, Trash2, Plus, Settings2, X } from "lucide-react";
+import { Clock, MapPin, CheckCircle2, XCircle, Calendar, CheckSquare, List, Edit3, Trash2, Plus, Settings2, X, Download } from "lucide-react";
 
 interface ParsedClass {
   courseAbb: string;
@@ -412,10 +412,13 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 className="text-2xl font-bold flex items-center gap-4">My Schedule {isEditMode && <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full animate-pulse">EDIT MODE</span>}</h2>
               <div className="flex items-center gap-4">
-                <button onClick={() => setIsEditMode(!isEditMode)} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${isEditMode ? 'bg-blue-600 shadow-lg shadow-blue-500/30 text-white hover:bg-blue-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
+                <button onClick={() => window.print()} className="no-print btn-secondary px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                   <Download className="w-4 h-4"/> Download PDF
+                </button>
+                <button onClick={() => setIsEditMode(!isEditMode)} className={`no-print px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${isEditMode ? 'bg-blue-600 shadow-lg shadow-blue-500/30 text-white hover:bg-blue-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
                    <Settings2 className="w-4 h-4" /> {isEditMode ? 'Done Editing' : 'Customize'}
                 </button>
-                <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
+                <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit no-print">
                   <button onClick={() => setViewMode("list")} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}><MapPin className="w-4 h-4" /> List</button>
                   <button onClick={() => setViewMode("table")} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${viewMode === 'table' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}><Clock className="w-4 h-4" /> Tabular</button>
                 </div>
