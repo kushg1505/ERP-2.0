@@ -126,13 +126,13 @@ export default function QuickSchedule() {
       
       master.forEach((cls) => {
         if (cls.day && cls.day.trim() !== "") daysSet.add(cls.day);
-        if (cls.timeSlot && cls.timeSlot.trim() !== "") slotsSet.add(cls.timeSlot);
+        if (cls.timeSlot && cls.timeSlot.trim() !== "" && cls.timeSlot !== "Full Day") slotsSet.add(cls.timeSlot);
       });
       
       // Also add days and slots from our filtered list in case we injected any custom ones
       filtered.forEach((cls) => {
         if (cls.day && cls.day.trim() !== "") daysSet.add(cls.day);
-        if (cls.timeSlot && cls.timeSlot.trim() !== "") slotsSet.add(cls.timeSlot);
+        if (cls.timeSlot && cls.timeSlot.trim() !== "" && cls.timeSlot !== "Full Day") slotsSet.add(cls.timeSlot);
       });
 
       const parseTime = (slot: string) => {
@@ -208,30 +208,66 @@ export default function QuickSchedule() {
                       <span className="font-bold text-base block">{day.split(',')[0]}</span>
                       <span className="text-xs text-slate-500">{day.split(',')[1]?.trim()}</span>
                     </td>
-                    {allTimeSlots.map(slot => {
-                      const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
-                      return (
-                        <td key={slot} className="p-3 border-r border-slate-200 align-top">
-                          {classesInSlot.length === 0 ? (
-                            <div className="min-h-[4rem] w-full" />
-                          ) : (
-                            <div className="flex flex-col gap-2 h-full">
-                              {classesInSlot.map((cls, idx) => (
-                                <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-white shadow-sm print-no-shadow">
-                                  <div className="font-bold text-sm text-slate-900 leading-tight">
-                                    {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
+                    {(() => {
+                      const isSSRThursday = program === "2nd-core" && day.toLowerCase().includes("thursday");
+                      const cells = [];
+                      let ssrStarted = false;
+                      const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
+                      
+                      for (let i = 0; i < allTimeSlots.length; i++) {
+                        const slot = allTimeSlots[i];
+                        const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
+                        
+                        if (isSSRThursday && !slotHasClass[i]) {
+                           if (!ssrStarted) {
+                             ssrStarted = true;
+                             let j = i;
+                             while (j < allTimeSlots.length && !slotHasClass[j]) j++;
+                             const ssrColSpan = j - i;
+                             
+                             cells.push(
+                               <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 align-middle bg-slate-50/50 print-bg-gray">
+                                  <div className="flex items-center justify-center h-full min-h-[4rem]">
+                                    <span className="font-bold text-slate-700 tracking-widest text-lg bg-white px-8 py-2 rounded-full border border-slate-200 shadow-sm print-no-shadow">
+                                      SSR Visit
+                                    </span>
                                   </div>
-                                  <div className="text-xs text-slate-500 flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-                                    <span>{cls.venue || 'TBA'}</span>
-                                    <span className="font-bold text-blue-600">Sec {cls.section}</span>
-                                  </div>
+                               </td>
+                             );
+                             i = j - 1; // skip the handled slots
+                           } else {
+                             cells.push(
+                               <td key={slot} className="p-3 border-r border-slate-200">
+                                 <div className="min-h-[4rem] w-full" />
+                               </td>
+                             );
+                           }
+                        } else {
+                          cells.push(
+                            <td key={slot} className="p-3 border-r border-slate-200 align-top">
+                              {classesInSlot.length === 0 ? (
+                                <div className="min-h-[4rem] w-full" />
+                              ) : (
+                                <div className="flex flex-col gap-2 h-full">
+                                  {classesInSlot.map((cls, idx) => (
+                                    <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-white shadow-sm print-no-shadow">
+                                      <div className="font-bold text-sm text-slate-900 leading-tight">
+                                        {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
+                                      </div>
+                                      <div className="text-xs text-slate-500 flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
+                                        <span>{cls.venue || 'TBA'}</span>
+                                        <span className="font-bold text-blue-600">Sec {cls.section}</span>
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
-                          )}
-                        </td>
-                      );
-                    })}
+                              )}
+                            </td>
+                          );
+                        }
+                      }
+                      return cells;
+                    })()}
                   </tr>
                 ))}
               </tbody>

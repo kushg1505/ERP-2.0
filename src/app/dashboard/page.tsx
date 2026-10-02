@@ -479,74 +479,110 @@ export default function DashboardPage() {
                         <td className="p-4 font-medium text-sm text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800 whitespace-nowrap bg-slate-50 dark:bg-slate-950 sticky left-0 z-10 shadow-[1px_0_0_0_#e2e8f0] dark:shadow-[1px_0_0_0_#1e293b]">
                           <span className="font-bold text-base">{day.split(',')[0]}</span>
                         </td>
-                        {allTimeSlots.map(slot => {
-                          const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
-                          return (
-                            <td key={slot} className="p-3 border-r border-slate-200 dark:border-slate-800 align-top group-hover:bg-slate-50/50 dark:group-hover:bg-slate-800/30 transition-colors">
-                              {classesInSlot.length === 0 ? (
-                                <div className="h-full w-full min-h-[5rem] flex items-center justify-center">
-                                  {isEditMode && (
-                                    <button onClick={() => {
-                                      setOriginalClassIdToReschedule(null);
-                                      setEditForm({
-                                        courseAbb: profile?.courses[0]?.courseCode || "NEW",
-                                        courseName: "New Session",
-                                        section: profile?.courses[0]?.section || "A",
-                                        day: day.split(',')[0],
-                                        timeSlot: slot,
-                                        startTime: slot.split('-')[0] || "09:00",
-                                        endTime: slot.split('-')[1] || "10:15",
-                                        venue: "TBA",
-                                        faculty: "TBA",
-                                        date: day.split(',')[1]?.trim() || "2026-10-05"
-                                      });
-                                      setEditModalOpen(true);
-                                    }} className="w-10 h-10 rounded-full border-2 border-dashed border-blue-300 dark:border-blue-700 text-blue-500 flex items-center justify-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
-                                      <Plus className="w-5 h-5"/>
-                                    </button>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="flex flex-col gap-2 h-full">
-                                  {classesInSlot.map((cls, idx) => {
-                                    const cId = getClassId(cls);
-                                    const isAttended = attendance[cId]?.status === 'attended' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'attended';
-                                    const isMissed = attendance[cId]?.status === 'missed' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'missed';
-                                    return (
-                                    <div key={idx} className={`p-3 rounded-xl border flex flex-col gap-1 shadow-sm h-full transition-all cursor-default ${isEditMode ? 'ring-2 ring-blue-500/50 hover:shadow-md' : 'hover-lift'} ${isAttended ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10' : isMissed ? 'border-red-300 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'}`}>
-                                      
-                                      {isEditMode ? (
-                                        <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-3 -mt-3 p-2 rounded-t-xl mb-1 border-b border-slate-200 dark:border-slate-700">
-                                          <button onClick={() => openRescheduleModal(cls)} className="p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3.5 h-3.5"/></button>
-                                          <button onClick={() => handleCancelClass(cls)} className="p-1.5 text-red-600 bg-red-100 hover:bg-red-200 rounded-lg dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/60"><Trash2 className="w-3.5 h-3.5"/></button>
-                                        </div>
-                                      ) : (
-                                        <div className="flex justify-between items-start gap-2">
-                                          <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
-                                            {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
-                                          </div>
-                                          {isAttended && <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded leading-none">P</span>}
-                                          {isMissed && <span className="text-[10px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded leading-none">A</span>}
-                                        </div>
-                                      )}
-                                      
-                                      {isEditMode && (
-                                        <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
-                                          {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
-                                        </div>
-                                      )}
-
-                                      <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between mt-auto pt-2">
-                                        <span>{cls.venue || 'TBA'}</span>
-                                        <span className="font-bold text-blue-600 dark:text-blue-400">Sec {cls.section}</span>
+                        {(() => {
+                          const isSSRThursday = p?.program === "2nd-core" && day.toLowerCase().includes("thursday");
+                          const cells = [];
+                          let ssrStarted = false;
+                          const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
+                          
+                          for (let i = 0; i < allTimeSlots.length; i++) {
+                            const slot = allTimeSlots[i];
+                            const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
+                            
+                            if (isSSRThursday && !slotHasClass[i]) {
+                               if (!ssrStarted) {
+                                 ssrStarted = true;
+                                 let j = i;
+                                 while (j < allTimeSlots.length && !slotHasClass[j]) j++;
+                                 const ssrColSpan = j - i;
+                                 
+                                 cells.push(
+                                   <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 dark:border-slate-800 align-middle bg-slate-50/50 dark:bg-slate-900/50">
+                                      <div className="flex items-center justify-center h-full min-h-[5rem]">
+                                        <span className="font-bold text-slate-700 dark:text-slate-300 tracking-widest text-lg bg-white dark:bg-slate-800 px-8 py-2 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
+                                          SSR Visit
+                                        </span>
                                       </div>
+                                   </td>
+                                 );
+                                 i = j - 1; // skip the handled slots
+                               } else {
+                                 cells.push(
+                                   <td key={slot} className="p-3 border-r border-slate-200 dark:border-slate-800">
+                                     <div className="h-full w-full min-h-[5rem]" />
+                                   </td>
+                                 );
+                               }
+                            } else {
+                              cells.push(
+                                <td key={slot} className="p-3 border-r border-slate-200 dark:border-slate-800 align-top group-hover:bg-slate-50/50 dark:group-hover:bg-slate-800/30 transition-colors">
+                                  {classesInSlot.length === 0 ? (
+                                    <div className="h-full w-full min-h-[5rem] flex items-center justify-center">
+                                      {isEditMode && (
+                                        <button onClick={() => {
+                                          setOriginalClassIdToReschedule(null);
+                                          setEditForm({
+                                            courseAbb: profile?.courses[0]?.courseCode || "NEW",
+                                            courseName: "New Session",
+                                            section: profile?.courses[0]?.section || "A",
+                                            day: day.split(',')[0],
+                                            timeSlot: slot,
+                                            startTime: slot.split('-')[0] || "09:00",
+                                            endTime: slot.split('-')[1] || "10:15",
+                                            venue: "TBA",
+                                            faculty: "TBA",
+                                            date: day.split(',')[1]?.trim() || "2026-10-05"
+                                          });
+                                          setEditModalOpen(true);
+                                        }} className="w-10 h-10 rounded-full border-2 border-dashed border-blue-300 dark:border-blue-700 text-blue-500 flex items-center justify-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
+                                          <Plus className="w-5 h-5"/>
+                                        </button>
+                                      )}
                                     </div>
-                                  )})}
-                                </div>
-                              )}
-                            </td>
-                          );
-                        })}
+                                  ) : (
+                                    <div className="flex flex-col gap-2 h-full">
+                                      {classesInSlot.map((cls, idx) => {
+                                        const cId = getClassId(cls);
+                                        const isAttended = attendance[cId]?.status === 'attended' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'attended';
+                                        const isMissed = attendance[cId]?.status === 'missed' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'missed';
+                                        return (
+                                        <div key={idx} className={`p-3 rounded-xl border flex flex-col gap-1 shadow-sm h-full transition-all cursor-default ${isEditMode ? 'ring-2 ring-blue-500/50 hover:shadow-md' : 'hover-lift'} ${isAttended ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10' : isMissed ? 'border-red-300 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'}`}>
+                                          
+                                          {isEditMode ? (
+                                            <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-3 -mt-3 p-2 rounded-t-xl mb-1 border-b border-slate-200 dark:border-slate-700">
+                                              <button onClick={() => openRescheduleModal(cls)} className="p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3.5 h-3.5"/></button>
+                                              <button onClick={() => handleCancelClass(cls)} className="p-1.5 text-red-600 bg-red-100 hover:bg-red-200 rounded-lg dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/60"><Trash2 className="w-3.5 h-3.5"/></button>
+                                            </div>
+                                          ) : (
+                                            <div className="flex justify-between items-start gap-2">
+                                              <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
+                                                {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
+                                              </div>
+                                              {isAttended && <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded leading-none">P</span>}
+                                              {isMissed && <span className="text-[10px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded leading-none">A</span>}
+                                            </div>
+                                          )}
+                                          
+                                          {isEditMode && (
+                                            <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
+                                              {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
+                                            </div>
+                                          )}
+
+                                          <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between mt-auto pt-2">
+                                            <span>{cls.venue || 'TBA'}</span>
+                                            <span className="font-bold text-blue-600 dark:text-blue-400">Sec {cls.section}</span>
+                                          </div>
+                                        </div>
+                                      )})}
+                                    </div>
+                                  )}
+                                </td>
+                              );
+                            }
+                          }
+                          return cells;
+                        })()}
                       </tr>
                     ))}
                   </tbody>
