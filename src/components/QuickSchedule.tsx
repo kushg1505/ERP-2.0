@@ -147,9 +147,6 @@ export default function QuickSchedule() {
       };
       
       const sortedSlots = Array.from(slotsSet).sort((a, b) => parseTime(a) - parseTime(b));
-      if (program === "2nd-core" && !sortedSlots.includes("Full Day") && Array.from(daysSet).some(d => d.toLowerCase().includes("thursday"))) {
-         sortedSlots.unshift("Full Day");
-      }
 
       const dayOrder: Record<string, number> = { "mon": 1, "tue": 2, "wed": 3, "thu": 4, "fri": 5, "sat": 6, "sun": 7 };
       const sortedDays = Array.from(daysSet).sort((a, b) => {
