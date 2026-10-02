@@ -62,6 +62,29 @@ export default function RootLayout({
             <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               {children}
             </main>
+            
+            <footer className="border-t border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm mt-auto py-8 no-print">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  
+                  <div className="flex flex-col items-center md:items-start text-center md:text-left">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">ERP 2.0</span>
+                    </div>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Intelligent Timetable & Clash Management for MBA Students.</p>
+                  </div>
+
+                  <div className="flex flex-col items-center md:items-end text-center md:text-right">
+                    <p className="text-slate-600 dark:text-slate-300 font-medium">
+                      Developed by <span className="font-bold text-blue-600 dark:text-blue-400">Kush Goyal</span>
+                    </p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Batch 2025-27</p>
+                  </div>
+
+                </div>
+              </div>
+            </footer>
           </AuthProvider>
         </ThemeProvider>
       </body>
