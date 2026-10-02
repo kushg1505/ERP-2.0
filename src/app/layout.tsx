@@ -11,7 +11,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Class Schedule & Clash Manager",
+  title: "ERP 2.0",
   description: "Personalized timetable and clash management for MBA students.",
 };
 
@@ -38,7 +38,7 @@ export default function RootLayout({
                       <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-xl group-hover:scale-110 transition-transform">
                         <CalendarDays className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <span className="font-bold text-xl tracking-tight hidden sm:block bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">ClassManager</span>
+                      <span className="font-bold text-xl tracking-tight hidden sm:block bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">ERP 2.0</span>
                     </Link>
                     <div className="hidden sm:ml-8 sm:flex sm:space-x-8">
                       <Link href="/dashboard" className="border-transparent text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold transition-all">
