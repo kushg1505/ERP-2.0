@@ -422,7 +422,7 @@ export default function DashboardPage() {
                                 </div>
                                 <div className="w-px h-12 bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
                                 <div>
-                                  <h4 className="font-bold text-lg">{cls.courseAbb} - {cls.courseName} {cls.sessionNo && <span className="text-slate-400 font-medium text-sm">(Session {cls.sessionNo})</span>}</h4>
+                                  <h4 className="font-bold text-lg">{cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''} - {cls.courseName}</h4>
                                   <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
                                     <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/> {cls.venue || 'TBA'}</span>
                                     {cls.faculty && <span className="flex items-center gap-1">Prof. {cls.faculty}</span>}
@@ -505,8 +505,7 @@ export default function DashboardPage() {
                                       ) : (
                                         <div className="flex justify-between items-start gap-2">
                                           <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
-                                            {cls.courseAbb}
-                                            {cls.sessionNo && <div className="text-xs text-slate-500 font-medium">Sess {cls.sessionNo}</div>}
+                                            {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
                                           </div>
                                           {isAttended && <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded leading-none">P</span>}
                                           {isMissed && <span className="text-[10px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded leading-none">A</span>}
@@ -515,8 +514,7 @@ export default function DashboardPage() {
                                       
                                       {isEditMode && (
                                         <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
-                                          {cls.courseAbb}
-                                          {cls.sessionNo && <div className="text-xs text-slate-500 font-medium">Sess {cls.sessionNo}</div>}
+                                          {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
                                         </div>
                                       )}
 
