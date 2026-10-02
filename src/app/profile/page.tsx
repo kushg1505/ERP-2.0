@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { getStudentProfile, saveStudentProfile, StudentProfile, fetchAllCourses, getStudentFromMasterDB } from "@/lib/db";
-import { Save, RefreshCw, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import { Save, RefreshCw, AlertCircle, CheckCircle2, ArrowRight, Trash2, Plus } from "lucide-react";
 import Link from "next/link";
 
 const AVAILABLE_SECTIONS = ["A", "B", "C", "D", "E", "F"];
@@ -28,6 +28,10 @@ export default function ProfilePage() {
   // BFS State
   const [bfsSection, setBfsSection] = useState("A");
   const [bfsElective, setBfsElective] = useState("BF");
+
+  // Manual Course Edit State
+  const [newCourseCode, setNewCourseCode] = useState("");
+  const [newCourseSection, setNewCourseSection] = useState("A");
 
   useEffect(() => {
     if (user) {
@@ -98,6 +102,23 @@ export default function ProfilePage() {
        setSyncMessage({ type: "error", text: "Roll number not found in master database." });
     }
     setSyncing(false);
+  };
+
+  const handleAddCourse = () => {
+    if (!newCourseCode) return;
+    if (profile.courses.some(c => c.courseCode === newCourseCode)) return; // Already exists
+    setProfile(prev => ({
+      ...prev,
+      courses: [...prev.courses, { courseCode: newCourseCode, section: newCourseSection }]
+    }));
+    setNewCourseCode(""); // Reset after add
+  };
+
+  const handleRemoveCourse = (courseCode: string) => {
+    setProfile(prev => ({
+      ...prev,
+      courses: prev.courses.filter(c => c.courseCode !== courseCode)
+    }));
   };
 
   if (loading) return <div className="flex justify-center p-20"><div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" /></div>;
@@ -181,15 +202,50 @@ export default function ProfilePage() {
             </div>
 
             {profile.courses.length > 0 && (
-               <div className="mt-6">
-                  <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-3">Enrolled Courses ({profile.courses.length})</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+               <div className="mt-6 border-t border-slate-200 dark:border-slate-800 pt-6">
+                  <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-4">Enrolled Courses ({profile.courses.length})</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                      {profile.courses.map((c, i) => (
-                        <div key={i} className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-center">
-                           <div className="font-bold">{c.courseCode}</div>
-                           <div className="text-xs text-slate-500">Section {c.section}</div>
+                        <div key={i} className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex justify-between items-center group">
+                           <div>
+                             <div className="font-bold text-lg">{c.courseCode}</div>
+                             <div className="text-xs text-slate-500 font-medium">Section {c.section}</div>
+                           </div>
+                           <button onClick={() => handleRemoveCourse(c.courseCode)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100" title="Remove course">
+                             <Trash2 className="w-5 h-5" />
+                           </button>
                         </div>
                      ))}
+                  </div>
+                  
+                  <div className="mt-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+                    <h4 className="text-sm font-bold text-slate-600 dark:text-slate-400 mb-3">Add / Override Course</h4>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <select 
+                        value={newCourseCode}
+                        onChange={(e) => setNewCourseCode(e.target.value)}
+                        className="input-field flex-grow"
+                      >
+                        <option value="">-- Select Course --</option>
+                        {availableCourses.filter(c => !profile.courses.some(pc => pc.courseCode === c.abbreviation)).map(c => (
+                          <option key={c.abbreviation} value={c.abbreviation}>{c.abbreviation} - {c.name}</option>
+                        ))}
+                      </select>
+                      <select
+                        value={newCourseSection}
+                        onChange={(e) => setNewCourseSection(e.target.value)}
+                        className="input-field w-full sm:w-32"
+                      >
+                        {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Sec {s}</option>)}
+                      </select>
+                      <button 
+                        onClick={handleAddCourse}
+                        disabled={!newCourseCode}
+                        className="btn-secondary px-6 rounded-lg font-bold flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Plus className="w-4 h-4" /> Add
+                      </button>
+                    </div>
                   </div>
                </div>
             )}
