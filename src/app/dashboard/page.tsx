@@ -139,11 +139,6 @@ export default function DashboardPage() {
           grouped[cls.day].push(cls);
         });
 
-        const dayPlans: DayPlan[] = Object.keys(grouped).map(day => ({
-          day,
-          classes: grouped[day].sort((a, b) => a.timeSlot.localeCompare(b.timeSlot))
-        }));
-
         // Extract ALL unique days and timeslots from the Master Timetable to build a perfect Grid
         const daysSet = new Set<string>();
         const slotsSet = new Set<string>();
@@ -179,9 +174,46 @@ export default function DashboardPage() {
           return (isNaN(dateA) ? 0 : dateA) - (isNaN(dateB) ? 0 : dateB);
         });
 
+        const dayPlans: DayPlan[] = sortedDays.map(day => {
+          let classesForDay = grouped[day] ? grouped[day].sort((a, b) => a.timeSlot.localeCompare(b.timeSlot)) : [];
+          
+          if (p.program === "2nd-core" && day.toLowerCase().includes("thursday")) {
+            classesForDay.push({
+               courseAbb: "SSR",
+               courseName: "SSR Visit",
+               section: "All",
+               day: day,
+               timeSlot: "Full Day",
+               startTime: "09:00",
+               endTime: "18:00",
+               venue: "Off-campus",
+               faculty: "",
+               date: day.split(",")[1]?.trim() || ""
+            });
+            classesForDay = classesForDay.sort((a, b) => {
+               if (a.timeSlot === "Full Day") return -1;
+               if (b.timeSlot === "Full Day") return 1;
+               return a.timeSlot.localeCompare(b.timeSlot);
+            });
+          }
+
+          return {
+            day,
+            classes: classesForDay
+          };
+        });
+
+        // Add Full Day to allTimeSlots if it's missing so Tabular view shows it
+        if (p.program === "2nd-core" && !sortedSlots.includes("Full Day")) {
+           const hasThursday = sortedDays.some(d => d.toLowerCase().includes("thursday"));
+           if (hasThursday) {
+             sortedSlots.unshift("Full Day");
+           }
+        }
+
         setAllTimeSlots(sortedSlots);
         setAllDays(sortedDays);
-        setMyClasses(myFilteredClasses);
+        setMyClasses(dayPlans.flatMap(dp => dp.classes));
         setSchedule(dayPlans);
       }
       setLoading(false);
@@ -376,28 +408,38 @@ export default function DashboardPage() {
                     <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                       <div className="bg-slate-900 dark:bg-slate-950 px-6 py-4"><h3 className="font-bold text-white">{dayPlan.day}</h3></div>
                       <div className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                        {dayPlan.classes.map((cls, cIdx) => (
-                          <div key={cIdx} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                            <div className="flex items-center gap-6">
-                              <div className="w-24 text-right shrink-0">
-                                <span className="text-sm font-medium block text-slate-700 dark:text-slate-300">{cls.timeSlot}</span>
-                              </div>
-                              <div className="w-px h-12 bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
-                              <div>
-                                <h4 className="font-bold text-lg">{cls.courseAbb} - {cls.courseName}</h4>
-                                <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
-                                  <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/> {cls.venue || 'TBA'}</span>
-                                  {cls.faculty && <span className="flex items-center gap-1">Prof. {cls.faculty}</span>}
-                                  <span className="font-bold text-blue-600 bg-blue-100 px-2 rounded-full">Sec {cls.section}</span>
+                        {dayPlan.classes.length === 0 ? (
+                          <div className="p-8 text-center text-slate-500 font-medium">
+                            No classes scheduled for this day.
+                          </div>
+                        ) : (
+                          dayPlan.classes.map((cls, cIdx) => (
+                            <div key={cIdx} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                              <div className="flex items-center gap-6">
+                                <div className="w-24 text-right shrink-0">
+                                  <span className="text-sm font-medium block text-slate-700 dark:text-slate-300">{cls.timeSlot}</span>
+                                </div>
+                                <div className="w-px h-12 bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
+                                <div>
+                                  <h4 className="font-bold text-lg">{cls.courseAbb} - {cls.courseName}</h4>
+                                  <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
+                                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/> {cls.venue || 'TBA'}</span>
+                                    {cls.faculty && <span className="flex items-center gap-1">Prof. {cls.faculty}</span>}
+                                    {cls.section && cls.section !== "All" && <span className="font-bold text-blue-600 bg-blue-100 px-2 rounded-full">Sec {cls.section}</span>}
+                                  </div>
                                 </div>
                               </div>
+                              <div className="flex gap-3 mt-4 md:mt-0">
+                                {cls.courseAbb !== "SSR" && (
+                                  <>
+                                    <button onClick={() => handleAttendance(getClassId(cls), "attended")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'attended' ? 'bg-emerald-500 text-white border-emerald-600' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}><CheckCircle2 className="w-4 h-4" /> Attended</button>
+                                    <button onClick={() => handleAttendance(getClassId(cls), "missed")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'missed' ? 'bg-red-500 text-white border-red-600' : 'border-red-200 text-red-700 hover:bg-red-50'}`}><XCircle className="w-4 h-4" /> Missed</button>
+                                  </>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex gap-3 mt-4 md:mt-0">
-                              <button onClick={() => handleAttendance(getClassId(cls), "attended")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'attended' ? 'bg-emerald-500 text-white border-emerald-600' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}><CheckCircle2 className="w-4 h-4" /> Attended</button>
-                              <button onClick={() => handleAttendance(getClassId(cls), "missed")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'missed' ? 'bg-red-500 text-white border-red-600' : 'border-red-200 text-red-700 hover:bg-red-50'}`}><XCircle className="w-4 h-4" /> Missed</button>
-                            </div>
-                          </div>
-                        ))}
+                          ))
+                        )}
                       </div>
                     </div>
                   ))
