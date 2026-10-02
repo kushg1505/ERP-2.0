@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "ERP 2.0",
-  description: "Personalized timetable and clash management for MBA students.",
+  description: "Personalized timetable and clash management made exclusively for IMT Ghaziabad students.",
 };
 
 export default function RootLayout({
@@ -72,7 +72,7 @@ export default function RootLayout({
                       <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">ERP 2.0</span>
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Intelligent Timetable & Clash Management for MBA Students.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Intelligent Timetable & Clash Management, made exclusively for IMT Ghaziabad students.</p>
                   </div>
 
                   <div className="flex flex-col items-center md:items-end text-center md:text-right">
