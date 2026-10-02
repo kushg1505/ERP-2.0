@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { getStudentProfile, saveStudentProfile, StudentProfile, fetchAllCourses, getStudentFromMasterDB } from "@/lib/db";
-import { Save, RefreshCw, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Save, RefreshCw, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const AVAILABLE_SECTIONS = ["A", "B", "C", "D", "E", "F"];
 const BFS_FIXED_COURSES = ["MLBFSI", "FIS", "VCPE", "HRM", "BFSI&STY"];
@@ -73,7 +74,8 @@ export default function ProfilePage() {
     setProfile(finalProfile);
     setSaving(false);
     setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    // Don't auto hide the saved state immediately, give them time to click the dashboard link
+    setTimeout(() => setSaved(false), 8000);
   };
 
   const handleSyncDatabase = async () => {
@@ -234,7 +236,13 @@ export default function ProfilePage() {
         )}
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex flex-col sm:flex-row justify-end items-center gap-4 pt-4">
+        {saved && (
+          <Link href="/dashboard" className="text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-emerald-100 hover:shadow-lg hover:shadow-emerald-500/20">
+            <CheckCircle2 className="w-5 h-5" />
+            Profile Saved! Go to Dashboard <ArrowRight className="w-5 h-5" />
+          </Link>
+        )}
         <button 
           onClick={handleSave} 
           disabled={saving}

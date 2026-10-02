@@ -3,9 +3,12 @@
 import { useAuth } from "@/lib/AuthContext";
 import { User, LogIn, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 
 export function AuthButton() {
   const { user, signInWithGoogle, logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
 
   if (user) {
     return (
@@ -20,8 +23,15 @@ export function AuthButton() {
     );
   }
 
+  const handleSignIn = async () => {
+    await signInWithGoogle();
+    if (pathname === "/") {
+      router.push("/profile");
+    }
+  };
+
   return (
-    <button onClick={signInWithGoogle} className="btn-primary flex items-center gap-2 text-sm px-4 py-2">
+    <button onClick={handleSignIn} className="btn-primary flex items-center gap-2 text-sm px-4 py-2">
       <LogIn className="h-4 w-4" />
       Sign In
     </button>

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { getStudentFromMasterDB, fetchMasterTimetable, fetchAvailableWeeks } from "@/lib/db";
 import { RefreshCw, Download, Calendar, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/lib/AuthContext";
+import { useRouter } from "next/navigation";
 
 const AVAILABLE_SECTIONS = ["A", "B", "C", "D", "E", "F"];
 const BFS_FIXED_COURSES = ["MLBFSI", "FIS", "VCPE", "HRM", "BFSI&STY"];
@@ -24,6 +26,9 @@ interface ParsedClass {
 }
 
 export default function QuickSchedule() {
+  const { user, signInWithGoogle } = useAuth();
+  const router = useRouter();
+
   const [step, setStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -183,7 +188,11 @@ export default function QuickSchedule() {
           <button onClick={() => setStep(1)} className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-medium px-4 py-2">&larr; Back to setup</button>
           <div className="flex items-center gap-3">
              <button onClick={handlePrint} className="btn-secondary px-6 py-2.5 rounded-lg font-medium flex items-center gap-2"><Download className="w-4 h-4"/> Download PDF</button>
-             <Link href="/dashboard" className="btn-primary px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">Sign In to Edit <ArrowRight className="w-4 h-4"/></Link>
+             {user ? (
+               <Link href="/dashboard" className="btn-primary px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">Go to Dashboard <ArrowRight className="w-4 h-4"/></Link>
+             ) : (
+               <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="btn-primary px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">Sign In to Edit <ArrowRight className="w-4 h-4"/></button>
+             )}
           </div>
         </div>
 
@@ -371,19 +380,35 @@ export default function QuickSchedule() {
       </div>
 
       {/* CTA Side */}
-      <div className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-10 text-white shadow-2xl shadow-blue-900/20 flex flex-col justify-center items-start text-left gap-6 transform transition-all hover:scale-[1.01]">
-        <div className="space-y-4">
-          <h2 className="text-3xl font-extrabold leading-tight">
-            Unlock the Full Experience
-          </h2>
-          <p className="text-blue-100 text-lg leading-relaxed">
-            Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
-          </p>
+      {!user ? (
+        <div className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-10 text-white shadow-2xl shadow-blue-900/20 flex flex-col justify-center items-start text-left gap-6 transform transition-all hover:scale-[1.01]">
+          <div className="space-y-4">
+            <h2 className="text-3xl font-extrabold leading-tight">
+              Unlock the Full Experience
+            </h2>
+            <p className="text-blue-100 text-lg leading-relaxed">
+              Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
+            </p>
+          </div>
+          <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="bg-white text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full justify-center">
+            Create Free Account <ArrowRight className="w-5 h-5" />
+          </button>
         </div>
-        <Link href="/dashboard" className="bg-white text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full justify-center">
-          Create Free Account <ArrowRight className="w-5 h-5" />
-        </Link>
-      </div>
+      ) : (
+        <div className="lg:col-span-2 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 md:p-10 text-white shadow-2xl shadow-emerald-900/20 flex flex-col justify-center items-start text-left gap-6 transform transition-all hover:scale-[1.01]">
+          <div className="space-y-4">
+            <h2 className="text-3xl font-extrabold leading-tight">
+              Welcome back!
+            </h2>
+            <p className="text-emerald-100 text-lg leading-relaxed">
+              Head over to your Dashboard to view your personalized schedule, manage attendance, and check for any clashes.
+            </p>
+          </div>
+          <Link href="/dashboard" className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full justify-center">
+            Go to Dashboard <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      )}
 
     </div>
   );
