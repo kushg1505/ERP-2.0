@@ -411,7 +411,7 @@ export default function DashboardPage() {
           <section>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 className="text-2xl font-bold flex items-center gap-4">My Schedule {isEditMode && <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full animate-pulse">EDIT MODE</span>}</h2>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <button onClick={() => window.print()} className="no-print btn-secondary px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
                    <Download className="w-4 h-4"/> Download PDF
                 </button>
