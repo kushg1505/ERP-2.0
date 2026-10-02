@@ -480,7 +480,7 @@ export default function DashboardPage() {
                           <span className="font-bold text-base">{day.split(',')[0]}</span>
                         </td>
                         {(() => {
-                          const isSSRThursday = p?.program === "2nd-core" && day.toLowerCase().includes("thursday");
+                          const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
                           const cells = [];
                           let ssrStarted = false;
                           const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
