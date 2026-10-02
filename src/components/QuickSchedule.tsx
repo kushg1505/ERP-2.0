@@ -136,14 +136,20 @@ export default function QuickSchedule() {
       });
 
       const parseTime = (slot: string) => {
-        const match = slot.match(/(\d+):(\d+)\s*(am|pm)/i);
-        if (!match) return 0;
-        let hours = parseInt(match[1]);
-        const mins = parseInt(match[2]);
-        const ampm = match[3].toLowerCase();
-        if (ampm === 'pm' && hours < 12) hours += 12;
-        if (ampm === 'am' && hours === 12) hours = 0;
-        return hours + mins / 60;
+        const ampmMatch = slot.match(/(\d+):(\d+)\s*(am|pm)/i);
+        if (ampmMatch) {
+          let hours = parseInt(ampmMatch[1]);
+          const mins = parseInt(ampmMatch[2]);
+          const ampm = ampmMatch[3].toLowerCase();
+          if (ampm === 'pm' && hours < 12) hours += 12;
+          if (ampm === 'am' && hours === 12) hours = 0;
+          return hours + mins / 60;
+        }
+        const timeMatch = slot.match(/(\d+):(\d+)/);
+        if (timeMatch) {
+          return parseInt(timeMatch[1]) + parseInt(timeMatch[2]) / 60;
+        }
+        return 0;
       };
       
       const sortedSlots = Array.from(slotsSet).sort((a, b) => parseTime(a) - parseTime(b));
