@@ -187,7 +187,7 @@ export default function QuickSchedule() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden print-no-border print-scale">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden print-no-border">
           <div className="p-6 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-center print-header">
              <div>
                 <h2 className="text-2xl font-bold">My Quick Schedule</h2>
@@ -206,14 +206,14 @@ export default function QuickSchedule() {
             <table className="w-full text-left border-collapse min-w-[800px] xl:min-w-0">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-950 print-bg-gray">
-                  <th className="p-4 print:p-2 font-semibold text-slate-500 w-28 print:w-20 border-r border-b border-slate-200 sticky left-0 bg-slate-50 z-20 text-sm print-no-sticky">Day / Time</th>
-                  {allTimeSlots.map(slot => <th key={slot} className="p-3 print:p-2 font-bold text-slate-800 border-r border-b border-slate-200 text-center bg-slate-50 text-sm print-no-sticky">{slot}</th>)}
+                  <th className="p-4 font-semibold text-slate-500 w-28 border-r border-b border-slate-200 sticky left-0 bg-slate-50 z-20 text-sm print-no-sticky">Day / Time</th>
+                  {allTimeSlots.map(slot => <th key={slot} className="p-3 font-bold text-slate-800 border-r border-b border-slate-200 text-center bg-slate-50 text-sm print-no-sticky">{slot}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {allDays.map(day => (
                   <tr key={day} className="border-b border-slate-200">
-                    <td className="p-4 print:p-2 font-medium text-sm text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-50 sticky left-0 z-10 print-no-sticky">
+                    <td className="p-4 font-medium text-sm text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-50 sticky left-0 z-10 print-no-sticky">
                       <span className="font-bold text-base block">{day.split(',')[0]}</span>
                       <span className="text-xs text-slate-500">{day.split(',')[1]?.trim()}</span>
                     </td>
@@ -235,9 +235,9 @@ export default function QuickSchedule() {
                              const ssrColSpan = j - i;
                              
                              cells.push(
-                               <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 print:p-1 border-r border-slate-200 align-middle bg-slate-50/50 print-bg-gray">
-                                  <div className="flex items-center justify-center h-full min-h-[4rem] print:min-h-0">
-                                    <span className="font-bold text-slate-700 tracking-widest text-lg print:text-base bg-white px-8 py-2 print:px-4 print:py-1 rounded-full border border-slate-200 shadow-sm print-no-shadow">
+                               <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 align-middle bg-slate-50/50 print-bg-gray">
+                                  <div className="flex items-center justify-center h-full min-h-[4rem]">
+                                    <span className="font-bold text-slate-700 tracking-widest text-lg bg-white px-8 py-2 rounded-full border border-slate-200 shadow-sm print-no-shadow">
                                       SSR Visit
                                     </span>
                                   </div>
@@ -246,24 +246,24 @@ export default function QuickSchedule() {
                              i = j - 1; // skip the handled slots
                            } else {
                              cells.push(
-                               <td key={slot} className="p-3 print:p-1 border-r border-slate-200">
-                                 <div className="min-h-[4rem] print:min-h-0 w-full" />
+                               <td key={slot} className="p-3 border-r border-slate-200">
+                                 <div className="min-h-[4rem] w-full" />
                                </td>
                              );
                            }
                         } else {
                           cells.push(
-                            <td key={slot} className="p-3 print:p-1 border-r border-slate-200 align-top">
+                            <td key={slot} className="p-3 border-r border-slate-200 align-top">
                               {classesInSlot.length === 0 ? (
-                                <div className="min-h-[4rem] print:min-h-0 w-full" />
+                                <div className="min-h-[4rem] w-full" />
                               ) : (
-                                <div className="flex flex-col gap-2 print:gap-1 h-full">
+                                <div className="flex flex-col gap-2 h-full">
                                   {classesInSlot.map((cls, idx) => (
-                                    <div key={idx} className="p-3 print:p-1.5 rounded-xl print:rounded-lg border border-slate-200 bg-white shadow-sm print-no-shadow">
-                                      <div className="font-bold text-sm print:text-xs text-slate-900 leading-tight">
+                                    <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-white shadow-sm print-no-shadow">
+                                      <div className="font-bold text-sm text-slate-900 leading-tight">
                                         {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
                                       </div>
-                                      <div className="text-xs print:text-[10px] text-slate-500 flex items-center justify-between mt-2 pt-2 print:mt-1 print:pt-1 border-t border-slate-100">
+                                      <div className="text-xs text-slate-500 flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
                                         <span>{cls.venue || 'TBA'}</span>
                                         <span className="font-bold text-blue-600">Sec {cls.section}</span>
                                       </div>

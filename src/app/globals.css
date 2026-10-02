@@ -72,9 +72,6 @@ body {
     margin: 1cm;
     size: landscape;
   }
-  .print-scale {
-    zoom: 0.70;
-  }
   body {
     background: white;
     color: black;
