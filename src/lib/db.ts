@@ -48,8 +48,9 @@ export async function getStudentFromMasterDB(rollNo: string) {
       return docSnap.data();
     }
     return null;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching student from master DB", error);
+    if (error.code === 'permission-denied') throw new Error("Firebase Permission Denied: Allow read access to 'students' collection in Firestore Rules.");
     return null;
   }
 }
@@ -86,8 +87,11 @@ export async function fetchAvailableWeeks(program: string = "2nd-core"): Promise
       const numB = parseInt(b.split("-")[1]) || 0;
       return numA - numB;
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching available weeks", error);
+    if (error.code === 'permission-denied') {
+      throw new Error("Firebase Permission Denied: You need to allow read access in Firestore Rules.");
+    }
     return [];
   }
 }
@@ -110,8 +114,9 @@ export async function fetchMasterTimetable(weekId: string, program: string = "2n
       return docSnap.data().classes || [];
     }
     return [];
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching timetable", error);
+    if (error.code === 'permission-denied') throw new Error(`Firebase Permission Denied: Allow read access to 'master_schedules_${program}' collection in Firestore Rules.`);
     return [];
   }
 }
