@@ -149,6 +149,24 @@ export default function DashboardPage() {
           if (cls.timeSlot && cls.timeSlot.trim() !== "") slotsSet.add(cls.timeSlot);
         });
 
+        if (p.program === "2nd-core") {
+           const hasThursday = Array.from(daysSet).some(d => d.toLowerCase().includes("thursday"));
+           if (!hasThursday && daysSet.size > 0) {
+              const anyDay = Array.from(daysSet)[0];
+              const dateStr = anyDay.split(',')[1]?.trim();
+              let thursdayStr = "Thursday";
+              if (dateStr) {
+                 const d = new Date(dateStr);
+                 if (!isNaN(d.getTime())) {
+                    const diff = 4 - d.getDay();
+                    d.setDate(d.getDate() + diff);
+                    thursdayStr = `Thursday, ${d.toISOString().split('T')[0]}`;
+                 }
+              }
+              daysSet.add(thursdayStr);
+           }
+        }
+
         // Sort time slots chronologically
         const parseTime = (slot: string) => {
           const match = slot.match(/(\d+):(\d+)\s*(am|pm)/i);

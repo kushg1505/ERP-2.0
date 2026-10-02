@@ -86,7 +86,25 @@ export default function QuickSchedule() {
       // Add SSR Visit for 2nd core
       if (program === "2nd-core") {
         const uniqueDays = Array.from(new Set(master.map(c => c.day))).filter(Boolean);
-        const thursdays = uniqueDays.filter(d => d.toLowerCase().includes("thursday"));
+        
+        let thursdays = uniqueDays.filter(d => d.toLowerCase().includes("thursday"));
+        
+        // If Thursday is completely missing from the master timetable, synthesize it
+        if (thursdays.length === 0 && uniqueDays.length > 0) {
+           const anyDay = uniqueDays[0];
+           const dateStr = anyDay.split(',')[1]?.trim();
+           let thursdayStr = "Thursday";
+           if (dateStr) {
+              const d = new Date(dateStr);
+              if (!isNaN(d.getTime())) {
+                 const diff = 4 - d.getDay(); // 4 is Thursday
+                 d.setDate(d.getDate() + diff);
+                 thursdayStr = `Thursday, ${d.toISOString().split('T')[0]}`;
+              }
+           }
+           thursdays.push(thursdayStr);
+        }
+
         thursdays.forEach(day => {
           filtered.push({
              courseAbb: "SSR",
@@ -107,6 +125,12 @@ export default function QuickSchedule() {
       const slotsSet = new Set<string>();
       
       master.forEach((cls) => {
+        if (cls.day && cls.day.trim() !== "") daysSet.add(cls.day);
+        if (cls.timeSlot && cls.timeSlot.trim() !== "") slotsSet.add(cls.timeSlot);
+      });
+      
+      // Also add days and slots from our filtered list in case we injected any custom ones
+      filtered.forEach((cls) => {
         if (cls.day && cls.day.trim() !== "") daysSet.add(cls.day);
         if (cls.timeSlot && cls.timeSlot.trim() !== "") slotsSet.add(cls.timeSlot);
       });
