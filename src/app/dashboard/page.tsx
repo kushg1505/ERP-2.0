@@ -403,11 +403,11 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-x-auto mt-6">
-                <table className="w-full text-left border-collapse min-w-[800px]">
+                <table className="w-full text-left border-collapse xl:table-fixed min-w-[800px] xl:min-w-0">
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-950">
-                      <th className="p-4 font-semibold text-slate-500 dark:text-slate-400 w-40 border-r border-b border-slate-200 dark:border-slate-800 sticky left-0 bg-slate-50 dark:bg-slate-950 z-20 shadow-[1px_0_0_0_#e2e8f0] dark:shadow-[1px_0_0_0_#1e293b]">Day / Time</th>
-                      {allTimeSlots.map(slot => <th key={slot} className="p-4 font-bold text-slate-800 dark:text-slate-200 border-r border-b border-slate-200 dark:border-slate-800 min-w-[200px] text-center bg-slate-50 dark:bg-slate-950">{slot}</th>)}
+                      <th className="p-4 font-semibold text-slate-500 dark:text-slate-400 w-24 md:w-32 xl:w-28 border-r border-b border-slate-200 dark:border-slate-800 sticky left-0 bg-slate-50 dark:bg-slate-950 z-20 shadow-[1px_0_0_0_#e2e8f0] dark:shadow-[1px_0_0_0_#1e293b] text-sm">Day / Time</th>
+                      {allTimeSlots.map(slot => <th key={slot} className="p-2 md:p-4 font-bold text-slate-800 dark:text-slate-200 border-r border-b border-slate-200 dark:border-slate-800 text-center bg-slate-50 dark:bg-slate-950 text-sm md:text-base">{slot}</th>)}
                     </tr>
                   </thead>
                   <tbody>
