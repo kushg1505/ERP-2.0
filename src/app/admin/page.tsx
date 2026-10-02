@@ -14,55 +14,61 @@ export default function AdminDashboard() {
   const [timetableStatus, setTimetableStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [clashStatus, setClashStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
 
-  const handleTimetableUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTimetableUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     setTimetableStatus("uploading");
     
-    Papa.parse(file, {
-      header: false,
-      skipEmptyLines: true,
-      complete: async (results) => {
-        try {
-          const rows = results.data as string[][];
-          
-          // Detect offset headers (e.g. if the first few rows are Titles instead of column names)
-          let headerRowIndex = -1;
-          for (let i = 0; i < Math.min(10, rows.length); i++) {
-             const rowVals = rows[i].map(v => String(v).trim().toLowerCase());
-             if (rowVals.includes("day")) {
-                headerRowIndex = i;
-                break;
-             }
-          }
-          
-          if (headerRowIndex === -1) {
-             throw new Error("Could not find a 'Day' column in the first 10 rows.");
-          }
-          
-          const headers = rows[headerRowIndex].map(h => String(h).trim());
-          
-          const rawData = rows.slice(headerRowIndex + 1).map(row => {
-             const obj: any = {};
-             row.forEach((val, index) => {
-                const header = headers[index];
-                if (header && header !== "") {
-                   obj[header] = val;
-                }
-             });
-             return obj;
-          });
+    try {
+       const reader = new FileReader();
+       reader.onload = async (e) => {
+         try {
+           const data = e.target?.result;
+           const workbook = (await import("xlsx")).read(data, { type: "array" });
+           const sheetName = workbook.SheetNames[0];
+           const worksheet = workbook.Sheets[sheetName];
+           const rows = (await import("xlsx")).utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+           
+           // Detect offset headers (e.g. if the first few rows are Titles instead of column names)
+           let headerRowIndex = -1;
+           for (let i = 0; i < Math.min(10, rows.length); i++) {
+              const rowVals = rows[i].map(v => String(v).trim().toLowerCase());
+              if (rowVals.includes("day")) {
+                 headerRowIndex = i;
+                 break;
+              }
+           }
+           
+           if (headerRowIndex === -1) {
+              throw new Error("Could not find a 'Day' column in the first 10 rows.");
+           }
+           
+           const headers = rows[headerRowIndex].map(h => String(h).trim());
+           
+           const rawData = rows.slice(headerRowIndex + 1).map(row => {
+              const obj: any = {};
+              row.forEach((val, index) => {
+                 const header = headers[index];
+                 if (header && header !== "") {
+                    obj[header] = val;
+                 }
+              });
+              return obj;
+           });
 
-          const parsedClasses = parseScheduleCSV(rawData);
-          await saveMasterTimetable(selectedWeek, selectedProgram, parsedClasses);
-          setTimetableStatus("success");
-        } catch (error) {
-          console.error(error);
-          setTimetableStatus("error");
-        }
-      },
-      error: () => setTimetableStatus("error")
-    });
+           const parsedClasses = parseScheduleCSV(rawData);
+           await saveMasterTimetable(selectedWeek, selectedProgram, parsedClasses);
+           setTimetableStatus("success");
+         } catch (error) {
+           console.error(error);
+           setTimetableStatus("error");
+         }
+       };
+       reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error(error);
+      setTimetableStatus("error");
+    }
   };
 
   const handleClashUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,11 +184,11 @@ export default function AdminDashboard() {
             <UploadCloud className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h2 className="text-xl font-semibold">Master Timetable</h2>
-          <p className="text-sm text-slate-500 mb-4">Upload the converted CSV of the weekly schedule.</p>
+          <p className="text-sm text-slate-500 mb-4">Upload the Master Timetable (.csv or .xlsx).</p>
           
           <label className="btn-primary cursor-pointer w-full text-center hover-lift relative overflow-hidden">
-            <input type="file" accept=".csv" className="hidden" onChange={handleTimetableUpload} />
-            {timetableStatus === "uploading" ? "Parsing..." : "Upload Timetable CSV"}
+            <input type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={handleTimetableUpload} />
+            {timetableStatus === "uploading" ? "Parsing..." : "Upload Timetable"}
           </label>
           
           {timetableStatus === "success" && <p className="text-emerald-500 text-sm flex items-center gap-1"><CheckCircle2 className="w-4 h-4"/> Successfully uploaded!</p>}
