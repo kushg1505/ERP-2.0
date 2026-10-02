@@ -16,7 +16,23 @@ export default function Home() {
 
       <QuickSchedule />
 
-      <div className="grid md:grid-cols-3 gap-8 mt-12 max-w-5xl w-full text-left no-print">
+      <div className="mt-12 max-w-4xl w-full no-print">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-10 text-white shadow-2xl shadow-blue-900/20 flex flex-col md:flex-row items-center justify-between gap-8 transform transition-all hover:scale-[1.01]">
+          <div className="text-left space-y-3 flex-1">
+            <h2 className="text-2xl md:text-3xl font-extrabold flex items-center gap-3">
+              Unlock the Full Experience
+            </h2>
+            <p className="text-blue-100 text-lg">
+              Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
+            </p>
+          </div>
+          <Link href="/dashboard" className="shrink-0 bg-white text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0">
+            Create Free Account <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-8 mt-16 max-w-5xl w-full text-left no-print">
         <div className="glass-panel p-6 rounded-2xl hover-lift">
           <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center mb-4">
             <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
