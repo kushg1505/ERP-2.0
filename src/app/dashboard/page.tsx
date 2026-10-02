@@ -422,7 +422,7 @@ export default function DashboardPage() {
                                 </div>
                                 <div className="w-px h-12 bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
                                 <div>
-                                  <h4 className="font-bold text-lg">{cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''} - {cls.courseName}</h4>
+                                  <h4 className="font-bold text-lg">{cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}{cls.courseName ? ` - ${cls.courseName}` : ''}</h4>
                                   <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
                                     <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/> {cls.venue || 'TBA'}</span>
                                     {cls.faculty && <span className="flex items-center gap-1">Prof. {cls.faculty}</span>}
