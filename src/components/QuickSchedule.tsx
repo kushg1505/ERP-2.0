@@ -187,11 +187,17 @@ export default function QuickSchedule() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden print-no-border">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden print-no-border print-scale">
           <div className="p-6 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-center print-header">
              <div>
                 <h2 className="text-2xl font-bold">My Quick Schedule</h2>
-                <p className="text-slate-400 text-sm mt-1">{activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} • {year} Year {spec.toUpperCase()}</p>
+                <div className="mt-3 flex items-center gap-3">
+                   <span className="font-extrabold text-xl text-blue-400 bg-blue-900/40 px-3 py-1 rounded-lg border border-blue-800/50 print:text-blue-700 print:bg-blue-50 print:border-blue-200">
+                     {activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                   </span> 
+                   <span className="text-slate-500">•</span> 
+                   <span className="font-medium text-slate-300 print:text-slate-600">{year} Year {spec.toUpperCase()}</span>
+                </div>
              </div>
              {rollNo && <div className="text-slate-400 font-medium">Roll No: {rollNo}</div>}
           </div>
