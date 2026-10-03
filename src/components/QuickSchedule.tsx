@@ -429,7 +429,7 @@ export default function QuickSchedule() {
                             </div>
                             <div className="flex-shrink-0">
                               <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold text-sm px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800/50 print:bg-transparent print:border-blue-300 print:text-blue-600">
-                                Sec {cls.section}
+                                {cls.courseAbb.startsWith('DTI') && cls.dtiGroup ? `Group ${cls.dtiGroup}` : `Sec ${cls.section}`}
                               </span>
                             </div>
                           </div>

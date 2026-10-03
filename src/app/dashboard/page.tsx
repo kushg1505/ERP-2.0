@@ -645,7 +645,7 @@ export default function DashboardPage() {
                                           </div>
                                           <div className="mt-1 md:mt-2 print:mt-1 flex">
                                              <span className={`font-bold text-[8px] md:text-xs print:text-[7px] px-1.5 md:px-2.5 py-0.5 md:py-1 print:px-1 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : isMissed ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-100/50'}`}>
-                                               Sec {cls.section}
+                                               {cls.courseAbb.startsWith('DTI') && cls.dtiGroup ? `Group ${cls.dtiGroup}` : `Sec ${cls.section}`}
                                              </span>
                                           </div>
                                         </div>
@@ -730,7 +730,7 @@ export default function DashboardPage() {
                           <div className="flex flex-col gap-3 shrink-0">
                             <div className="flex items-center justify-end gap-2">
                                <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold text-sm px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800/50">
-                                 Sec {cls.section}
+                                 {cls.courseAbb.startsWith('DTI') && cls.dtiGroup ? `Group ${cls.dtiGroup}` : `Sec ${cls.section}`}
                                </span>
                             </div>
 
