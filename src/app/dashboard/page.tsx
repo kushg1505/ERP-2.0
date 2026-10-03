@@ -421,123 +421,66 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {viewMode === "list" ? (
-              <div className="space-y-8 mt-6">
-                {schedule.length === 0 ? (
-                  <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl p-12 text-center border border-slate-100 dark:border-slate-800">
-                    <p className="text-slate-500">No classes scheduled for this week.</p>
-                  </div>
-                ) : (
-                  schedule.map((dayPlan, idx) => (
-                    <div key={idx} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                      <div className="bg-slate-900 dark:bg-slate-950 px-6 py-4"><h3 className="font-bold text-white">{dayPlan.day}</h3></div>
-                      <div className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                        {dayPlan.classes.length === 0 ? (
-                          <div className="p-8 text-center text-slate-500 font-medium">
-                            No classes scheduled for this day.
-                          </div>
-                        ) : (
-                          dayPlan.classes.map((cls, cIdx) => {
-                            let isFuture = false;
-                            const dateStr = cls.date || (cls.day ? cls.day.split(',')[1]?.trim() : "");
-                            const endTimeStr = cls.endTime || (cls.timeSlot ? cls.timeSlot.split('-')[1]?.trim() : "");
-                            if (dateStr && endTimeStr) {
-                               const endDateTime = new Date(`${dateStr}T${endTimeStr}:00+05:30`).getTime();
-                               isFuture = Date.now() < endDateTime;
-                            }
-                            
-                            return (
-                            <div key={cIdx} className={`p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isFuture ? 'opacity-70' : ''}`}>
-                              <div className="flex items-center gap-6">
-                                <div className="w-24 text-right shrink-0">
-                                  <span className="text-sm font-medium block text-slate-700 dark:text-slate-300">{cls.timeSlot}</span>
-                                </div>
-                                <div className="w-px h-12 bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
-                                <div>
-                                  <h4 className="font-bold text-lg">{cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}{cls.courseName ? ` - ${cls.courseName}` : ''}</h4>
-                                  <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
-                                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4"/> {cls.venue || 'TBA'}</span>
-                                    {cls.faculty && <span className="flex items-center gap-1">Prof. {cls.faculty}</span>}
-                                    {cls.section && cls.section !== "All" && <span className="font-bold text-blue-600 bg-blue-100 px-2 rounded-full">Sec {cls.section}</span>}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex gap-3 mt-4 md:mt-0">
-                                {cls.courseAbb !== "SSR" && (
-                                  isFuture ? (
-                                    <span className="text-xs font-bold text-slate-500 bg-slate-200 dark:bg-slate-800 px-4 py-2 rounded-xl uppercase tracking-wider flex items-center gap-1.5"><Calendar className="w-4 h-4"/> Upcoming Class</span>
-                                  ) : (
-                                    <>
-                                      <button onClick={() => handleAttendance(getClassId(cls), "attended")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'attended' ? 'bg-emerald-500 text-white border-emerald-600' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}><CheckCircle2 className="w-4 h-4" /> Attended</button>
-                                      <button onClick={() => handleAttendance(getClassId(cls), "missed")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'missed' ? 'bg-red-500 text-white border-red-600' : 'border-red-200 text-red-700 hover:bg-red-50'}`}><XCircle className="w-4 h-4" /> Missed</button>
-                                    </>
-                                  )
-                                )}
-                              </div>
-                            </div>
-                          )})
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            ) : (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-x-auto mt-6">
-                <table className="w-full text-left border-collapse xl:table-fixed min-w-[800px] xl:min-w-0">
-                  <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-950">
-                      <th className="p-4 font-semibold text-slate-500 dark:text-slate-400 w-24 md:w-32 xl:w-28 border-r border-b border-slate-200 dark:border-slate-800 sticky left-0 bg-slate-50 dark:bg-slate-950 z-20 shadow-[1px_0_0_0_#e2e8f0] dark:shadow-[1px_0_0_0_#1e293b] text-sm">Day / Time</th>
-                      {allTimeSlots.map(slot => <th key={slot} className="p-2 md:p-4 font-bold text-slate-800 dark:text-slate-200 border-r border-b border-slate-200 dark:border-slate-800 text-center bg-slate-50 dark:bg-slate-950 text-sm md:text-base">{slot}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {allDays.map(day => (
-                      <tr key={day} className="border-b border-slate-200 dark:border-slate-800 last:border-0 group">
-                        <td className="p-4 font-medium text-sm text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800 whitespace-nowrap bg-slate-50 dark:bg-slate-950 sticky left-0 z-10 shadow-[1px_0_0_0_#e2e8f0] dark:shadow-[1px_0_0_0_#1e293b]">
-                          <span className="font-bold text-base">{day.split(',')[0]}</span>
-                        </td>
-                        {(() => {
-                          const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
-                          const cells = [];
-                          let ssrStarted = false;
-                          const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
-                          
-                          for (let i = 0; i < allTimeSlots.length; i++) {
-                            const slot = allTimeSlots[i];
-                            const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
-                            
-                            if (isSSRThursday && !slotHasClass[i]) {
-                               if (!ssrStarted) {
-                                 ssrStarted = true;
-                                 let j = i;
-                                 while (j < allTimeSlots.length && !slotHasClass[j]) j++;
-                                 const ssrColSpan = j - i;
-                                 
-                                 cells.push(
-                                   <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 dark:border-slate-800 align-middle bg-slate-50/50 dark:bg-slate-900/50">
-                                      <div className="flex items-center justify-center h-full min-h-[5rem]">
-                                        <span className="font-bold text-slate-700 dark:text-slate-300 tracking-widest text-lg bg-white dark:bg-slate-800 px-8 py-2 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
-                                          SSR Visit
-                                        </span>
-                                      </div>
-                                   </td>
-                                 );
-                                 i = j - 1; // skip the handled slots
-                               } else {
-                                 cells.push(
-                                   <td key={slot} className="p-3 border-r border-slate-200 dark:border-slate-800">
-                                     <div className="h-full w-full min-h-[5rem]" />
-                                   </td>
-                                 );
-                               }
-                            } else {
-                              cells.push(
-                                <td key={slot} className="p-3 border-r border-slate-200 dark:border-slate-800 align-top group-hover:bg-slate-50/50 dark:group-hover:bg-slate-800/30 transition-colors">
-                                  {classesInSlot.length === 0 ? (
-                                    <div className="h-full w-full min-h-[5rem] flex items-center justify-center">
-                                      {isEditMode && (
-                                        <button onClick={() => {
+            {/* Table View (Hidden on screen if in list mode, ALWAYS visible on print) */}
+            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-visible border border-slate-200 print:border-slate-200 mt-6 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
+               <table className="w-full text-left border-collapse bg-white min-w-[800px] xl:min-w-0">
+                 <thead>
+                   <tr>
+                     <th className="p-4 print:p-2 font-bold text-white w-32 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print:text-xs print-no-sticky text-center">Day / Time</th>
+                     {allTimeSlots.map(slot => <th key={slot} className="p-3 print:p-2 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-sm print:text-xs print-no-sticky">{slot}</th>)}
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {allDays.map(day => (
+                     <tr key={day} className="border-t border-slate-200 print:border-slate-200">
+                       <td className="p-4 print:p-2 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-slate-900 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center">
+                         <span className="font-extrabold text-base print:text-sm block text-blue-900">{day.split(',')[0]}</span>
+                         <span className="text-xs font-medium text-slate-500 mt-1 block print:mt-0">{day.split(',')[1]?.trim()}</span>
+                       </td>
+                       {(() => {
+                         const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
+                         const cells = [];
+                         let ssrStarted = false;
+                         const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
+                         
+                         for (let i = 0; i < allTimeSlots.length; i++) {
+                           const slot = allTimeSlots[i];
+                           const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
+                           
+                           if (isSSRThursday && !slotHasClass[i]) {
+                              if (!ssrStarted) {
+                                ssrStarted = true;
+                                let j = i;
+                                while (j < allTimeSlots.length && !slotHasClass[j]) j++;
+                                const ssrColSpan = j - i;
+                                
+                                cells.push(
+                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 print:p-2 border-r border-slate-200 print:border-slate-200 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[3rem] bg-amber-50 rounded-xl border border-amber-100/50 mx-1">
+                                       <div className="flex items-center gap-2">
+                                          <Users className="w-5 h-5 print:w-4 print:h-4 text-amber-500" />
+                                          <span className="font-extrabold text-slate-800 tracking-wide text-lg print:text-sm">
+                                            SSR Visit
+                                          </span>
+                                       </div>
+                                     </div>
+                                  </td>
+                                );
+                                i = j - 1; 
+                              } else {
+                                cells.push(
+                                  <td key={slot} className="p-3 print:p-2 border-r border-slate-200 print:border-slate-200">
+                                    <div className="min-h-[4.5rem] print:min-h-[3rem] w-full" />
+                                  </td>
+                                );
+                              }
+                           } else {
+                             cells.push(
+                               <td key={slot} className="p-2 sm:p-3 print:p-1.5 border-r border-slate-200 print:border-slate-200 align-top bg-white relative">
+                                 {classesInSlot.length === 0 ? (
+                                   <div className="min-h-[4.5rem] print:min-h-[3rem] w-full flex items-center justify-center">
+                                     {isEditMode && (
+                                       <button onClick={() => {
                                           setOriginalClassIdToReschedule(null);
                                           setEditForm({
                                             courseAbb: profile?.courses[0]?.courseCode || "NEW",
@@ -552,61 +495,160 @@ export default function DashboardPage() {
                                             date: day.split(',')[1]?.trim() || "2026-10-05"
                                           });
                                           setEditModalOpen(true);
-                                        }} className="w-10 h-10 rounded-full border-2 border-dashed border-blue-300 dark:border-blue-700 text-blue-500 flex items-center justify-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
-                                          <Plus className="w-5 h-5"/>
-                                        </button>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <div className="flex flex-col gap-2 h-full">
-                                      {classesInSlot.map((cls, idx) => {
+                                       }} className="w-10 h-10 rounded-full border-2 border-dashed border-blue-300 dark:border-blue-700 text-blue-500 flex items-center justify-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
+                                         <Plus className="w-5 h-5"/>
+                                       </button>
+                                     )}
+                                   </div>
+                                 ) : (
+                                   <div className="flex flex-col gap-1.5 h-full">
+                                     {classesInSlot.map((cls, idx) => {
                                         const cId = getClassId(cls);
                                         const isAttended = attendance[cId]?.status === 'attended' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'attended';
                                         const isMissed = attendance[cId]?.status === 'missed' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'missed';
-                                        return (
-                                        <div key={idx} className={`p-3 rounded-xl border flex flex-col gap-1 shadow-sm h-full transition-all cursor-default ${isEditMode ? 'ring-2 ring-blue-500/50 hover:shadow-md' : 'hover-lift'} ${isAttended ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10' : isMissed ? 'border-red-300 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'}`}>
-                                          
-                                          {isEditMode ? (
-                                            <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-3 -mt-3 p-2 rounded-t-xl mb-1 border-b border-slate-200 dark:border-slate-700">
-                                              <button onClick={() => openRescheduleModal(cls)} className="p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3.5 h-3.5"/></button>
-                                              <button onClick={() => handleCancelClass(cls)} className="p-1.5 text-red-600 bg-red-100 hover:bg-red-200 rounded-lg dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/60"><Trash2 className="w-3.5 h-3.5"/></button>
-                                            </div>
-                                          ) : (
-                                            <div className="flex justify-between items-start gap-2">
-                                              <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
-                                                {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
-                                              </div>
-                                              {isAttended && <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded leading-none">P</span>}
-                                              {isMissed && <span className="text-[10px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded leading-none">A</span>}
-                                            </div>
-                                          )}
-                                          
-                                          {isEditMode && (
-                                            <div className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
-                                              {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
-                                            </div>
-                                          )}
+                                        
+                                        let cardClasses = "bg-white border-blue-100 border-l-blue-600 shadow-sm";
+                                        if (isEditMode) cardClasses = "bg-white border-blue-300 border-l-blue-600 ring-2 ring-blue-500/30 shadow-md";
+                                        else if (isAttended) cardClasses = "bg-emerald-50/50 border-emerald-200 border-l-emerald-500 shadow-sm";
+                                        else if (isMissed) cardClasses = "bg-red-50/50 border-red-200 border-l-red-500 shadow-sm";
 
-                                          <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between mt-auto pt-2">
-                                            <span>{cls.venue || 'TBA'}</span>
-                                            <span className="font-bold text-blue-600 dark:text-blue-400">Sec {cls.section}</span>
+                                        return (
+                                        <div key={idx} className={`p-2 sm:p-3 print:p-2 rounded-xl print:rounded-lg border-y border-r border-l-4 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
+                                          {isEditMode && (
+                                            <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-2 sm:-mx-3 -mt-2 sm:-mt-3 p-2 rounded-t-xl mb-2 border-b border-slate-200 dark:border-slate-700">
+                                              <button onClick={() => openRescheduleModal(cls)} className="p-1 sm:p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3.5 h-3.5"/></button>
+                                              <button onClick={() => handleCancelClass(cls)} className="p-1 sm:p-1.5 text-red-600 bg-red-100 hover:bg-red-200 rounded-lg dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/60"><Trash2 className="w-3.5 h-3.5"/></button>
+                                            </div>
+                                          )}
+                                          <div>
+                                             <div className="flex justify-between items-start gap-1">
+                                               <div className="font-extrabold text-sm print:text-[11px] text-slate-900 leading-tight">
+                                                 {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
+                                               </div>
+                                               {!isEditMode && isAttended && <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded leading-none">P</span>}
+                                               {!isEditMode && isMissed && <span className="text-[10px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded leading-none">A</span>}
+                                             </div>
+                                             <div className="text-xs print:text-[10px] text-slate-500 mt-1 print:mt-0.5 font-medium">
+                                               {cls.venue || 'TBA'}
+                                             </div>
+                                          </div>
+                                          <div className="mt-2 flex">
+                                             <span className={`font-bold text-[10px] sm:text-xs print:text-[9px] px-2.5 py-1 print:px-1.5 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-blue-300 print:text-blue-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : isMissed ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-100/50'}`}>
+                                               Sec {cls.section}
+                                             </span>
                                           </div>
                                         </div>
                                       )})}
-                                    </div>
-                                  )}
-                                </td>
-                              );
-                            }
-                          }
-                          return cells;
-                        })()}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                                   </div>
+                                 )}
+                               </td>
+                             );
+                           }
+                         }
+                         return cells;
+                       })()}
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+            </div>
+
+            {/* List View (Hidden on screen if in table mode, NEVER visible on print) */}
+            <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
+              {allDays.map(day => {
+                const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
+                const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
+                
+                if (dayClasses.length === 0 && !isSSRThursday) return null;
+
+                return (
+                  <div key={day} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden break-inside-avoid">
+                    <div className="bg-slate-100 dark:bg-slate-800 px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                      <div>
+                        <h3 className="font-extrabold text-slate-800 dark:text-white text-lg">{day.split(',')[0]}</h3>
+                        <span className="text-sm font-medium text-slate-500">{day.split(',')[1]?.trim()}</span>
+                      </div>
+                    </div>
+                    <div className="p-4 sm:p-6 flex flex-col gap-4">
+                      {isSSRThursday && dayClasses.length === 0 && (
+                        <div className="flex items-center gap-4 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30">
+                          <div className="bg-amber-100 dark:bg-amber-800/50 p-3 rounded-lg">
+                            <Users className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                          </div>
+                          <div>
+                            <h4 className="font-extrabold text-slate-800 dark:text-amber-100 text-lg">SSR Visit</h4>
+                            <p className="text-amber-700 dark:text-amber-300/80 text-sm font-medium">All day field visit</p>
+                          </div>
+                        </div>
+                      )}
+                      {dayClasses.map((cls, idx) => {
+                         const cId = getClassId(cls);
+                         const isAttended = attendance[cId]?.status === 'attended' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'attended';
+                         const isMissed = attendance[cId]?.status === 'missed' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'missed';
+                         
+                         let isFuture = false;
+                         const dateStr = cls.date || (cls.day ? cls.day.split(',')[1]?.trim() : "");
+                         const endTimeStr = cls.endTime || (cls.timeSlot ? cls.timeSlot.split('-')[1]?.trim() : "");
+                         if (dateStr && endTimeStr) {
+                            const endDateTime = new Date(`${dateStr}T${endTimeStr}:00+05:30`).getTime();
+                            isFuture = Date.now() < endDateTime;
+                         }
+
+                         return (
+                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-white dark:bg-slate-900 p-4 rounded-xl border border-blue-100 dark:border-slate-700 border-l-4 border-l-blue-500 shadow-sm transition-all hover:shadow-md break-inside-avoid relative">
+                          <div className="flex-shrink-0 min-w-[120px]">
+                            <div className="text-sm font-extrabold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                              <Clock className="w-4 h-4" />
+                              {cls.timeSlot}
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-extrabold text-slate-800 dark:text-white text-lg">
+                              {cls.courseName || 'New Session'} <span className="text-slate-400 font-medium text-sm">({cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''})</span>
+                            </h4>
+                            <div className="flex flex-wrap items-center gap-3 mt-2">
+                              <span className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md">
+                                📍 {cls.venue || 'TBA'}
+                              </span>
+                              <span className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md">
+                                👨‍🏫 {cls.faculty}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col gap-3 shrink-0">
+                            <div className="flex items-center justify-end gap-2">
+                               <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold text-sm px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800/50">
+                                 Sec {cls.section}
+                               </span>
+                            </div>
+
+                            <div className="flex gap-2">
+                              {cls.courseAbb !== "SSR" && !isEditMode && (
+                                isFuture ? (
+                                  <span className="text-xs font-bold text-slate-500 bg-slate-200 dark:bg-slate-800 px-4 py-2 rounded-xl uppercase tracking-wider flex items-center gap-1.5"><Calendar className="w-4 h-4"/> Upcoming</span>
+                                ) : (
+                                  <>
+                                    <button onClick={() => handleAttendance(cId, "attended")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${isAttended ? 'bg-emerald-500 text-white border-emerald-600' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}><CheckCircle2 className="w-4 h-4" /> Attended</button>
+                                    <button onClick={() => handleAttendance(cId, "missed")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${isMissed ? 'bg-red-500 text-white border-red-600' : 'border-red-200 text-red-700 hover:bg-red-50'}`}><XCircle className="w-4 h-4" /> Missed</button>
+                                  </>
+                                )
+                              )}
+                              {isEditMode && (
+                                <>
+                                  <button onClick={() => openRescheduleModal(cls)} className="bg-slate-100 text-blue-600 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5"><Edit3 className="w-3.5 h-3.5"/> Edit</button>
+                                  <button onClick={() => handleCancelClass(cls)} className="bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-100 flex items-center gap-1.5"><Trash2 className="w-3.5 h-3.5"/> Delete</button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )})}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </section>
         </div>
       )}
