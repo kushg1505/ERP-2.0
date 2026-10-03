@@ -91,8 +91,7 @@ export default function QuickSchedule() {
       // Filter master schedule
       const filtered = year === "1st" ? master.filter(cls => {
          if (cls.courseAbb.startsWith('DTI') && spec === 'core') {
-            const gStr = `G-${dtiGroup}`;
-            return cls.section === gStr || cls.section.startsWith(`${gStr}(`) || cls.section.startsWith(`${gStr} `);
+            return cls.dtiGroup === `G-${dtiGroup}`;
          }
          return !cls.section || cls.section.includes(bfsSection);
       }) : master.filter(cls => 

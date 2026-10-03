@@ -132,8 +132,7 @@ export default function DashboardPage() {
           ? master.filter(cls => {
               if (cls.courseAbb.startsWith('DTI') && p.program === '1st-core') {
                  if (!p.dtiGroup) return false;
-                 const gStr = `G-${p.dtiGroup}`;
-                 return cls.section === gStr || cls.section.startsWith(`${gStr}(`) || cls.section.startsWith(`${gStr} `);
+                 return cls.dtiGroup === `G-${p.dtiGroup}`;
               }
               return !cls.section || (p.section && cls.section.includes(p.section));
           })

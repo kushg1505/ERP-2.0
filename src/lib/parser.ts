@@ -9,6 +9,7 @@ export interface ParsedClass {
   faculty: string;
   venue: string;
   sessionNo?: string;
+  dtiGroup?: string;
 }
 
 export function parseScheduleCSV(data: any[]): ParsedClass[] {
@@ -57,6 +58,7 @@ export function parseScheduleCSV(data: any[]): ParsedClass[] {
     
     const venue = String(normalizedRow['venue'] || normalizedRow['room'] || "").trim();
     const sessionNo = String(normalizedRow['sessionno.'] || normalizedRow['sessionno'] || "").trim();
+    const dtiGroup = String(normalizedRow['dtigroup'] || "").trim();
 
     // Only add if it has a course abbreviation
     if (courseAbb) {
@@ -70,7 +72,8 @@ export function parseScheduleCSV(data: any[]): ParsedClass[] {
         section,
         faculty,
         venue,
-        sessionNo
+        sessionNo,
+        dtiGroup
       });
     }
   }
