@@ -30,6 +30,7 @@ export default function QuickSchedule() {
   const router = useRouter();
 
   const [step, setStep] = useState<1 | 2>(1);
+  const [viewMode, setViewMode] = useState<"list" | "table">("list");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -207,12 +208,29 @@ export default function QuickSchedule() {
                 <span className="text-sm font-medium text-slate-500">{new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
              </div>
 
-             {/* Title */}
-             <div className="mb-4 sm:mb-6 relative inline-block">
-                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight print:text-4xl">
-                   <span className="text-slate-900 dark:text-white border-b-4 border-slate-900 dark:border-white pb-1 mr-2">My</span>
-                   <span className="text-blue-600">Quick Schedule</span>
-                </h2>
+             {/* Title & View Toggle */}
+             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-4 sm:mb-6 relative">
+               <div className="relative inline-block">
+                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight print:text-4xl">
+                     <span className="text-slate-900 dark:text-white border-b-4 border-slate-900 dark:border-white pb-1 mr-2">My</span>
+                     <span className="text-blue-600">Quick Schedule</span>
+                  </h2>
+               </div>
+               
+               <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl no-print self-start sm:self-auto">
+                 <button 
+                   onClick={() => setViewMode("list")}
+                   className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${viewMode === "list" ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700 dark:text-slate-400"}`}
+                 >
+                   List View
+                 </button>
+                 <button 
+                   onClick={() => setViewMode("table")}
+                   className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${viewMode === "table" ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700 dark:text-slate-400"}`}
+                 >
+                   Table View
+                 </button>
+               </div>
              </div>
 
              {/* Pills row */}
@@ -240,6 +258,7 @@ export default function QuickSchedule() {
           </div>
           
           <div className="px-4 sm:px-8 pb-4 sm:pb-8 relative z-10 flex-1 print:px-6 print:pb-6 print:flex-none">
+            {viewMode === "table" ? (
             <div className="rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-visible border border-slate-200 print:border-slate-200">
                <table className="w-full text-left border-collapse bg-white min-w-[800px] xl:min-w-0">
                  <thead>
@@ -329,6 +348,79 @@ export default function QuickSchedule() {
               </tbody>
             </table>
           </div>
+          ) : (
+              <div className="flex flex-col gap-6">
+                {allDays.map(day => {
+                  const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
+                  const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
+                  
+                  if (dayClasses.length === 0 && !isSSRThursday) return null;
+
+                  return (
+                    <div key={day} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden print:border-slate-300 print:bg-transparent break-inside-avoid">
+                      <div className="bg-slate-100 dark:bg-slate-800 px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center print:bg-slate-50">
+                        <div>
+                          <h3 className="font-extrabold text-slate-800 dark:text-white text-lg">{day.split(',')[0]}</h3>
+                          <span className="text-sm font-medium text-slate-500">{day.split(',')[1]?.trim()}</span>
+                        </div>
+                      </div>
+                      <div className="p-4 sm:p-6 flex flex-col gap-4">
+                        {isSSRThursday && dayClasses.length === 0 && (
+                          <div className="flex items-center gap-4 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30 print:border-amber-200">
+                            <div className="bg-amber-100 dark:bg-amber-800/50 p-3 rounded-lg print:bg-amber-50">
+                              <Users className="w-6 h-6 text-amber-600 dark:text-amber-400 print:text-amber-600" />
+                            </div>
+                            <div>
+                              <h4 className="font-extrabold text-slate-800 dark:text-amber-100 text-lg print:text-slate-800">SSR Visit</h4>
+                              <p className="text-amber-700 dark:text-amber-300/80 text-sm font-medium print:text-amber-700">All day field visit</p>
+                            </div>
+                          </div>
+                        )}
+                        {isSSRThursday && dayClasses.length > 0 && (
+                          <div className="flex items-center gap-4 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30 print:border-amber-200">
+                            <div className="bg-amber-100 dark:bg-amber-800/50 p-3 rounded-lg print:bg-amber-50">
+                              <Users className="w-6 h-6 text-amber-600 dark:text-amber-400 print:text-amber-600" />
+                            </div>
+                            <div>
+                              <h4 className="font-extrabold text-slate-800 dark:text-amber-100 text-lg print:text-slate-800">SSR Visit</h4>
+                              <p className="text-amber-700 dark:text-amber-300/80 text-sm font-medium print:text-amber-700">Field Visit</p>
+                            </div>
+                          </div>
+                        )}
+                        {dayClasses.map((cls, idx) => (
+                          <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-white dark:bg-slate-900 p-4 rounded-xl border border-blue-100 dark:border-slate-700 border-l-4 border-l-blue-500 shadow-sm transition-all hover:shadow-md break-inside-avoid print:shadow-none print:border-slate-300">
+                            <div className="flex-shrink-0 min-w-[120px]">
+                              <div className="text-sm font-extrabold text-blue-600 dark:text-blue-400 flex items-center gap-2 print:text-blue-600">
+                                <Clock className="w-4 h-4 print:text-blue-600" />
+                                {cls.timeSlot}
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-extrabold text-slate-800 dark:text-white text-lg print:text-slate-800">
+                                {cls.courseName} <span className="text-slate-400 font-medium text-sm">({cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''})</span>
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-3 mt-2">
+                                <span className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md print:bg-slate-50 print:text-slate-600">
+                                  📍 {cls.venue || 'TBA'}
+                                </span>
+                                <span className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md print:bg-slate-50 print:text-slate-600">
+                                  👨‍🏫 {cls.faculty}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0">
+                              <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold text-sm px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800/50 print:bg-transparent print:border-blue-300 print:text-blue-600">
+                                Sec {cls.section}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
         </div>
 
         {/* Print Footer */}
