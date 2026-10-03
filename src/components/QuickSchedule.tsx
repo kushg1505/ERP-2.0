@@ -446,8 +446,9 @@ export default function QuickSchedule() {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in slide-in-from-bottom-8 duration-700 no-print flex flex-col items-center relative">
         <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none z-0 opacity-50"></div>
         
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-end w-full relative z-10">
-          {/* Left Side */}
+        {/* Top Row: Hero Text & Image */}
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full relative z-10 mb-12 sm:mb-16">
+          {/* Left Side: Hero Text */}
           <div className="space-y-8 text-center lg:text-left relative z-10 w-full max-w-xl mx-auto lg:mx-0">
              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold text-sm">
                <GraduationCap className="w-4 h-4" /> Built for IMT Ghaziabad Students
@@ -461,9 +462,21 @@ export default function QuickSchedule() {
              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400">
                No more missing classes or guessing clash resolutions. Get your personalized timetable, clash alerts, and attendance tracking all in one place.
              </p>
+          </div>
+          
+          {/* Right Side: Image */}
+          <div className="relative z-0 flex justify-center lg:justify-end w-full max-w-xl mx-auto lg:mx-0 pointer-events-none">
+             <img src="/hero-light.png" alt="Hero Illustration" className="w-full max-w-lg h-auto dark:hidden drop-shadow-2xl scale-110 object-contain origin-center lg:origin-bottom-right" />
+             <img src="/hero-dark.png" alt="Hero Illustration" className="w-full max-w-lg h-auto hidden dark:block drop-shadow-2xl scale-110 object-contain origin-center lg:origin-bottom-right" />
+          </div>
+        </div>
 
-             <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/50 dark:shadow-none w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl relative z-20 text-left">
-                <div className="flex items-center gap-3 mb-6">
+        {/* Bottom Row: Cards */}
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-stretch w-full relative z-10">
+           {/* Left Card: Generate Quick Schedule */}
+           <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/50 dark:shadow-none w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl relative z-20 text-left flex flex-col h-full">
+              <div className="flex-1">
+                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
@@ -533,29 +546,20 @@ export default function QuickSchedule() {
 
                 {error && <div className="mt-4 text-center text-red-500 font-medium text-sm bg-red-50 dark:bg-red-900/20 py-2 rounded-lg">{error}</div>}
 
-                <button 
+                 <button 
                   onClick={handleGenerate}
                   disabled={loading}
                   className="mt-6 btn-primary w-full py-4 rounded-xl font-bold text-base shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 inline-flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
                 >
                   {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <><Sparkles className="w-5 h-5" /> Generate My Timetable <ArrowRight className="w-5 h-5 ml-1" /></>}
                 </button>
-             </div>
-          </div>
+              </div>
+           </div>
           
-          {/* Right Side */}
-          <div className="relative z-0 flex flex-col items-center lg:items-end w-full max-w-xl mx-auto lg:mx-0">
-             
-             {/* Illustration Image */}
-             <div className="w-full relative z-0 mb-[-40px] sm:mb-[-80px] lg:mr-[-10%] pointer-events-none transition-all duration-500">
-               <img src="/hero-light.png" alt="Hero Illustration" className="w-full h-auto dark:hidden drop-shadow-2xl scale-110 object-contain origin-bottom-right" />
-               <img src="/hero-dark.png" alt="Hero Illustration" className="w-full h-auto hidden dark:block drop-shadow-2xl scale-110 object-contain origin-bottom-right" />
-             </div>
-             
-             {/* CTA Card positioned overlapping or below */}
-             <div className="w-full relative z-10 transition-all hover:scale-[1.01]">
-               {!user ? (
-                  <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl shadow-blue-900/30 flex flex-col sm:flex-row items-center sm:items-stretch text-center sm:text-left gap-8 overflow-hidden relative">
+          {/* Right Card: CTA / Welcome Back */}
+          <div className="w-full relative z-10 transition-all hover:scale-[1.01] h-full flex flex-col">
+             {!user ? (
+                <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl shadow-blue-900/30 flex flex-col sm:flex-row items-center sm:items-stretch text-center sm:text-left gap-8 overflow-hidden relative h-full flex-1">
                     
                     {/* Background decorations */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
@@ -605,25 +609,24 @@ export default function QuickSchedule() {
 
                   </div>
                ) : (
-                  <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 text-white shadow-2xl shadow-emerald-900/30 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-8 overflow-hidden relative">
+                  <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 text-white shadow-2xl shadow-emerald-900/30 flex flex-col items-center justify-center text-center gap-6 overflow-hidden relative h-full flex-1">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
-                    <div className="flex-1 space-y-4 relative z-10">
-                      <div className="w-12 h-12 bg-emerald-400/20 rounded-xl flex items-center justify-center mx-auto sm:mx-0">
-                        <ShieldCheck className="w-6 h-6 text-emerald-300" />
-                      </div>
-                      <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight">
+                    <div className="w-20 h-20 bg-emerald-400/20 rounded-2xl flex items-center justify-center relative z-10 mb-2">
+                      <ShieldCheck className="w-10 h-10 text-emerald-300" />
+                    </div>
+                    <div className="relative z-10 space-y-4">
+                      <h2 className="text-3xl sm:text-4xl font-extrabold leading-tight">
                         Welcome back!
                       </h2>
-                      <p className="text-emerald-100 text-sm sm:text-base leading-relaxed">
+                      <p className="text-emerald-100 text-base sm:text-lg leading-relaxed max-w-sm mx-auto">
                         Head over to your Dashboard to view your personalized schedule, manage attendance, and check for any clashes.
                       </p>
-                      <Link href="/dashboard" className="bg-white text-emerald-700 hover:bg-emerald-50 px-6 py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto justify-center group">
-                        Go to Dashboard <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </Link>
                     </div>
+                    <Link href="/dashboard" className="relative z-10 bg-white text-emerald-700 hover:bg-emerald-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 group mt-4">
+                      Go to Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
                   </div>
                )}
-             </div>
           </div>
         </div>
 
