@@ -274,7 +274,7 @@ export default function ProfilePage() {
                         onChange={(e) => setNewCourseSection(e.target.value)}
                         className="input-field w-full sm:w-32"
                       >
-                        {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Sec {s}</option>)}
+                        {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Sec {s}</option>)}
                       </select>
                       <button 
                         onClick={handleAddCourse}
