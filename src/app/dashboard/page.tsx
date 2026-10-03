@@ -168,7 +168,9 @@ export default function DashboardPage() {
         
         master.forEach((cls: ParsedClass) => {
           if (cls.day && cls.day.trim() !== "") daysSet.add(cls.day);
-          if (cls.timeSlot && cls.timeSlot.trim() !== "" && cls.timeSlot.toLowerCase() !== "full day") slotsSet.add(cls.timeSlot);
+          if (cls.timeSlot && cls.timeSlot.trim() !== "" && cls.timeSlot.toLowerCase() !== "full day" && cls.timeSlot !== "09:00-11:45") {
+            slotsSet.add(cls.timeSlot);
+          }
         });
 
         if (p.program === "2nd-core") {
