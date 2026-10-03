@@ -425,7 +425,7 @@ export default function QuickSchedule() {
                         Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
                       </p>
                       <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto justify-center group mt-2">
-                        Create Free Account <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        Create Profile <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </button>
                     </div>
 
