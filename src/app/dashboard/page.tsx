@@ -490,7 +490,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Print Header (Only visible when printing) */}
-            <div className="hidden print:block w-full bg-[url('/hero-light.png')] bg-cover bg-center rounded-2xl border border-slate-200 overflow-hidden relative mb-6">
+            <div className="hidden print:block w-full bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden relative mb-6">
               <div className="p-8 pb-6 relative z-10">
                  <div className="flex justify-between items-center mb-6">
                     <span className="font-extrabold text-sm tracking-widest text-slate-700">ERP 2.0</span>
@@ -523,8 +523,8 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Table View (Hidden on screen if in list mode, ALWAYS visible on print) */}
-            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 mt-4 sm:mt-6 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
+            {/* Table View (Hidden on screen if in list mode, NEVER visible on print if in list mode) */}
+            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 mt-4 sm:mt-6 ${viewMode === "table" ? "block print:block" : "hidden print:hidden"}`}>
                <table className="w-full text-left border-collapse bg-white min-w-[max-content] md:min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
@@ -664,8 +664,8 @@ export default function DashboardPage() {
              </table>
             </div>
 
-            {/* List View (Hidden on screen if in table mode, NEVER visible on print) */}
-            <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
+            {/* List View */}
+            <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block print:block" : "hidden print:hidden"}`}>
               {allDays.map(day => {
                 const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
                 const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
