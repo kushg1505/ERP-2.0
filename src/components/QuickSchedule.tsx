@@ -64,7 +64,9 @@ export default function QuickSchedule() {
       
       let enrolledCourses: {courseCode: string, section: string}[] = [];
 
-      if (spec === "bfs") {
+      if (year === "1st") {
+        // 1st years don't need roll no, we just filter the master table by their section
+      } else if (spec === "bfs") {
         for (const c of BFS_FIXED_COURSES) {
           enrolledCourses.push({ courseCode: c, section: bfsSection });
         }
@@ -82,7 +84,7 @@ export default function QuickSchedule() {
       }
 
       // Filter master schedule
-      const filtered = master.filter(cls => 
+      const filtered = year === "1st" ? master.filter(cls => !cls.section || cls.section.includes(bfsSection)) : master.filter(cls => 
         enrolledCourses.some(c => 
           c.courseCode === cls.courseAbb && 
           (c.section === cls.section || !cls.section || cls.section.includes(c.section))
@@ -491,7 +493,15 @@ export default function QuickSchedule() {
                   </div>
 
                   <div className="space-y-4">
-                    {(spec === "core" || spec === "dcp") ? (
+                    {year === "1st" ? (
+                      <div>
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
+                        <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
+                           {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+                        </select>
+                        <p className="text-xs text-blue-500 font-medium mt-2 bg-blue-50 p-2 rounded">Roll Number is not required for 1st-year students.</p>
+                      </div>
+                    ) : (spec === "core" || spec === "dcp") ? (
                       <div>
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
                         <input 

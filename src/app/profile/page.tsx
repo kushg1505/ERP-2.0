@@ -64,7 +64,9 @@ export default function ProfilePage() {
     const programStr = `${year}-${spec}`;
     let finalProfile = { ...profile, program: programStr };
 
-    if (spec === "bfs") {
+    if (year === "1st") {
+      finalProfile.section = bfsSection;
+    } else if (spec === "bfs") {
       // Build courses list manually
       const courses = [];
       for (const c of BFS_FIXED_COURSES) {
@@ -155,7 +157,19 @@ export default function ProfilePage() {
       <div className="glass-panel p-6 rounded-2xl space-y-6">
         <h2 className="text-xl font-bold border-b border-slate-200 dark:border-slate-800 pb-4">2. Course Setup</h2>
 
-        {(spec === "core" || spec === "dcp") && (
+        {year === "1st" ? (
+          <div className="space-y-6">
+             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300">
+               <p className="text-sm font-medium">1st-year students do not need a Roll Number. Just select your Section.</p>
+             </div>
+             <div>
+               <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
+               <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full max-w-xs">
+                 {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+               </select>
+             </div>
+          </div>
+        ) : (spec === "core" || spec === "dcp") ? (
           <div className="space-y-6">
              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300">
                <p className="text-sm font-medium">For Core and DCP students, simply enter your Roll Number and click Sync. Your courses will be automatically fetched.</p>
@@ -250,9 +264,9 @@ export default function ProfilePage() {
                </div>
             )}
           </div>
-        )}
+        ) : null}
 
-        {spec === "bfs" && (
+        {year !== "1st" && spec === "bfs" && (
            <div className="space-y-6">
               <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300">
                <p className="text-sm font-medium">As a BFS student, you have 5 fixed courses. Please select your 1 Elective and your Section.</p>

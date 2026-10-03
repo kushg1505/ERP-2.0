@@ -12,6 +12,7 @@ export interface StudentProfile {
   rollNo: string;
   name: string;
   program?: string;
+  section?: string;
   courses: { courseCode: string; section: string }[];
   scheduleOverrides?: ScheduleOverride[];
 }

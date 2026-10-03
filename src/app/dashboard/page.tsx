@@ -120,12 +120,15 @@ export default function DashboardPage() {
         setAllHistoricalSessions(historicalSessions);
 
         // Filter master schedule for student's courses in current week
-        let myFilteredClasses = master.filter(cls => 
-          p.courses.some(c => 
-            c.courseCode === cls.courseAbb && 
-            (c.section === cls.section || !cls.section || cls.section.includes(c.section))
-          )
-        );
+        const isFirstYear = p.program?.startsWith('1st-');
+        let myFilteredClasses = isFirstYear 
+          ? master.filter(cls => !cls.section || (p.section && cls.section.includes(p.section)))
+          : master.filter(cls => 
+            p.courses?.some(c => 
+              c.courseCode === cls.courseAbb && 
+              (c.section === cls.section || !cls.section || cls.section.includes(c.section))
+            )
+          );
         
         const currentWeekOverrides = p.scheduleOverrides?.filter((o: any) => o.weekId === targetWeek) || [];
         const currentCanceledIds = currentWeekOverrides.filter((o: any) => o.type === 'cancel' || o.type === 'reschedule').map((o: any) => o.originalClassId);
