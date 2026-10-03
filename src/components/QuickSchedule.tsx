@@ -40,6 +40,7 @@ export default function QuickSchedule() {
   
   const [bfsSection, setBfsSection] = useState("A");
   const [bfsElective, setBfsElective] = useState("BF");
+  const [dtiGroup, setDtiGroup] = useState("1");
   const [isFinPrep, setIsFinPrep] = useState(false);
 
   const [myClasses, setMyClasses] = useState<ParsedClass[]>([]);
@@ -88,7 +89,13 @@ export default function QuickSchedule() {
       }
 
       // Filter master schedule
-      const filtered = year === "1st" ? master.filter(cls => !cls.section || cls.section.includes(bfsSection)) : master.filter(cls => 
+      const filtered = year === "1st" ? master.filter(cls => {
+         if (cls.courseAbb.startsWith('DTI') && spec === 'core') {
+            const gStr = `G-${dtiGroup}`;
+            return cls.section === gStr || cls.section.startsWith(`${gStr}(`) || cls.section.startsWith(`${gStr} `);
+         }
+         return !cls.section || cls.section.includes(bfsSection);
+      }) : master.filter(cls => 
         enrolledCourses.some(c => 
           c.courseCode === cls.courseAbb && 
           (c.courseCode === "FINPrep" || c.section === cls.section || !cls.section || cls.section.includes(c.section))
@@ -516,11 +523,21 @@ export default function QuickSchedule() {
 
                   <div className="space-y-4">
                     {year === "1st" ? (
-                      <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
-                        <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                           {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
-                        </select>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
+                          <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
+                             {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Section {s}</option>)}
+                          </select>
+                        </div>
+                        {spec === 'core' && (
+                          <div>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your DTI Group</label>
+                            <select value={dtiGroup} onChange={(e) => setDtiGroup(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
+                              {[...Array(11)].map((_, i) => <option key={i+1} value={(i+1).toString()}>Group {i+1}</option>)}
+                            </select>
+                          </div>
+                        )}
                         <p className="text-xs text-blue-500 font-medium mt-2 bg-blue-50 p-2 rounded">Roll Number is not required for 1st-year students.</p>
                       </div>
                     ) : (spec === "core" || spec === "dcp") ? (

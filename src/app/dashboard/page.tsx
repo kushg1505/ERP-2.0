@@ -129,7 +129,14 @@ export default function DashboardPage() {
         // Filter master schedule for student's courses in current week
         const isFirstYear = p.program?.startsWith('1st-');
         let myFilteredClasses = isFirstYear 
-          ? master.filter(cls => !cls.section || (p.section && cls.section.includes(p.section)))
+          ? master.filter(cls => {
+              if (cls.courseAbb.startsWith('DTI') && p.program === '1st-core') {
+                 if (!p.dtiGroup) return false;
+                 const gStr = `G-${p.dtiGroup}`;
+                 return cls.section === gStr || cls.section.startsWith(`${gStr}(`) || cls.section.startsWith(`${gStr} `);
+              }
+              return !cls.section || (p.section && cls.section.includes(p.section));
+          })
           : master.filter(cls => 
             p.courses?.some(c => 
               c.courseCode === cls.courseAbb && 

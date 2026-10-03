@@ -13,6 +13,7 @@ export interface StudentProfile {
   name: string;
   program?: string;
   section?: string;
+  dtiGroup?: string;
   courses: { courseCode: string; section: string }[];
   scheduleOverrides?: ScheduleOverride[];
 }

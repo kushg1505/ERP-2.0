@@ -28,6 +28,7 @@ export default function ProfilePage() {
   // BFS State
   const [bfsSection, setBfsSection] = useState("A");
   const [bfsElective, setBfsElective] = useState("BF");
+  const [dtiGroup, setDtiGroup] = useState("1");
 
   // Manual Course Edit State
   const [newCourseCode, setNewCourseCode] = useState("");
@@ -50,6 +51,8 @@ export default function ProfilePage() {
           if (profileData.courses?.some((c: any) => c.courseCode === "FINPrep")) {
             setIsFinPrep(true);
           }
+          if (profileData.section) setBfsSection(profileData.section);
+          if (profileData.dtiGroup) setDtiGroup(profileData.dtiGroup);
         } else {
           setProfile(prev => ({ ...prev, name: user.displayName || "" }));
         }
@@ -80,6 +83,7 @@ export default function ProfilePage() {
 
     if (year === "1st") {
       finalProfile.section = bfsSection;
+      if (spec === "core") finalProfile.dtiGroup = dtiGroup;
     } else if (spec === "bfs") {
       // Build courses list manually
       const courses = [];
@@ -179,11 +183,21 @@ export default function ProfilePage() {
              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300">
                <p className="text-sm font-medium">1st-year students do not need a Roll Number. Just select your Section.</p>
              </div>
-             <div>
-               <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
-               <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full max-w-xs">
-                 {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Section {s}</option>)}
-               </select>
+             <div className="grid md:grid-cols-2 gap-6">
+               <div>
+                 <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
+                 <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full">
+                   {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Section {s}</option>)}
+                 </select>
+               </div>
+               {spec === 'core' && (
+                 <div>
+                   <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your DTI Group</label>
+                   <select value={dtiGroup} onChange={(e) => setDtiGroup(e.target.value)} className="input-field w-full">
+                     {[...Array(11)].map((_, i) => <option key={i+1} value={(i+1).toString()}>Group {i+1}</option>)}
+                   </select>
+                 </div>
+               )}
              </div>
           </div>
         ) : (spec === "core" || spec === "dcp") ? (
