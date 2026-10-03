@@ -408,13 +408,13 @@ export default function QuickSchedule() {
              {/* CTA Card positioned overlapping or below */}
              <div className="w-full relative z-10 transition-all hover:scale-[1.01]">
                {!user ? (
-                  <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl shadow-blue-900/30 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-8 overflow-hidden relative">
+                  <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl shadow-blue-900/30 flex flex-col sm:flex-row items-center sm:items-stretch text-center sm:text-left gap-8 overflow-hidden relative">
                     
                     {/* Background decorations */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
                     <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-500/20 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
 
-                    <div className="flex-1 space-y-4 relative z-10">
+                    <div className="flex-1 space-y-4 relative z-10 flex flex-col justify-center">
                       <div className="w-12 h-12 bg-amber-400/20 rounded-xl flex items-center justify-center mx-auto sm:mx-0">
                         <Crown className="w-6 h-6 text-amber-400" />
                       </div>
@@ -424,35 +424,35 @@ export default function QuickSchedule() {
                       <p className="text-blue-100 text-sm sm:text-base leading-relaxed">
                         Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
                       </p>
-                      <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto justify-center group">
+                      <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto justify-center group mt-2">
                         Create Free Account <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </button>
                     </div>
 
-                    <div className="w-full sm:w-[200px] shrink-0 flex flex-col gap-3 relative z-10">
-                       <div className="absolute -top-3 right-0 bg-blue-900/50 backdrop-blur-md px-3 py-1 rounded-full border border-blue-500/30 text-[10px] font-bold tracking-wider text-blue-200 uppercase flex items-center gap-1 z-20">
-                          <Sparkles className="w-3 h-3" /> Recommended
+                    <div className="w-full sm:w-[220px] shrink-0 flex flex-col justify-center gap-3 relative z-10 mt-6 sm:mt-0">
+                       <div className="absolute -top-4 -right-2 sm:-right-4 bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg shadow-amber-500/40 px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-extrabold tracking-wider text-slate-900 uppercase flex items-center gap-1.5 z-20 transform rotate-2">
+                          <Sparkles className="w-3.5 h-3.5" /> Recommended
                        </div>
                        
-                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-lg bg-blue-500/30 flex items-center justify-center shrink-0">
-                           <Clock className="w-4 h-4 text-blue-100" />
+                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3 hover:bg-white/15 transition-colors">
+                         <div className="w-8 h-8 rounded-lg bg-blue-500/40 flex items-center justify-center shrink-0">
+                           <Clock className="w-4 h-4 text-blue-50" />
                          </div>
-                         <span className="text-sm font-semibold leading-tight">Personalized Timetables</span>
+                         <span className="text-sm font-semibold leading-tight text-white">Personalized Timetables</span>
                        </div>
                        
-                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-lg bg-blue-500/30 flex items-center justify-center shrink-0">
-                           <BarChart2 className="w-4 h-4 text-blue-100" />
+                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3 hover:bg-white/15 transition-colors">
+                         <div className="w-8 h-8 rounded-lg bg-emerald-500/40 flex items-center justify-center shrink-0">
+                           <BarChart2 className="w-4 h-4 text-emerald-50" />
                          </div>
-                         <span className="text-sm font-semibold leading-tight">Attendance Tracking</span>
+                         <span className="text-sm font-semibold leading-tight text-white">Attendance Tracking</span>
                        </div>
                        
-                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-lg bg-amber-500/30 flex items-center justify-center shrink-0">
-                           <AlertTriangle className="w-4 h-4 text-amber-200" />
+                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3 hover:bg-white/15 transition-colors">
+                         <div className="w-8 h-8 rounded-lg bg-amber-500/40 flex items-center justify-center shrink-0">
+                           <AlertTriangle className="w-4 h-4 text-amber-50" />
                          </div>
-                         <span className="text-sm font-semibold leading-tight">Smart Clash Alerts</span>
+                         <span className="text-sm font-semibold leading-tight text-white">Smart Clash Alerts</span>
                        </div>
                     </div>
 
