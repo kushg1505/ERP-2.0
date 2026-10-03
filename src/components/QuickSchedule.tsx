@@ -258,8 +258,8 @@ export default function QuickSchedule() {
           </div>
           
           <div className="px-4 sm:px-8 pb-4 sm:pb-8 relative z-10 flex-1 print:px-6 print:pb-6 print:flex-none">
-            {viewMode === "table" ? (
-            <div className="rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-visible border border-slate-200 print:border-slate-200">
+            {/* Table View (Hidden on screen if in list mode, ALWAYS visible on print) */}
+            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-visible border border-slate-200 print:border-slate-200 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
                <table className="w-full text-left border-collapse bg-white min-w-[800px] xl:min-w-0">
                  <thead>
                    <tr>
@@ -343,13 +343,14 @@ export default function QuickSchedule() {
                          }
                          return cells;
                        })()}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          ) : (
-              <div className="flex flex-col gap-6">
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+            </div>
+
+            {/* List View (Hidden on screen if in table mode, NEVER visible on print) */}
+            <div className={`flex flex-col gap-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
                 {allDays.map(day => {
                   const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
                   const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
@@ -420,7 +421,6 @@ export default function QuickSchedule() {
                   );
                 })}
               </div>
-            )}
         </div>
 
         {/* Print Footer */}
