@@ -314,7 +314,7 @@ export default function QuickSchedule() {
                                             </div>
                                          </div>
                                          <div className="mt-3 flex">
-                                            <span className="bg-blue-50 text-blue-700 font-bold text-[10px] sm:text-xs px-2.5 py-1 rounded-full border border-blue-100/50">
+                                            <span className="bg-blue-50 text-blue-700 font-bold text-[10px] sm:text-xs px-2.5 py-1 rounded-full border border-blue-100/50 whitespace-nowrap inline-block">
                                               Sec {cls.section}
                                             </span>
                                          </div>
