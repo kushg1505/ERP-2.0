@@ -146,7 +146,7 @@ export default function DashboardPage() {
         
         master.forEach((cls: ParsedClass) => {
           if (cls.day && cls.day.trim() !== "") daysSet.add(cls.day);
-          if (cls.timeSlot && cls.timeSlot.trim() !== "") slotsSet.add(cls.timeSlot);
+          if (cls.timeSlot && cls.timeSlot.trim() !== "" && cls.timeSlot.toLowerCase() !== "full day") slotsSet.add(cls.timeSlot);
         });
 
         if (p.program === "2nd-core") {
@@ -228,13 +228,6 @@ export default function DashboardPage() {
           };
         });
 
-        // Add Full Day to allTimeSlots if it's missing so Tabular view shows it
-        if (p.program === "2nd-core" && !sortedSlots.includes("Full Day")) {
-           const hasThursday = sortedDays.some(d => d.toLowerCase().includes("thursday"));
-           if (hasThursday) {
-             sortedSlots.unshift("Full Day");
-           }
-        }
 
         setAllTimeSlots(sortedSlots);
         setAllDays(sortedDays);
