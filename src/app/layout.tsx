@@ -7,6 +7,7 @@ import { AuthProvider } from "@/lib/AuthContext";
 import { AuthButton } from "@/components/AuthButton";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileNav } from "@/components/MobileNav";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -40,7 +41,7 @@ export default function RootLayout({
                       </div>
                       <span className="font-bold text-xl tracking-tight hidden sm:block bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">ERP 2.0</span>
                     </Link>
-                    <div className="flex ml-4 sm:ml-8 space-x-4 sm:space-x-8">
+                    <div className="hidden md:flex ml-4 sm:ml-8 space-x-4 sm:space-x-8">
                       <Link href="/dashboard" className="border-transparent text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold transition-all">
                         Dashboard
                       </Link>
@@ -55,6 +56,7 @@ export default function RootLayout({
                       <Settings className="h-5 w-5" />
                     </Link>
                     <AuthButton />
+                    <MobileNav />
                   </div>
                 </div>
               </div>

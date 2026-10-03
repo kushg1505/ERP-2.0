@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getStudentFromMasterDB, fetchMasterTimetable, fetchAvailableWeeks } from "@/lib/db";
-import { RefreshCw, Download, Calendar, ArrowRight } from "lucide-react";
+import { RefreshCw, Download, Calendar, ArrowRight, GraduationCap, Crown, Sparkles, Clock, BarChart2, AlertTriangle, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
@@ -302,114 +302,218 @@ export default function QuickSchedule() {
     );
   }
 
-  return (
-    <div className="w-full max-w-6xl mx-auto mt-16 mb-16 grid lg:grid-cols-5 gap-8 items-stretch animate-in slide-in-from-bottom-8 duration-700 no-print">
-      
-      {/* Form Side */}
-      <div className="lg:col-span-3 glass-panel p-8 rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col justify-center">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent inline-flex items-center gap-2">
-            <Calendar className="w-6 h-6 text-blue-600" /> Generate Quick Schedule
-          </h2>
-          <p className="text-slate-500 mt-2">No sign-up required. Just enter your details to view and download your timetable.</p>
+  if (step === 1) {
+    return (
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in slide-in-from-bottom-8 duration-700 no-print flex flex-col items-center">
+        
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-start w-full">
+          {/* Left Side */}
+          <div className="space-y-8 text-left relative z-10 w-full max-w-xl mx-auto lg:mx-0">
+             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold text-sm">
+               <GraduationCap className="w-4 h-4" /> Built for IMT Ghaziabad Students
+             </div>
+             
+             <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight leading-tight text-slate-900 dark:text-white">
+               Your MBA <br className="hidden lg:block"/> Schedule, <br className="hidden lg:block"/>
+               <span className="text-blue-600 dark:text-blue-500">Simplified.</span>
+             </h1>
+             
+             <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400">
+               No more missing classes or guessing clash resolutions. Get your personalized timetable, clash alerts, and attendance tracking all in one place.
+             </p>
+
+             <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/50 dark:shadow-none w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl relative z-20">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Generate Quick Schedule</h2>
+                    <p className="text-sm text-slate-500">No sign-up required. Just enter your details to view and download your timetable.</p>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-6 w-full">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Year</label>
+                      <select value={year} onChange={(e) => setYear(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
+                        <option value="1st">1st Year</option>
+                        <option value="2nd">2nd Year</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Specialization</label>
+                      <select value={spec} onChange={(e) => setSpec(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
+                        <option value="core">Core</option>
+                        <option value="bfs">BFS</option>
+                        <option value="dcp">DCP</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {(spec === "core" || spec === "dcp") ? (
+                      <div>
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number <span className="font-normal opacity-70">(Optional)</span></label>
+                        <input 
+                          type="text" 
+                          value={rollNo}
+                          onChange={(e) => setRollNo(e.target.value)}
+                          placeholder="e.g. 2402001"
+                          className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
+                          onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
+                          <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
+                             {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Choose Elective</label>
+                          <select value={bfsElective} onChange={(e) => setBfsElective(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
+                             {BFS_ELECTIVE_COURSES.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {error && <div className="mt-4 text-center text-red-500 font-medium text-sm bg-red-50 dark:bg-red-900/20 py-2 rounded-lg">{error}</div>}
+
+                <button 
+                  onClick={handleGenerate}
+                  disabled={loading}
+                  className="mt-6 btn-primary w-full py-4 rounded-xl font-bold text-base shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 inline-flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <><Sparkles className="w-5 h-5" /> Generate My Timetable <ArrowRight className="w-5 h-5 ml-1" /></>}
+                </button>
+             </div>
+          </div>
+          
+          {/* Right Side */}
+          <div className="relative z-0 flex flex-col items-center lg:items-end w-full max-w-xl mx-auto lg:mx-0">
+             
+             {/* Illustration Image */}
+             <div className="w-full relative z-0 mb-[-40px] sm:mb-[-80px] lg:mr-[-10%] pointer-events-none transition-all duration-500">
+               <img src="/hero-light.png" alt="Hero Illustration" className="w-full h-auto dark:hidden drop-shadow-2xl scale-110 object-contain origin-bottom-right" />
+               <img src="/hero-dark.png" alt="Hero Illustration" className="w-full h-auto hidden dark:block drop-shadow-2xl scale-110 object-contain origin-bottom-right" />
+             </div>
+             
+             {/* CTA Card positioned overlapping or below */}
+             <div className="w-full relative z-10 transition-all hover:scale-[1.01]">
+               {!user ? (
+                  <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl shadow-blue-900/30 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-8 overflow-hidden relative">
+                    
+                    {/* Background decorations */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-500/20 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
+
+                    <div className="flex-1 space-y-4 relative z-10">
+                      <div className="w-12 h-12 bg-amber-400/20 rounded-xl flex items-center justify-center mx-auto sm:mx-0">
+                        <Crown className="w-6 h-6 text-amber-400" />
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight">
+                        Unlock the Full Experience
+                      </h2>
+                      <p className="text-blue-100 text-sm sm:text-base leading-relaxed">
+                        Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
+                      </p>
+                      <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto justify-center group">
+                        Create Free Account <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+
+                    <div className="w-full sm:w-[200px] shrink-0 flex flex-col gap-3 relative z-10">
+                       <div className="absolute -top-3 right-0 bg-blue-900/50 backdrop-blur-md px-3 py-1 rounded-full border border-blue-500/30 text-[10px] font-bold tracking-wider text-blue-200 uppercase flex items-center gap-1 z-20">
+                          <Sparkles className="w-3 h-3" /> Recommended
+                       </div>
+                       
+                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-lg bg-blue-500/30 flex items-center justify-center shrink-0">
+                           <Clock className="w-4 h-4 text-blue-100" />
+                         </div>
+                         <span className="text-sm font-semibold leading-tight">Personalized Timetables</span>
+                       </div>
+                       
+                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-lg bg-blue-500/30 flex items-center justify-center shrink-0">
+                           <BarChart2 className="w-4 h-4 text-blue-100" />
+                         </div>
+                         <span className="text-sm font-semibold leading-tight">Attendance Tracking</span>
+                       </div>
+                       
+                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-lg bg-amber-500/30 flex items-center justify-center shrink-0">
+                           <AlertTriangle className="w-4 h-4 text-amber-200" />
+                         </div>
+                         <span className="text-sm font-semibold leading-tight">Smart Clash Alerts</span>
+                       </div>
+                    </div>
+
+                  </div>
+               ) : (
+                  <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 text-white shadow-2xl shadow-emerald-900/30 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-8 overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                    <div className="flex-1 space-y-4 relative z-10">
+                      <div className="w-12 h-12 bg-emerald-400/20 rounded-xl flex items-center justify-center mx-auto sm:mx-0">
+                        <ShieldCheck className="w-6 h-6 text-emerald-300" />
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold leading-tight">
+                        Welcome back!
+                      </h2>
+                      <p className="text-emerald-100 text-sm sm:text-base leading-relaxed">
+                        Head over to your Dashboard to view your personalized schedule, manage attendance, and check for any clashes.
+                      </p>
+                      <Link href="/dashboard" className="bg-white text-emerald-700 hover:bg-emerald-50 px-6 py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto justify-center group">
+                        Go to Dashboard <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
+                  </div>
+               )}
+             </div>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto w-full">
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Year</label>
-              <select value={year} onChange={(e) => setYear(e.target.value)} className="input-field w-full">
-                <option value="1st">1st Year</option>
-                <option value="2nd">2nd Year</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Specialization</label>
-              <select value={spec} onChange={(e) => setSpec(e.target.value)} className="input-field w-full">
-                <option value="core">Core</option>
-                <option value="bfs">BFS</option>
-                <option value="dcp">DCP</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            {(spec === "core" || spec === "dcp") ? (
-              <div>
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
-                <input 
-                  type="text" 
-                  value={rollNo}
-                  onChange={(e) => setRollNo(e.target.value)}
-                  placeholder="e.g. 2402001"
-                  className="input-field w-full"
-                  onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
-                />
-                <p className="text-xs text-slate-400 mt-2">Your courses will be automatically fetched from the master database.</p>
+        {/* Bottom Feature Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mt-20 w-full max-w-6xl mx-auto">
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/50 hover-lift text-left bg-white dark:bg-slate-900 shadow-sm">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800">
+                <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
-            ) : (
-              <>
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
-                  <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full">
-                     {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Choose Elective</label>
-                  <select value={bfsElective} onChange={(e) => setBfsElective(e.target.value)} className="input-field w-full">
-                     {BFS_ELECTIVE_COURSES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-              </>
-            )}
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Personalized Timetable</h3>
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">View only the classes you are enrolled in. No more scrolling through the giant master PDF.</p>
+          </div>
+          
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/50 hover-lift text-left bg-white dark:bg-slate-900 shadow-sm">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 rounded-xl flex items-center justify-center shrink-0 border border-amber-100 dark:border-amber-800">
+                <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Smart Clash Alerts</h3>
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Instantly see if you have a schedule clash and the official resolution provided by the program office.</p>
+          </div>
+
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/50 hover-lift text-left bg-white dark:bg-slate-900 shadow-sm">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-800">
+                <ShieldCheck className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">Attendance Tracking</h3>
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Keep a reliable personal record of your attendance, especially for classes attended in alternate sections.</p>
           </div>
         </div>
 
-        {error && <div className="mt-6 text-center text-red-500 font-medium text-sm bg-red-50 py-3 rounded-lg">{error}</div>}
-
-        <div className="mt-8 text-center">
-          <button 
-            onClick={handleGenerate}
-            disabled={loading}
-            className="btn-primary px-10 py-4 rounded-full font-bold text-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 w-full sm:w-auto inline-flex items-center justify-center gap-3 transition-all transform hover:scale-105 active:scale-95"
-          >
-            {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : "Generate My Timetable"}
-          </button>
-        </div>
       </div>
-
-      {/* CTA Side */}
-      {!user ? (
-        <div className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 md:p-10 text-white shadow-2xl shadow-blue-900/20 flex flex-col justify-center items-start text-left gap-6 transform transition-all hover:scale-[1.01]">
-          <div className="space-y-4">
-            <h2 className="text-3xl font-extrabold leading-tight">
-              Unlock the Full Experience
-            </h2>
-            <p className="text-blue-100 text-lg leading-relaxed">
-              Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
-            </p>
-          </div>
-          <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="bg-white text-blue-700 hover:bg-blue-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full justify-center">
-            Create Free Account <ArrowRight className="w-5 h-5" />
-          </button>
-        </div>
-      ) : (
-        <div className="lg:col-span-2 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 md:p-10 text-white shadow-2xl shadow-emerald-900/20 flex flex-col justify-center items-start text-left gap-6 transform transition-all hover:scale-[1.01]">
-          <div className="space-y-4">
-            <h2 className="text-3xl font-extrabold leading-tight">
-              Welcome back!
-            </h2>
-            <p className="text-emerald-100 text-lg leading-relaxed">
-              Head over to your Dashboard to view your personalized schedule, manage attendance, and check for any clashes.
-            </p>
-          </div>
-          <Link href="/dashboard" className="bg-white text-emerald-700 hover:bg-emerald-50 px-8 py-4 rounded-xl font-bold text-lg shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full justify-center">
-            Go to Dashboard <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
-      )}
-
-    </div>
-  );
+    );
+  }
 }
