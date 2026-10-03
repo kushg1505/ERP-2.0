@@ -148,7 +148,7 @@ export default function QuickSchedule() {
       });
 
       const parseTime = (slot: string) => {
-        const ampmMatch = slot.match(/(\d+):(\d+)\s*(am|pm)/i);
+        const ampmMatch = slot.match(/(\d+)[:.](\d+)\s*(am|pm)/i);
         if (ampmMatch) {
           let hours = parseInt(ampmMatch[1]);
           const mins = parseInt(ampmMatch[2]);
@@ -157,7 +157,7 @@ export default function QuickSchedule() {
           if (ampm === 'am' && hours === 12) hours = 0;
           return hours + mins / 60;
         }
-        const timeMatch = slot.match(/(\d+):(\d+)/);
+        const timeMatch = slot.match(/(\d+)[:.](\d+)/);
         if (timeMatch) {
           return parseInt(timeMatch[1]) + parseInt(timeMatch[2]) / 60;
         }
