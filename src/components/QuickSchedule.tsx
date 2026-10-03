@@ -356,12 +356,11 @@ export default function QuickSchedule() {
                   <div className="space-y-4">
                     {(spec === "core" || spec === "dcp") ? (
                       <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number <span className="font-normal opacity-70">(Optional)</span></label>
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
                         <input 
                           type="text" 
                           value={rollNo}
                           onChange={(e) => setRollNo(e.target.value)}
-                          placeholder="e.g. 2402001"
                           className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
                           onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
                         />
