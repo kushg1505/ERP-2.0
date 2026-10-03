@@ -66,6 +66,10 @@ body {
   @apply bg-white text-blue-700 border border-blue-200 px-5 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-sm hover:bg-blue-50 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 dark:bg-slate-800 dark:text-blue-400 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600 dark:hover:shadow-blue-500/10;
 }
 
+.input-field {
+  @apply px-4 py-3 rounded-xl border border-slate-200 text-slate-800 dark:border-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all bg-white dark:bg-slate-800;
+}
+
 /* Print Styles */
 @media print {
   @page {
