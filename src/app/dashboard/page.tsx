@@ -466,20 +466,25 @@ export default function DashboardPage() {
             </div>
 
             {/* Table View (Hidden on screen if in list mode, ALWAYS visible on print) */}
-            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-visible border border-slate-200 print:border-slate-200 mt-6 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
-               <table className="w-full text-left border-collapse bg-white min-w-[800px] xl:min-w-0">
+            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 mt-6 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
+               <table className="w-full text-left border-collapse bg-white min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
-                     <th className="p-4 print:p-2 font-bold text-white w-32 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print:text-xs print-no-sticky text-center">Day / Time</th>
-                     {allTimeSlots.map(slot => <th key={slot} className="p-3 print:p-2 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-sm print:text-xs print-no-sticky">{slot}</th>)}
+                     <th className="p-4 print:p-1 font-bold text-white w-32 print:w-16 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print:text-[10px] print-no-sticky text-center align-middle">Day / Time</th>
+                     {allTimeSlots.map(slot => (
+                       <th key={slot} className="p-3 print:p-1 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-sm print:text-[9px] print-no-sticky align-middle">
+                         <span className="print:hidden">{slot}</span>
+                         <span className="hidden print:block whitespace-pre-line">{slot.replace('-', '\n')}</span>
+                       </th>
+                     ))}
                    </tr>
                  </thead>
                  <tbody>
                    {allDays.map(day => (
                      <tr key={day} className="border-t border-slate-200 print:border-slate-200">
-                       <td className="p-4 print:p-2 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-slate-900 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center">
-                         <span className="font-extrabold text-base print:text-sm block text-blue-900">{day.split(',')[0]}</span>
-                         <span className="text-xs font-medium text-slate-500 mt-1 block print:mt-0">{day.split(',')[1]?.trim()}</span>
+                       <td className="p-4 print:p-1 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-slate-900 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center align-middle">
+                         <span className="font-extrabold text-base print:text-[10px] block text-blue-900">{day.split(',')[0]}</span>
+                         <span className="text-xs font-medium text-slate-500 mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
                        </td>
                        {(() => {
                          const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
@@ -499,11 +504,11 @@ export default function DashboardPage() {
                                 const ssrColSpan = j - i;
                                 
                                 cells.push(
-                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 print:p-2 border-r border-slate-200 print:border-slate-200 align-middle">
-                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[3rem] bg-amber-50 rounded-xl border border-amber-100/50 mx-1">
+                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[2.5rem] bg-amber-50 rounded-xl border border-amber-100/50 mx-1">
                                        <div className="flex items-center gap-2">
-                                          <Users className="w-5 h-5 print:w-4 print:h-4 text-amber-500" />
-                                          <span className="font-extrabold text-slate-800 tracking-wide text-lg print:text-sm">
+                                          <Users className="w-5 h-5 print:w-3 print:h-3 text-amber-500" />
+                                          <span className="font-extrabold text-slate-800 tracking-wide text-lg print:text-[10px]">
                                             SSR Visit
                                           </span>
                                        </div>
@@ -513,16 +518,16 @@ export default function DashboardPage() {
                                 i = j - 1; 
                               } else {
                                 cells.push(
-                                  <td key={slot} className="p-3 print:p-2 border-r border-slate-200 print:border-slate-200">
-                                    <div className="min-h-[4.5rem] print:min-h-[3rem] w-full" />
+                                  <td key={slot} className="p-3 print:p-1 border-r border-slate-200 print:border-slate-200">
+                                    <div className="min-h-[4.5rem] print:min-h-[2.5rem] w-full" />
                                   </td>
                                 );
                               }
                            } else {
                              cells.push(
-                               <td key={slot} className="p-2 sm:p-3 print:p-1.5 border-r border-slate-200 print:border-slate-200 align-top bg-white relative">
+                               <td key={slot} className="p-2 sm:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-top bg-white relative">
                                  {classesInSlot.length === 0 ? (
-                                   <div className="min-h-[4.5rem] print:min-h-[3rem] w-full flex items-center justify-center">
+                                   <div className="min-h-[4.5rem] print:min-h-[2.5rem] w-full flex items-center justify-center">
                                      {isEditMode && (
                                        <button onClick={() => {
                                           setOriginalClassIdToReschedule(null);
@@ -557,7 +562,7 @@ export default function DashboardPage() {
                                         else if (isMissed) cardClasses = "bg-red-50/50 border-red-200 border-l-red-500 shadow-sm";
 
                                         return (
-                                        <div key={idx} className={`p-2 sm:p-3 print:p-2 rounded-xl print:rounded-lg border-y border-r border-l-4 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
+                                        <div key={idx} className={`p-2 sm:p-3 print:p-1 print:px-1.5 rounded-xl print:rounded border-y border-r border-l-4 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
                                           {isEditMode && (
                                             <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-2 sm:-mx-3 -mt-2 sm:-mt-3 p-2 rounded-t-xl mb-2 border-b border-slate-200 dark:border-slate-700">
                                               <button onClick={() => openRescheduleModal(cls)} className="p-1 sm:p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3.5 h-3.5"/></button>
@@ -566,18 +571,18 @@ export default function DashboardPage() {
                                           )}
                                           <div>
                                              <div className="flex justify-between items-start gap-1">
-                                               <div className="font-extrabold text-sm print:text-[11px] text-slate-900 leading-tight">
+                                               <div className="font-extrabold text-sm print:text-[9px] text-slate-900 leading-tight">
                                                  {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
                                                </div>
-                                               {!isEditMode && isAttended && <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded leading-none">P</span>}
-                                               {!isEditMode && isMissed && <span className="text-[10px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded leading-none">A</span>}
+                                               {!isEditMode && isAttended && <span className="text-[10px] print:text-[8px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded leading-none">P</span>}
+                                               {!isEditMode && isMissed && <span className="text-[10px] print:text-[8px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded leading-none">A</span>}
                                              </div>
-                                             <div className="text-xs print:text-[10px] text-slate-500 mt-1 print:mt-0.5 font-medium">
+                                             <div className="text-xs print:text-[8px] text-slate-500 mt-1 print:mt-0 font-medium break-words leading-tight">
                                                {cls.venue || 'TBA'}
                                              </div>
                                           </div>
-                                          <div className="mt-2 flex">
-                                             <span className={`font-bold text-[10px] sm:text-xs print:text-[9px] px-2.5 py-1 print:px-1.5 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-blue-300 print:text-blue-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : isMissed ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-100/50'}`}>
+                                          <div className="mt-2 print:mt-1 flex">
+                                             <span className={`font-bold text-[10px] sm:text-xs print:text-[7px] px-2.5 py-1 print:px-1 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : isMissed ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-100/50'}`}>
                                                Sec {cls.section}
                                              </span>
                                           </div>
