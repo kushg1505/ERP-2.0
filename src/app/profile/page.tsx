@@ -182,7 +182,7 @@ export default function ProfilePage() {
              <div>
                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
                <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full max-w-xs">
-                 {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+                 {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Section {s}</option>)}
                </select>
              </div>
           </div>
@@ -274,7 +274,7 @@ export default function ProfilePage() {
                         onChange={(e) => setNewCourseSection(e.target.value)}
                         className="input-field w-full sm:w-32"
                       >
-                        {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Sec {s}</option>)}
+                        {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Sec {s}</option>)}
                       </select>
                       <button 
                         onClick={handleAddCourse}
@@ -300,7 +300,7 @@ export default function ProfilePage() {
                 <div>
                   <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
                   <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full">
-                     {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+                     {['A', 'B'].map(s => <option key={s} value={s}>Section {s}</option>)}
                   </select>
                 </div>
                 <div>
