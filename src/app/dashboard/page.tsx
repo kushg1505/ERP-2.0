@@ -515,7 +515,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Table View (Hidden on screen if in list mode, ALWAYS visible on print) */}
-            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 mt-0 sm:mt-6 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
+            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 mt-4 sm:mt-6 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
                <table className="w-full text-left border-collapse bg-white min-w-[max-content] md:min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
