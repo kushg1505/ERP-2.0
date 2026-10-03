@@ -365,7 +365,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-12">
-      <header className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+      <header className="flex flex-col md:flex-row md:items-start justify-between gap-6 print:hidden">
         <div>
           <h1 className="text-3xl font-bold mb-2">My Dashboard</h1>
           <p className="text-slate-500">Welcome back, {profile?.name || "Student"}!</p>
@@ -396,7 +396,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+      <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto print:hidden">
         <button onClick={() => setActiveTab("schedule")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap ${activeTab === 'schedule' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}>My Schedule</button>
         <button onClick={() => setActiveTab("attendance")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'attendance' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}><CheckSquare className="w-4 h-4" /> Attendance</button>
         <button onClick={() => setActiveTab("clashes")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'clashes' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}><List className="w-4 h-4" /> Clash Management</button>
@@ -405,7 +405,7 @@ export default function DashboardPage() {
       {activeTab === "schedule" && (
         <div className="space-y-12 animate-in fade-in duration-300">
           <section>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
               <h2 className="text-2xl font-bold flex items-center gap-4">My Schedule {isEditMode && <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full animate-pulse">EDIT MODE</span>}</h2>
               <div className="flex flex-wrap items-center gap-4">
                 <button onClick={() => window.print()} className="no-print btn-secondary px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
@@ -418,6 +418,40 @@ export default function DashboardPage() {
                   <button onClick={() => setViewMode("list")} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}><MapPin className="w-4 h-4" /> List</button>
                   <button onClick={() => setViewMode("table")} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${viewMode === 'table' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}><Clock className="w-4 h-4" /> Tabular</button>
                 </div>
+              </div>
+            </div>
+
+            {/* Print Header (Only visible when printing) */}
+            <div className="hidden print:block w-full bg-[url('/hero-light.png')] bg-cover bg-center rounded-2xl border border-slate-200 overflow-hidden relative mb-6">
+              <div className="p-8 pb-6 relative z-10">
+                 <div className="flex justify-between items-center mb-6">
+                    <span className="font-extrabold text-sm tracking-widest text-slate-700">ERP 2.0</span>
+                    <span className="text-sm font-medium text-slate-500">{new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
+                 </div>
+
+                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-6 relative">
+                   <div className="relative inline-block">
+                      <h2 className="text-5xl font-extrabold tracking-tight">
+                         <span className="text-slate-900 border-b-4 border-slate-900 pb-1 mr-3">My</span>
+                         <span className="text-blue-600">Schedule</span>
+                      </h2>
+                   </div>
+                 </div>
+
+                 <div className="flex items-center gap-4 mt-2">
+                    <div className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full font-bold text-sm">
+                      <Calendar className="w-4 h-4" />
+                      {selectedWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || "Current Week"}
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm text-slate-700 px-4 py-2 rounded-full font-bold border border-slate-200 text-sm">
+                      <Users className="w-4 h-4 text-slate-500" />
+                      {profile?.name || "Student"}
+                    </div>
+                    <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm text-slate-700 px-4 py-2 rounded-full font-bold border border-slate-200 text-sm">
+                      <Clock className="w-4 h-4 text-slate-500" />
+                      Roll No: {profile?.rollNo}
+                    </div>
+                 </div>
               </div>
             </div>
 
