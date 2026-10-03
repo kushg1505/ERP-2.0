@@ -8,6 +8,7 @@ import { AuthButton } from "@/components/AuthButton";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileNav } from "@/components/MobileNav";
+import { AdminLink } from "@/components/AdminLink";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -50,9 +51,7 @@ export default function RootLayout({
                   </div>
                   <div className="flex items-center gap-3">
                     <ThemeToggle />
-                    <Link href="/admin" className="hidden sm:block p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors" title="Admin Portal">
-                      <Settings className="h-5 w-5" />
-                    </Link>
+                    <AdminLink />
                     <AuthButton />
                     <MobileNav />
                   </div>
