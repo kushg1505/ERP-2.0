@@ -547,12 +547,22 @@ export default function DashboardPage() {
                        </td>
                        {(() => {
                          const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
+                         const isADPThursday = profile?.program === "2nd-bfs" && selectedWeek === "week-1" && day.toLowerCase().includes("thursday");
+                         
+                         const getStartHour = (s: string) => {
+                            const m = s.match(/(\d+)[:.](\d+)/);
+                            return m ? parseInt(m[1]) + parseInt(m[2])/60 : 0;
+                         };
+
                          const cells = [];
                          let ssrStarted = false;
+                         let adpStarted = false;
                          const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
                          
                          for (let i = 0; i < allTimeSlots.length; i++) {
                            const slot = allTimeSlots[i];
+                           const slotStart = getStartHour(slot);
+                           const isADPRange = slotStart >= 8.5 && slotStart < 11.5;
                            const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
                            
                            if (isSSRThursday && !slotHasClass[i]) {
@@ -568,7 +578,8 @@ export default function DashboardPage() {
                                        <div className="flex items-center gap-1 md:gap-2">
                                           <Users className="w-3 h-3 md:w-5 md:h-5 print:w-3 print:h-3 text-amber-500" />
                                           <span className="font-extrabold text-slate-800 tracking-wide text-xs md:text-lg print:text-[10px]">
-                                            {window.innerWidth < 768 ? 'SSR' : 'SSR Visit'}
+                                            <span className="md:hidden">SSR</span>
+                                            <span className="hidden md:inline">SSR Visit</span>
                                           </span>
                                        </div>
                                      </div>
@@ -583,6 +594,28 @@ export default function DashboardPage() {
                                     </div>
                                   </td>
                                 );
+                              }
+                           } else if (isADPThursday && isADPRange && !slotHasClass[i]) {
+                              if (!adpStarted) {
+                                adpStarted = true;
+                                let j = i;
+                                while (j < allTimeSlots.length && (getStartHour(allTimeSlots[j]) >= 8.5 && getStartHour(allTimeSlots[j]) < 11.5)) j++;
+                                const adpColSpan = j - i;
+                                
+                                cells.push(
+                                  <td key={`adp-${slot}`} colSpan={adpColSpan} className="p-1 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-indigo-50 rounded-lg md:rounded-xl border border-indigo-100/50 mx-0.5 md:mx-1">
+                                       <div className="flex items-center gap-1 md:gap-2">
+                                          <Users className="w-3 h-3 md:w-5 md:h-5 print:w-3 print:h-3 text-indigo-600" />
+                                          <span className="font-extrabold text-slate-800 tracking-wide text-xs md:text-lg print:text-[10px]">
+                                            <span className="md:hidden print:hidden">ADP</span>
+                                            <span className="hidden md:inline print:inline">ADP Placement</span>
+                                          </span>
+                                       </div>
+                                     </div>
+                                  </td>
+                                );
+                                i = j - 1; 
                               }
                            } else {
                              cells.push(
@@ -668,9 +701,16 @@ export default function DashboardPage() {
             <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block print:block" : "hidden print:hidden"}`}>
               {allDays.map(day => {
                 const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
+                const isADPThursday = profile?.program === "2nd-bfs" && selectedWeek === "week-1" && day.toLowerCase().includes("thursday");
                 const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
                 
-                if (dayClasses.length === 0 && !isSSRThursday) return null;
+                const hasADPSlots = dayClasses.some(c => {
+                   const m = c.timeSlot.match(/(\d+)[:.](\d+)/);
+                   const start = m ? parseInt(m[1]) + parseInt(m[2])/60 : 0;
+                   return start >= 8.5 && start < 11.5;
+                });
+                
+                if (dayClasses.length === 0 && !isSSRThursday && !isADPThursday) return null;
 
                 return (
                   <div key={day} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden break-inside-avoid">
@@ -689,6 +729,17 @@ export default function DashboardPage() {
                           <div>
                             <h4 className="font-extrabold text-slate-800 dark:text-amber-100 text-lg">SSR Visit</h4>
                             <p className="text-amber-700 dark:text-amber-300/80 text-sm font-medium">All day field visit</p>
+                          </div>
+                        </div>
+                      )}
+                      {isADPThursday && !hasADPSlots && (
+                        <div className="flex items-center gap-4 bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/30 mb-2">
+                          <div className="bg-indigo-100 dark:bg-indigo-800/50 p-3 rounded-lg">
+                            <Users className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                          </div>
+                          <div>
+                            <h4 className="font-extrabold text-slate-800 dark:text-indigo-100 text-lg">ADP Placement Process</h4>
+                            <p className="text-indigo-700 dark:text-indigo-300/80 text-sm font-medium">09:00 - 11:45</p>
                           </div>
                         </div>
                       )}
