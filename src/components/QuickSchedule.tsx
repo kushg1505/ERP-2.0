@@ -304,11 +304,12 @@ export default function QuickSchedule() {
 
   if (step === 1) {
     return (
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in slide-in-from-bottom-8 duration-700 no-print flex flex-col items-center">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in slide-in-from-bottom-8 duration-700 no-print flex flex-col items-center relative">
+        <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none z-0 opacity-50"></div>
         
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-start w-full">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-end w-full relative z-10">
           {/* Left Side */}
-          <div className="space-y-8 text-left relative z-10 w-full max-w-xl mx-auto lg:mx-0">
+          <div className="space-y-8 text-center lg:text-left relative z-10 w-full max-w-xl mx-auto lg:mx-0">
              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold text-sm">
                <GraduationCap className="w-4 h-4" /> Built for IMT Ghaziabad Students
              </div>
@@ -322,7 +323,7 @@ export default function QuickSchedule() {
                No more missing classes or guessing clash resolutions. Get your personalized timetable, clash alerts, and attendance tracking all in one place.
              </p>
 
-             <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/50 dark:shadow-none w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl relative z-20">
+             <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200/50 shadow-xl shadow-slate-200/50 dark:shadow-none w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl relative z-20 text-left">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
