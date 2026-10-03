@@ -75,17 +75,13 @@ export default function RootLayout({
                   </div>
 
                   <div className="flex flex-col items-center md:items-end text-center md:text-right">
-                    <p className="text-slate-600 dark:text-slate-300 font-medium">
-                      Developed by <span className="font-bold text-blue-600 dark:text-blue-400">Kush Goyal</span>
-                    </p>
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Batch 2025-27</p>
-                      <span className="text-slate-300 dark:text-slate-700">&bull;</span>
-                      <a href="https://www.linkedin.com/in/kush-goyal-5218661b4" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 transition-colors">
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span>LinkedIn</span>
+                    <p className="text-slate-700 dark:text-slate-200 font-bold text-base">
+                      Developed by{' '}
+                      <a href="https://www.linkedin.com/in/kush-goyal-5218661b4" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline decoration-2 underline-offset-4 transition-colors">
+                        Kush Goyal
                       </a>
-                    </div>
+                    </p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mt-1">Batch 2025-27</p>
                   </div>
 
                 </div>
