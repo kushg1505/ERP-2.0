@@ -10,8 +10,8 @@ export async function GET() {
     const basePath = process.cwd();
     
     // Parse Courses
-    const cPath = path.join(basePath, "Term_V_Courses_and_Faculty_DCP.xlsx");
-    if (!fs.existsSync(cPath)) return NextResponse.json({ error: "Courses file not found" }, { status: 400 });
+    const cPath = path.join(basePath, "database", "2nd year", "DCP", "2nd year DCP course-faculty.xlsx");
+    if (!fs.existsSync(cPath)) return NextResponse.json({ error: "Courses file not found at " + cPath }, { status: 400 });
     
     const cBuffer = fs.readFileSync(cPath);
     const cWb = xlsx.read(cBuffer);
@@ -25,8 +25,8 @@ export async function GET() {
     });
 
     // Parse Students
-    const sPath = path.join(basePath, "Student_Course_Section_DCP.xlsx");
-    if (!fs.existsSync(sPath)) return NextResponse.json({ error: "Students file not found" }, { status: 400 });
+    const sPath = path.join(basePath, "database", "2nd year", "DCP", "2nd year DCP student-course.xlsx");
+    if (!fs.existsSync(sPath)) return NextResponse.json({ error: "Students file not found at " + sPath }, { status: 400 });
     
     const sBuffer = fs.readFileSync(sPath);
     const sWb = xlsx.read(sBuffer);
