@@ -551,8 +551,9 @@ export default function DashboardPage() {
                          <span className="text-[9px] md:text-xs font-medium text-slate-500 mt-0.5 md:mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
                        </td>
                        {(() => {
-                         const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
-                         const isADPThursday = profile?.program === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");
+                         const actualProgram = profile?.program || "2nd-core";
+                         const isSSRThursday = actualProgram === "2nd-core" && day.toLowerCase().includes("thursday");
+                         const isADPThursday = actualProgram === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");
                          
                          const getStartHour = (s: string) => {
                             const m = s.match(/(\d+)[:.](\d+)/);
@@ -724,8 +725,9 @@ export default function DashboardPage() {
             {/* List View */}
             <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block print:block" : "hidden print:hidden"}`}>
               {allDays.map(day => {
-                const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
-                const isADPThursday = profile?.program === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");
+                const actualProgram = profile?.program || "2nd-core";
+                const isSSRThursday = actualProgram === "2nd-core" && day.toLowerCase().includes("thursday");
+                const isADPThursday = actualProgram === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");
                 const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
                 
                 const hasADPSlots = dayClasses.some(c => {
