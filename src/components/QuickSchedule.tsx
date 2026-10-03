@@ -197,10 +197,10 @@ export default function QuickSchedule() {
         </div>
 
         {/* Print wrapper */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 print:shadow-none print:border-slate-200 relative overflow-hidden flex flex-col print:max-h-screen print:h-fit box-border">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-slate-200 dark:border-slate-800 print:shadow-none print:border-slate-200 relative overflow-hidden flex flex-col print:max-h-screen print:h-fit box-border">
           
           {/* Header Section */}
-          <div className="p-8 pb-6 relative z-10 print:p-6 print:pb-4">
+          <div className="p-4 sm:p-8 pb-4 sm:pb-6 relative z-10 print:p-6 print:pb-4">
              {/* Top info row */}
              <div className="hidden print:flex justify-between items-center mb-4">
                 <span className="font-extrabold text-sm tracking-widest text-slate-700">ERP 2.0</span>
@@ -209,39 +209,39 @@ export default function QuickSchedule() {
 
              {/* Title */}
              <div className="mb-4 sm:mb-6 relative inline-block">
-                <h2 className="text-4xl font-extrabold tracking-tight print:text-4xl">
+                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight print:text-4xl">
                    <span className="text-slate-900 dark:text-white border-b-4 border-slate-900 dark:border-white pb-1 mr-2">My</span>
                    <span className="text-blue-600">Quick Schedule</span>
                 </h2>
              </div>
 
              {/* Pills row */}
-             <div className="flex flex-wrap items-center justify-between gap-4 mt-2">
-                <div className="flex items-center gap-3">
+             <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2">
+                <div className="flex items-center gap-2 sm:gap-3">
                    {/* Week Pill */}
-                   <div className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none print:text-sm print:px-3 print:py-1.5">
-                     <Calendar className="w-4 h-4 print:w-3.5 print:h-3.5" />
+                   <div className="flex items-center gap-2 bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">
+                     <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 print:w-3.5 print:h-3.5" />
                      {activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                    </div>
                    {/* Specialization Pill */}
-                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 print:text-sm print:px-3 print:py-1.5">
-                     <GraduationCap className="w-4 h-4 print:w-3.5 print:h-3.5" />
+                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">
+                     <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 print:w-3.5 print:h-3.5" />
                      {year} Year {spec.toUpperCase()}
                    </div>
                 </div>
                 {/* Roll No Pill */}
                 {rollNo && (
-                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 print:text-sm print:px-3 print:py-1.5">
-                     <IdCard className="w-4 h-4 text-slate-500 print:w-3.5 print:h-3.5" />
+                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 text-xs sm:text-base print:text-sm print:px-3 print:py-1.5 mt-1 sm:mt-0">
+                     <IdCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 print:w-3.5 print:h-3.5" />
                      Roll No: {rollNo}
                    </div>
                 )}
              </div>
           </div>
           
-          <div className="px-8 pb-8 relative z-10 flex-1 print:px-6 print:pb-6 print:flex-none">
-            <div className="rounded-2xl overflow-hidden border border-slate-200 print:border-slate-200">
-               <table className="w-full text-left border-collapse bg-white">
+          <div className="px-4 sm:px-8 pb-4 sm:pb-8 relative z-10 flex-1 print:px-6 print:pb-6 print:flex-none">
+            <div className="rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-visible border border-slate-200 print:border-slate-200">
+               <table className="w-full text-left border-collapse bg-white min-w-[800px] xl:min-w-0">
                  <thead>
                    <tr>
                      <th className="p-4 print:p-2 font-bold text-white w-32 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print:text-xs print-no-sticky text-center">Day / Time</th>
