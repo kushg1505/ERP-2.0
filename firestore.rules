@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if user is signed in
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user is an Admin
+    // ACTION REQUIRED: Replace with your actual admin email(s) or UID(s)
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == 'admin@example.com' ||
+        request.auth.token.email == 'your.email@example.com'
+      );
+    }
+
+    // 1. Users Collection: Users can only read and write their own profile
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 2. Attendance Collection: Users can only read and write their own attendance
+    match /attendance/{userId}/records/{weekId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 3. Master Schedules (All Programs): Anyone can read, only Admins can write
+    match /master_schedules_{program}/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 4. Clashes: Anyone can read, only Admins can write
+    match /clashes/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 5. Students (DCP Migration data): Anyone can read, only Admins can write
+    match /students/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 6. Courses (DCP Migration data): Anyone can read, only Admins can write
+    match /courses/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Default Deny All - Blocks access to any collections not explicitly defined above
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
