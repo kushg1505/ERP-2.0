@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getStudentFromMasterDB, fetchMasterTimetable, fetchAvailableWeeks } from "@/lib/db";
-import { RefreshCw, Download, Calendar, ArrowRight, GraduationCap, Crown, Sparkles, Clock, BarChart2, AlertTriangle, ShieldCheck } from "lucide-react";
+import { RefreshCw, Download, Calendar, ArrowRight, GraduationCap, Crown, Sparkles, Clock, BarChart2, AlertTriangle, ShieldCheck, IdCard, Users } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
@@ -183,7 +183,7 @@ export default function QuickSchedule() {
 
   if (step === 2) {
     return (
-      <div className="w-full max-w-6xl mx-auto mt-16 print-fullscreen">
+      <div className="w-full max-w-6xl mx-auto mt-16 print-fullscreen print:bg-white print:text-black">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 no-print gap-4">
           <button onClick={() => setStep(1)} className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-medium px-4 py-2">&larr; Back to setup</button>
           <div className="flex items-center gap-3">
@@ -196,104 +196,153 @@ export default function QuickSchedule() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden print-no-border">
-          <div className="p-6 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-end print:bg-transparent print:text-black print:pb-4 print:pt-0">
-             <div>
-                <h2 className="text-2xl font-bold print:text-black">My Quick Schedule</h2>
-                <div className="mt-3 flex items-center gap-3">
-                   <span className="font-extrabold text-xl text-blue-400 bg-blue-900/40 px-3 py-1 rounded-lg border border-blue-800/50 print:text-blue-600 print:bg-transparent print:border-blue-200 print:rounded-xl">
-                     {activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                   </span> 
-                   <span className="text-slate-500 print:text-slate-600">•</span> 
-                   <span className="font-medium text-slate-300 print:text-slate-600">{year} Year {spec.toUpperCase()}</span>
-                </div>
+        {/* Print wrapper */}
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 print:shadow-none print:border-none print:rounded-none relative overflow-hidden flex flex-col min-h-screen">
+          
+          {/* Decorative background vectors for print only */}
+          <div className="hidden print:block absolute top-0 right-0 w-[500px] h-[300px] bg-gradient-to-bl from-blue-50 to-transparent opacity-60 z-0"></div>
+          <div className="hidden print:block absolute bottom-0 left-0 w-[500px] h-[300px] bg-gradient-to-tr from-blue-50 to-transparent opacity-60 z-0"></div>
+
+          {/* Header Section */}
+          <div className="p-8 pb-6 relative z-10 print:pt-4">
+             {/* Top info row */}
+             <div className="hidden print:flex justify-between items-center mb-6">
+                <span className="font-extrabold text-sm tracking-widest text-slate-700">ERP 2.0</span>
+                <span className="text-sm font-medium text-slate-500">{new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
              </div>
-             {rollNo && <div className="text-slate-400 font-medium print:text-slate-600 print:mb-2">Roll No: {rollNo}</div>}
+
+             {/* Title */}
+             <div className="mb-6 relative inline-block">
+                <h2 className="text-4xl font-extrabold tracking-tight print:text-5xl">
+                   <span className="text-slate-900 dark:text-white border-b-4 border-slate-900 dark:border-white pb-1 mr-2">My</span>
+                   <span className="text-blue-600">Quick Schedule</span>
+                </h2>
+             </div>
+
+             {/* Pills row */}
+             <div className="flex flex-wrap items-center justify-between gap-4 mt-2">
+                <div className="flex items-center gap-3">
+                   {/* Week Pill */}
+                   <div className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none">
+                     <Calendar className="w-4 h-4" />
+                     {activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                   </div>
+                   {/* Specialization Pill */}
+                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700">
+                     <GraduationCap className="w-4 h-4" />
+                     {year} Year {spec.toUpperCase()}
+                   </div>
+                </div>
+                {/* Roll No Pill */}
+                {rollNo && (
+                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700">
+                     <IdCard className="w-4 h-4 text-slate-500" />
+                     Roll No: {rollNo}
+                   </div>
+                )}
+             </div>
           </div>
           
-          <div className="overflow-x-auto print-overflow-visible print:border-t print:border-slate-200">
-            <table className="w-full text-left border-collapse min-w-[800px] xl:min-w-0">
-              <thead>
-                <tr className="bg-slate-50 dark:bg-slate-950 print:bg-white">
-                  <th className="p-4 font-semibold text-slate-500 w-28 border-r border-b border-slate-200 sticky left-0 bg-slate-50 z-20 text-sm print-no-sticky print:bg-white print:text-slate-600">Day / Time</th>
-                  {allTimeSlots.map(slot => <th key={slot} className="p-3 font-bold text-slate-800 border-r border-b border-slate-200 text-center bg-slate-50 text-sm print-no-sticky print:bg-white print:text-black">{slot}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {allDays.map(day => (
-                  <tr key={day} className="border-b border-slate-200">
-                    <td className="p-4 font-medium text-sm text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-50 sticky left-0 z-10 print-no-sticky print:bg-white print:text-black">
-                      <span className="font-bold text-base block print:text-blue-950">{day.split(',')[0]}</span>
-                      <span className="text-xs text-slate-500">{day.split(',')[1]?.trim()}</span>
-                    </td>
-                    {(() => {
-                      const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
-                      const cells = [];
-                      let ssrStarted = false;
-                      const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
-                      
-                      for (let i = 0; i < allTimeSlots.length; i++) {
-                        const slot = allTimeSlots[i];
-                        const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
-                        
-                        if (isSSRThursday && !slotHasClass[i]) {
-                           if (!ssrStarted) {
-                             ssrStarted = true;
-                             let j = i;
-                             while (j < allTimeSlots.length && !slotHasClass[j]) j++;
-                             const ssrColSpan = j - i;
-                             
-                             cells.push(
-                               <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 align-middle bg-slate-50/50 print:bg-white">
-                                  <div className="flex items-center justify-center h-full min-h-[4rem]">
-                                    <span className="font-bold text-slate-700 tracking-widest text-lg bg-white px-8 py-2 rounded-full border border-slate-200 shadow-sm print-no-shadow print:text-slate-800">
-                                      SSR Visit
-                                    </span>
-                                  </div>
-                               </td>
-                             );
-                             i = j - 1; // skip the handled slots
+          <div className="px-8 pb-8 relative z-10 flex-1">
+            <div className="rounded-2xl overflow-hidden border border-slate-200 print:border-blue-100">
+               <table className="w-full text-left border-collapse bg-white">
+                 <thead>
+                   <tr>
+                     <th className="p-4 font-bold text-white w-32 border-r border-slate-200 print:border-blue-100 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print-no-sticky text-center">Day / Time</th>
+                     {allTimeSlots.map(slot => <th key={slot} className="p-3 font-bold text-slate-800 border-r border-slate-200 print:border-blue-100 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-sm print-no-sticky">{slot}</th>)}
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {allDays.map(day => (
+                     <tr key={day} className="border-t border-slate-200 print:border-blue-100">
+                       <td className="p-4 border-r border-slate-200 print:border-blue-100 whitespace-nowrap bg-blue-50/30 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center">
+                         <span className="font-extrabold text-base block text-blue-900">{day.split(',')[0]}</span>
+                         <span className="text-xs font-medium text-slate-500 mt-1 block">{day.split(',')[1]?.trim()}</span>
+                       </td>
+                       {(() => {
+                         const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
+                         const cells = [];
+                         let ssrStarted = false;
+                         const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
+                         
+                         for (let i = 0; i < allTimeSlots.length; i++) {
+                           const slot = allTimeSlots[i];
+                           const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
+                           
+                           if (isSSRThursday && !slotHasClass[i]) {
+                              if (!ssrStarted) {
+                                ssrStarted = true;
+                                let j = i;
+                                while (j < allTimeSlots.length && !slotHasClass[j]) j++;
+                                const ssrColSpan = j - i;
+                                
+                                cells.push(
+                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 print:border-blue-100 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] bg-amber-50 rounded-xl border border-amber-100/50 mx-1">
+                                       <div className="flex items-center gap-3">
+                                          <Users className="w-5 h-5 text-amber-500" />
+                                          <span className="font-extrabold text-slate-800 tracking-wide text-lg">
+                                            SSR Visit
+                                          </span>
+                                       </div>
+                                     </div>
+                                  </td>
+                                );
+                                i = j - 1; 
+                              } else {
+                                cells.push(
+                                  <td key={slot} className="p-3 border-r border-slate-200 print:border-blue-100">
+                                    <div className="min-h-[4.5rem] w-full" />
+                                  </td>
+                                );
+                              }
                            } else {
                              cells.push(
-                               <td key={slot} className="p-3 border-r border-slate-200 print:bg-white">
-                                 <div className="min-h-[4rem] w-full" />
+                               <td key={slot} className="p-2 sm:p-3 border-r border-slate-200 print:border-blue-100 align-top bg-white">
+                                 {classesInSlot.length === 0 ? (
+                                   <div className="min-h-[4.5rem] w-full" />
+                                 ) : (
+                                   <div className="flex flex-col gap-2 h-full">
+                                     {classesInSlot.map((cls, idx) => (
+                                       <div key={idx} className="p-2 sm:p-3 rounded-xl border border-blue-100 border-l-4 border-l-blue-600 bg-white shadow-sm print:shadow-none h-full flex flex-col justify-between">
+                                         <div>
+                                            <div className="font-extrabold text-sm text-slate-900 leading-tight">
+                                              {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
+                                            </div>
+                                            <div className="text-xs text-slate-500 mt-1 font-medium">
+                                              {cls.venue || 'TBA'}
+                                            </div>
+                                         </div>
+                                         <div className="mt-3 flex">
+                                            <span className="bg-blue-50 text-blue-700 font-bold text-[10px] sm:text-xs px-2.5 py-1 rounded-full border border-blue-100/50">
+                                              Sec {cls.section}
+                                            </span>
+                                         </div>
+                                       </div>
+                                     ))}
+                                   </div>
+                                 )}
                                </td>
                              );
                            }
-                        } else {
-                          cells.push(
-                            <td key={slot} className="p-3 border-r border-slate-200 align-top print:bg-white">
-                              {classesInSlot.length === 0 ? (
-                                <div className="min-h-[4rem] w-full" />
-                              ) : (
-                                <div className="flex flex-col gap-2 h-full">
-                                  {classesInSlot.map((cls, idx) => (
-                                    <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-white shadow-sm print-no-shadow print:border-slate-300">
-                                      <div className="font-bold text-sm text-slate-900 leading-tight">
-                                        {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
-                                      </div>
-                                      <div className="text-xs text-slate-500 flex items-center justify-between mt-2 pt-2 border-t border-slate-100 print:border-slate-200">
-                                        <span>{cls.venue || 'TBA'}</span>
-                                        <span className="font-bold text-blue-600">Sec {cls.section}</span>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </td>
-                          );
-                        }
-                      }
-                      return cells;
-                    })()}
+                         }
+                         return cells;
+                       })()}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
-        
-        <div className="mt-8 text-center bg-blue-50 border border-blue-200 rounded-xl p-6 no-print">
+
+        {/* Print Footer */}
+        <div className="hidden print:flex px-8 pb-8 justify-end items-center relative z-10">
+           <span className="text-slate-500 font-bold text-xs tracking-wide">Generated from ERP 2.0</span>
+           <div className="w-8 h-[3px] bg-blue-600 ml-4 rounded-full"></div>
+        </div>
+      </div>
+      
+      <div className="mt-8 text-center bg-blue-50 border border-blue-200 rounded-xl p-6 no-print">
            <h3 className="text-lg font-bold text-blue-900 mb-2">Want to save this schedule?</h3>
            <p className="text-blue-700 mb-4">Sign in to edit classes, track your attendance, and manage schedule clashes permanently.</p>
            <Link href="/dashboard" className="btn-primary inline-flex px-8 py-3 rounded-lg font-bold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50">Create Free Account</Link>
