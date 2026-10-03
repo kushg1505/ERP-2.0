@@ -547,7 +547,7 @@ export default function DashboardPage() {
                        </td>
                        {(() => {
                          const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
-                         const isADPThursday = profile?.program === "2nd-bfs" && selectedWeek === "week-1" && day.toLowerCase().includes("thursday");
+                         const isADPThursday = profile?.program === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");
                          
                          const getStartHour = (s: string) => {
                             const m = s.match(/(\d+)[:.](\d+)/);
@@ -701,7 +701,7 @@ export default function DashboardPage() {
             <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block print:block" : "hidden print:hidden"}`}>
               {allDays.map(day => {
                 const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
-                const isADPThursday = profile?.program === "2nd-bfs" && selectedWeek === "week-1" && day.toLowerCase().includes("thursday");
+                const isADPThursday = profile?.program === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");
                 const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
                 
                 const hasADPSlots = dayClasses.some(c => {
@@ -766,7 +766,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex-1">
                             <h4 className="font-extrabold text-slate-800 dark:text-white text-lg">
-                              {cls.courseName || 'New Session'} <span className="text-slate-400 font-medium text-sm">({cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''})</span>
+                              {cls.courseName || cls.courseAbb || 'New Session'} <span className="text-slate-400 font-medium text-sm">({cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''})</span>
                             </h4>
                             <div className="flex flex-wrap items-center gap-3 mt-2">
                               <span className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md">
