@@ -31,9 +31,9 @@ export function AuthButton() {
   };
 
   return (
-    <button onClick={handleSignIn} className="btn-primary flex items-center gap-2 text-sm px-4 py-2">
-      <LogIn className="h-4 w-4" />
-      Sign In
+    <button onClick={handleSignIn} className="btn-primary flex items-center justify-center gap-2 text-sm px-3 sm:px-4 py-2 whitespace-nowrap">
+      <LogIn className="h-4 w-4 shrink-0" />
+      <span className="hidden sm:inline">Sign In</span>
     </button>
   );
 }

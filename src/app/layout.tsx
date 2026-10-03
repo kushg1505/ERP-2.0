@@ -51,7 +51,7 @@ export default function RootLayout({
                   </div>
                   <div className="flex items-center gap-3">
                     <ThemeToggle />
-                    <Link href="/admin" className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors" title="Admin Portal">
+                    <Link href="/admin" className="hidden sm:block p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors" title="Admin Portal">
                       <Settings className="h-5 w-5" />
                     </Link>
                     <AuthButton />
