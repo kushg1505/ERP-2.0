@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { CalendarDays, Settings, Linkedin } from "lucide-react";
+import { CalendarDays, Settings, ExternalLink } from "lucide-react";
 import { AuthProvider } from "@/lib/AuthContext";
 import { AuthButton } from "@/components/AuthButton";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -82,7 +82,7 @@ export default function RootLayout({
                       <p className="text-sm text-slate-500 dark:text-slate-400">Batch 2025-27</p>
                       <span className="text-slate-300 dark:text-slate-700">&bull;</span>
                       <a href="https://www.linkedin.com/in/kush-goyal-5218661b4" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 transition-colors">
-                        <Linkedin className="w-3.5 h-3.5" />
+                        <ExternalLink className="w-3.5 h-3.5" />
                         <span>LinkedIn</span>
                       </a>
                     </div>
