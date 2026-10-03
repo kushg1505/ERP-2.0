@@ -183,7 +183,7 @@ export default function QuickSchedule() {
 
   if (step === 2) {
     return (
-      <div className="w-full max-w-6xl mx-auto mt-16 print-fullscreen print:bg-white print:text-black">
+      <div className="w-full max-w-6xl mx-auto mt-16 print:mt-0 print-fullscreen print:bg-white print:text-black flex flex-col justify-center">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 no-print gap-4">
           <button onClick={() => setStep(1)} className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-medium px-4 py-2">&larr; Back to setup</button>
           <div className="flex items-center gap-3">
@@ -197,23 +197,19 @@ export default function QuickSchedule() {
         </div>
 
         {/* Print wrapper */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 print:shadow-none print:border-none print:rounded-none relative overflow-hidden flex flex-col min-h-screen">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 print:shadow-none print:border-slate-200 relative overflow-hidden flex flex-col print:max-h-screen print:h-fit box-border">
           
-          {/* Decorative background vectors for print only */}
-          <div className="hidden print:block absolute top-0 right-0 w-[500px] h-[300px] bg-gradient-to-bl from-blue-50 to-transparent opacity-60 z-0"></div>
-          <div className="hidden print:block absolute bottom-0 left-0 w-[500px] h-[300px] bg-gradient-to-tr from-blue-50 to-transparent opacity-60 z-0"></div>
-
           {/* Header Section */}
-          <div className="p-8 pb-6 relative z-10 print:pt-4">
+          <div className="p-8 pb-6 relative z-10 print:p-6 print:pb-4">
              {/* Top info row */}
-             <div className="hidden print:flex justify-between items-center mb-6">
+             <div className="hidden print:flex justify-between items-center mb-4">
                 <span className="font-extrabold text-sm tracking-widest text-slate-700">ERP 2.0</span>
                 <span className="text-sm font-medium text-slate-500">{new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
              </div>
 
              {/* Title */}
-             <div className="mb-6 relative inline-block">
-                <h2 className="text-4xl font-extrabold tracking-tight print:text-5xl">
+             <div className="mb-4 sm:mb-6 relative inline-block">
+                <h2 className="text-4xl font-extrabold tracking-tight print:text-4xl">
                    <span className="text-slate-900 dark:text-white border-b-4 border-slate-900 dark:border-white pb-1 mr-2">My</span>
                    <span className="text-blue-600">Quick Schedule</span>
                 </h2>
@@ -223,41 +219,41 @@ export default function QuickSchedule() {
              <div className="flex flex-wrap items-center justify-between gap-4 mt-2">
                 <div className="flex items-center gap-3">
                    {/* Week Pill */}
-                   <div className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none">
-                     <Calendar className="w-4 h-4" />
+                   <div className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none print:text-sm print:px-3 print:py-1.5">
+                     <Calendar className="w-4 h-4 print:w-3.5 print:h-3.5" />
                      {activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                    </div>
                    {/* Specialization Pill */}
-                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700">
-                     <GraduationCap className="w-4 h-4" />
+                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 print:text-sm print:px-3 print:py-1.5">
+                     <GraduationCap className="w-4 h-4 print:w-3.5 print:h-3.5" />
                      {year} Year {spec.toUpperCase()}
                    </div>
                 </div>
                 {/* Roll No Pill */}
                 {rollNo && (
-                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700">
-                     <IdCard className="w-4 h-4 text-slate-500" />
+                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 print:text-sm print:px-3 print:py-1.5">
+                     <IdCard className="w-4 h-4 text-slate-500 print:w-3.5 print:h-3.5" />
                      Roll No: {rollNo}
                    </div>
                 )}
              </div>
           </div>
           
-          <div className="px-8 pb-8 relative z-10 flex-1">
-            <div className="rounded-2xl overflow-hidden border border-slate-200 print:border-blue-100">
+          <div className="px-8 pb-8 relative z-10 flex-1 print:px-6 print:pb-6 print:flex-none">
+            <div className="rounded-2xl overflow-hidden border border-slate-200 print:border-slate-200">
                <table className="w-full text-left border-collapse bg-white">
                  <thead>
                    <tr>
-                     <th className="p-4 font-bold text-white w-32 border-r border-slate-200 print:border-blue-100 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print-no-sticky text-center">Day / Time</th>
-                     {allTimeSlots.map(slot => <th key={slot} className="p-3 font-bold text-slate-800 border-r border-slate-200 print:border-blue-100 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-sm print-no-sticky">{slot}</th>)}
+                     <th className="p-4 print:p-2 font-bold text-white w-32 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print:text-xs print-no-sticky text-center">Day / Time</th>
+                     {allTimeSlots.map(slot => <th key={slot} className="p-3 print:p-2 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-sm print:text-xs print-no-sticky">{slot}</th>)}
                    </tr>
                  </thead>
                  <tbody>
                    {allDays.map(day => (
-                     <tr key={day} className="border-t border-slate-200 print:border-blue-100">
-                       <td className="p-4 border-r border-slate-200 print:border-blue-100 whitespace-nowrap bg-blue-50/30 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center">
-                         <span className="font-extrabold text-base block text-blue-900">{day.split(',')[0]}</span>
-                         <span className="text-xs font-medium text-slate-500 mt-1 block">{day.split(',')[1]?.trim()}</span>
+                     <tr key={day} className="border-t border-slate-200 print:border-slate-200">
+                       <td className="p-4 print:p-2 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-blue-50/30 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center">
+                         <span className="font-extrabold text-base print:text-sm block text-blue-900">{day.split(',')[0]}</span>
+                         <span className="text-xs font-medium text-slate-500 mt-1 block print:mt-0">{day.split(',')[1]?.trim()}</span>
                        </td>
                        {(() => {
                          const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
@@ -277,11 +273,11 @@ export default function QuickSchedule() {
                                 const ssrColSpan = j - i;
                                 
                                 cells.push(
-                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 print:border-blue-100 align-middle">
-                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] bg-amber-50 rounded-xl border border-amber-100/50 mx-1">
-                                       <div className="flex items-center gap-3">
-                                          <Users className="w-5 h-5 text-amber-500" />
-                                          <span className="font-extrabold text-slate-800 tracking-wide text-lg">
+                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 print:p-2 border-r border-slate-200 print:border-slate-200 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[3rem] bg-amber-50 rounded-xl border border-amber-100/50 mx-1">
+                                       <div className="flex items-center gap-2">
+                                          <Users className="w-5 h-5 print:w-4 print:h-4 text-amber-500" />
+                                          <span className="font-extrabold text-slate-800 tracking-wide text-lg print:text-sm">
                                             SSR Visit
                                           </span>
                                        </div>
@@ -291,30 +287,30 @@ export default function QuickSchedule() {
                                 i = j - 1; 
                               } else {
                                 cells.push(
-                                  <td key={slot} className="p-3 border-r border-slate-200 print:border-blue-100">
-                                    <div className="min-h-[4.5rem] w-full" />
+                                  <td key={slot} className="p-3 print:p-2 border-r border-slate-200 print:border-slate-200">
+                                    <div className="min-h-[4.5rem] print:min-h-[3rem] w-full" />
                                   </td>
                                 );
                               }
                            } else {
                              cells.push(
-                               <td key={slot} className="p-2 sm:p-3 border-r border-slate-200 print:border-blue-100 align-top bg-white">
+                               <td key={slot} className="p-2 sm:p-3 print:p-1.5 border-r border-slate-200 print:border-slate-200 align-top bg-white">
                                  {classesInSlot.length === 0 ? (
-                                   <div className="min-h-[4.5rem] w-full" />
+                                   <div className="min-h-[4.5rem] print:min-h-[3rem] w-full" />
                                  ) : (
-                                   <div className="flex flex-col gap-2 h-full">
+                                   <div className="flex flex-col gap-1.5 h-full">
                                      {classesInSlot.map((cls, idx) => (
-                                       <div key={idx} className="p-2 sm:p-3 rounded-xl border border-blue-100 border-l-4 border-l-blue-600 bg-white shadow-sm print:shadow-none h-full flex flex-col justify-between">
+                                       <div key={idx} className="p-2 sm:p-3 print:p-2 rounded-xl print:rounded-lg border border-blue-100 print:border-slate-200 border-l-4 border-l-blue-600 bg-white shadow-sm print:shadow-none h-full flex flex-col justify-between">
                                          <div>
-                                            <div className="font-extrabold text-sm text-slate-900 leading-tight">
+                                            <div className="font-extrabold text-sm print:text-[11px] text-slate-900 leading-tight">
                                               {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
                                             </div>
-                                            <div className="text-xs text-slate-500 mt-1 font-medium">
+                                            <div className="text-xs print:text-[10px] text-slate-500 mt-1 print:mt-0.5 font-medium">
                                               {cls.venue || 'TBA'}
                                             </div>
                                          </div>
-                                         <div className="mt-3 flex">
-                                            <span className="bg-blue-50 text-blue-700 font-bold text-[10px] sm:text-xs px-2.5 py-1 rounded-full border border-blue-100/50 whitespace-nowrap inline-block">
+                                         <div className="mt-2 flex">
+                                            <span className="bg-blue-50 text-blue-700 font-bold text-[10px] sm:text-xs print:text-[9px] px-2.5 py-1 print:px-1.5 print:py-0.5 rounded-full border border-blue-100/50 whitespace-nowrap inline-block">
                                               Sec {cls.section}
                                             </span>
                                          </div>
