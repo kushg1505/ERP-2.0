@@ -374,60 +374,109 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-12">
-      <header className="flex flex-col md:flex-row md:items-start justify-between gap-6 print:hidden">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">My Dashboard</h1>
-          <p className="text-slate-500">Welcome back, {profile?.name || "Student"}!</p>
-          <div className="mt-4 flex flex-wrap items-center gap-4">
-            <span className="text-xs font-medium text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">Roll No: {profile?.rollNo}</span>
+    <div className="space-y-8 md:space-y-12 pb-24 md:pb-0">
+      <header className="flex flex-col gap-4 print:hidden">
+        {/* Rich Hero Card */}
+        <div className="w-full bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 rounded-2xl md:rounded-3xl p-6 md:p-8 flex items-center justify-between overflow-hidden relative border border-blue-100 dark:border-blue-800/30">
+          <div className="relative z-10">
+            <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base font-medium mb-1">Welcome back,</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 leading-tight">{profile?.name || "Student"}!</h1>
+            <div className="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-200/50 dark:border-blue-700/50 shadow-sm">
+               <Users className="w-4 h-4 text-slate-500" />
+               <span className="text-xs md:text-sm font-bold text-slate-700 dark:text-slate-300">Roll No: {profile?.rollNo}</span>
+            </div>
+          </div>
+          {/* Decorative Calendar Graphic for Hero */}
+          <div className="absolute right-[-20px] md:right-8 opacity-90 rotate-12 transform scale-110 md:scale-100 pointer-events-none">
+             <div className="w-24 h-24 md:w-32 md:h-32 bg-blue-500 rounded-2xl shadow-xl shadow-blue-500/20 flex flex-col overflow-hidden border-2 border-white/20">
+                <div className="h-6 md:h-8 bg-blue-600 w-full border-b border-blue-400 flex justify-around items-center px-4">
+                  <div className="w-2 h-4 bg-white/80 rounded-full -mt-4 shadow-sm" />
+                  <div className="w-2 h-4 bg-white/80 rounded-full -mt-4 shadow-sm" />
+                </div>
+                <div className="flex-1 bg-white p-2 md:p-3 grid grid-cols-3 gap-1 md:gap-1.5">
+                   {[...Array(9)].map((_, i) => <div key={i} className={`rounded ${i===7 ? 'bg-emerald-400' : 'bg-slate-100'}`} />)}
+                </div>
+             </div>
+             {/* Checkmark badge */}
+             <div className="absolute -bottom-2 -right-2 w-8 h-8 md:w-10 md:h-10 bg-emerald-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
+               <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-white" />
+             </div>
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-xl px-4 py-3 flex items-center gap-3">
-            <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            <select 
-              value={selectedWeek} 
-              onChange={(e) => setSelectedWeek(e.target.value)}
-              className="bg-transparent font-bold text-blue-800 dark:text-blue-300 outline-none cursor-pointer"
-            >
-              {availableWeeks.length === 0 ? (
-                <option value="">No weeks available</option>
-              ) : (
-                availableWeeks.map(w => (
-                  <option key={w} value={w} className="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800">
-                    {formatWeek(w)}
-                  </option>
-                ))
-              )}
-            </select>
+        {/* Week Selector Card */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-3 w-full">
+            <div className="bg-blue-100 dark:bg-blue-900/50 p-2.5 rounded-xl text-blue-600 dark:text-blue-400">
+               <Calendar className="w-5 h-5" />
+            </div>
+            <div className="flex-1 relative">
+              <select 
+                value={selectedWeek} 
+                onChange={(e) => setSelectedWeek(e.target.value)}
+                className="bg-transparent font-bold text-slate-900 dark:text-slate-100 outline-none w-full appearance-none cursor-pointer text-base md:text-lg z-10 relative"
+              >
+                {availableWeeks.length === 0 ? (
+                  <option value="">No weeks available</option>
+                ) : (
+                  availableWeeks.map(w => (
+                    <option key={w} value={w} className="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800">
+                      {formatWeek(w)}
+                    </option>
+                  ))
+                )}
+              </select>
+              <div className="text-xs text-slate-500 font-medium mt-0.5">
+                5 Oct 2026 - 11 Oct 2026
+              </div>
+            </div>
+            {/* Arrows for Next/Prev Week */}
+            <div className="flex items-center gap-2 shrink-0">
+               <button onClick={() => {
+                 const idx = availableWeeks.indexOf(selectedWeek);
+                 if (idx > 0) setSelectedWeek(availableWeeks[idx-1]);
+               }} className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition-colors disabled:opacity-50" disabled={availableWeeks.indexOf(selectedWeek) <= 0}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+               </button>
+               <button onClick={() => {
+                 const idx = availableWeeks.indexOf(selectedWeek);
+                 if (idx < availableWeeks.length - 1) setSelectedWeek(availableWeeks[idx+1]);
+               }} className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition-colors disabled:opacity-50" disabled={availableWeeks.indexOf(selectedWeek) >= availableWeeks.length - 1}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+               </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto print:hidden">
+      <div className="hidden md:flex border-b border-slate-200 dark:border-slate-800 overflow-x-auto print:hidden">
         <button onClick={() => setActiveTab("schedule")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap ${activeTab === 'schedule' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}>My Schedule</button>
         <button onClick={() => setActiveTab("attendance")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'attendance' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}><CheckSquare className="w-4 h-4" /> Attendance</button>
         <button onClick={() => setActiveTab("clashes")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'clashes' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}><List className="w-4 h-4" /> Clash Management</button>
       </div>
 
       {activeTab === "schedule" && (
-        <div className="space-y-12 animate-in fade-in duration-300">
+        <div className="space-y-8 animate-in fade-in duration-300">
           <section>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
-              <h2 className="text-2xl font-bold flex items-center gap-4">My Schedule {isEditMode && <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full animate-pulse">EDIT MODE</span>}</h2>
-              <div className="flex flex-wrap items-center gap-4">
-                <button onClick={() => window.print()} className="no-print btn-secondary px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-                   <Download className="w-4 h-4"/> Download PDF
-                </button>
-                <button onClick={() => setIsEditMode(!isEditMode)} className={`no-print px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${isEditMode ? 'bg-blue-600 shadow-lg shadow-blue-500/30 text-white hover:bg-blue-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
-                   <Settings2 className="w-4 h-4" /> {isEditMode ? 'Done Editing' : 'Customize'}
-                </button>
-                <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit no-print">
-                  <button onClick={() => setViewMode("list")} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}><MapPin className="w-4 h-4" /> List</button>
-                  <button onClick={() => setViewMode("table")} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${viewMode === 'table' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}><Clock className="w-4 h-4" /> Tabular</button>
+            <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-4 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm print:hidden">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold flex items-center gap-4">My Schedule {isEditMode && <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full animate-pulse">EDIT MODE</span>}</h2>
+                  <p className="text-sm text-slate-500 mt-1">View your class schedule for the selected week.</p>
                 </div>
+                <div className="flex flex-wrap items-center gap-2 md:gap-4">
+                  <button onClick={() => window.print()} className="no-print btn-secondary flex-1 md:flex-none justify-center px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30">
+                     <Download className="w-4 h-4"/> Download PDF
+                  </button>
+                  <button onClick={() => setIsEditMode(!isEditMode)} className={`no-print flex-1 md:flex-none justify-center px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${isEditMode ? 'bg-blue-600 shadow-lg shadow-blue-500/30 text-white hover:bg-blue-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'}`}>
+                     <Settings2 className="w-4 h-4" /> {isEditMode ? 'Done Editing' : 'Customize'}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit no-print mt-2">
+                <button onClick={() => setViewMode("list")} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${viewMode === 'list' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}><List className="w-4 h-4" /> List</button>
+                <button onClick={() => setViewMode("table")} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${viewMode === 'table' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}><Clock className="w-4 h-4" /> Tabular</button>
               </div>
             </div>
 
@@ -466,14 +515,15 @@ export default function DashboardPage() {
             </div>
 
             {/* Table View (Hidden on screen if in list mode, ALWAYS visible on print) */}
-            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 mt-6 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
-               <table className="w-full text-left border-collapse bg-white min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
+            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 mt-0 sm:mt-6 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
+               <table className="w-full text-left border-collapse bg-white min-w-[max-content] md:min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
-                     <th className="p-4 print:p-1 font-bold text-white w-32 print:w-16 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print:text-[10px] print-no-sticky text-center align-middle">Day / Time</th>
+                     <th className="p-2 md:p-4 print:p-1 font-bold text-white w-20 md:w-32 print:w-16 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-[10px] md:text-sm print:text-[10px] print-no-sticky text-center align-middle">Day / Time</th>
                      {allTimeSlots.map(slot => (
-                       <th key={slot} className="p-3 print:p-1 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-sm print:text-[9px] print-no-sticky align-middle">
-                         <span className="print:hidden">{slot}</span>
+                       <th key={slot} className="p-1 md:p-3 print:p-1 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-[10px] md:text-sm print:text-[9px] print-no-sticky align-middle">
+                         <span className="hidden md:inline print:hidden">{slot}</span>
+                         <span className="md:hidden block whitespace-pre-line">{slot.replace('-', '\n')}</span>
                          <span className="hidden print:block whitespace-pre-line">{slot.replace('-', '\n')}</span>
                        </th>
                      ))}
@@ -482,9 +532,9 @@ export default function DashboardPage() {
                  <tbody>
                    {allDays.map(day => (
                      <tr key={day} className="border-t border-slate-200 print:border-slate-200">
-                       <td className="p-4 print:p-1 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-slate-900 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center align-middle">
-                         <span className="font-extrabold text-base print:text-[10px] block text-blue-900">{day.split(',')[0]}</span>
-                         <span className="text-xs font-medium text-slate-500 mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
+                       <td className="p-2 md:p-4 print:p-1 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-slate-900 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center align-middle">
+                         <span className="font-extrabold text-[11px] md:text-base print:text-[10px] block text-blue-900">{day.split(',')[0]}</span>
+                         <span className="text-[9px] md:text-xs font-medium text-slate-500 mt-0.5 md:mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
                        </td>
                        {(() => {
                          const isSSRThursday = profile?.program === "2nd-core" && day.toLowerCase().includes("thursday");
@@ -504,12 +554,12 @@ export default function DashboardPage() {
                                 const ssrColSpan = j - i;
                                 
                                 cells.push(
-                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
-                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[2.5rem] bg-amber-50 rounded-xl border border-amber-100/50 mx-1">
-                                       <div className="flex items-center gap-2">
-                                          <Users className="w-5 h-5 print:w-3 print:h-3 text-amber-500" />
-                                          <span className="font-extrabold text-slate-800 tracking-wide text-lg print:text-[10px]">
-                                            SSR Visit
+                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-1 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-amber-50 rounded-lg md:rounded-xl border border-amber-100/50 mx-0.5 md:mx-1">
+                                       <div className="flex items-center gap-1 md:gap-2">
+                                          <Users className="w-3 h-3 md:w-5 md:h-5 print:w-3 print:h-3 text-amber-500" />
+                                          <span className="font-extrabold text-slate-800 tracking-wide text-xs md:text-lg print:text-[10px]">
+                                            {window.innerWidth < 768 ? 'SSR' : 'SSR Visit'}
                                           </span>
                                        </div>
                                      </div>
@@ -518,16 +568,19 @@ export default function DashboardPage() {
                                 i = j - 1; 
                               } else {
                                 cells.push(
-                                  <td key={slot} className="p-3 print:p-1 border-r border-slate-200 print:border-slate-200">
-                                    <div className="min-h-[4.5rem] print:min-h-[2.5rem] w-full" />
+                                  <td key={slot} className="p-1 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200">
+                                    <div className="min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] w-full flex items-center justify-center text-slate-300">
+                                      <span className="md:hidden">-</span>
+                                    </div>
                                   </td>
                                 );
                               }
                            } else {
                              cells.push(
-                               <td key={slot} className="p-2 sm:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-top bg-white relative">
+                               <td key={slot} className="p-1 sm:p-2 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-top bg-white relative">
                                  {classesInSlot.length === 0 ? (
-                                   <div className="min-h-[4.5rem] print:min-h-[2.5rem] w-full flex items-center justify-center">
+                                   <div className="min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] w-full flex items-center justify-center text-slate-200">
+                                     {!isEditMode && <span className="md:hidden">-</span>}
                                      {isEditMode && (
                                        <button onClick={() => {
                                           setOriginalClassIdToReschedule(null);
@@ -562,27 +615,27 @@ export default function DashboardPage() {
                                         else if (isMissed) cardClasses = "bg-red-50/50 border-red-200 border-l-red-500 shadow-sm";
 
                                         return (
-                                        <div key={idx} className={`p-2 sm:p-3 print:p-1 print:px-1.5 rounded-xl print:rounded border-y border-r border-l-4 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
+                                        <div key={idx} className={`p-1.5 md:p-3 print:p-1 print:px-1.5 rounded-lg md:rounded-xl print:rounded border-y border-r border-l-[3px] md:border-l-4 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
                                           {isEditMode && (
-                                            <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-2 sm:-mx-3 -mt-2 sm:-mt-3 p-2 rounded-t-xl mb-2 border-b border-slate-200 dark:border-slate-700">
-                                              <button onClick={() => openRescheduleModal(cls)} className="p-1 sm:p-1.5 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3.5 h-3.5"/></button>
-                                              <button onClick={() => handleCancelClass(cls)} className="p-1 sm:p-1.5 text-red-600 bg-red-100 hover:bg-red-200 rounded-lg dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/60"><Trash2 className="w-3.5 h-3.5"/></button>
+                                            <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-1.5 md:-mx-3 -mt-1.5 md:-mt-3 p-1.5 md:p-2 rounded-t-xl mb-1.5 md:mb-2 border-b border-slate-200 dark:border-slate-700">
+                                              <button onClick={() => openRescheduleModal(cls)} className="p-1 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3 h-3 md:w-3.5 md:h-3.5"/></button>
+                                              <button onClick={() => handleCancelClass(cls)} className="p-1 text-red-600 bg-red-100 hover:bg-red-200 rounded-lg dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-900/60"><Trash2 className="w-3 h-3 md:w-3.5 md:h-3.5"/></button>
                                             </div>
                                           )}
                                           <div>
                                              <div className="flex justify-between items-start gap-1">
-                                               <div className="font-extrabold text-sm print:text-[9px] text-slate-900 leading-tight">
-                                                 {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
+                                               <div className="font-extrabold text-[10px] md:text-sm print:text-[9px] text-slate-900 leading-tight">
+                                                 {cls.courseAbb}{cls.sessionNo ? <span className="md:inline hidden">-{cls.sessionNo}</span> : ''}
                                                </div>
-                                               {!isEditMode && isAttended && <span className="text-[10px] print:text-[8px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded leading-none">P</span>}
-                                               {!isEditMode && isMissed && <span className="text-[10px] print:text-[8px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded leading-none">A</span>}
+                                               {!isEditMode && isAttended && <span className="text-[8px] md:text-[10px] print:text-[8px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1 py-0.5 rounded leading-none">P</span>}
+                                               {!isEditMode && isMissed && <span className="text-[8px] md:text-[10px] print:text-[8px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1 py-0.5 rounded leading-none">A</span>}
                                              </div>
-                                             <div className="text-xs print:text-[8px] text-slate-500 mt-1 print:mt-0 font-medium break-words leading-tight">
+                                             <div className="text-[8px] md:text-xs print:text-[8px] text-slate-500 mt-0.5 md:mt-1 print:mt-0 font-medium break-words leading-tight hidden md:block">
                                                {cls.venue || 'TBA'}
                                              </div>
                                           </div>
-                                          <div className="mt-2 print:mt-1 flex">
-                                             <span className={`font-bold text-[10px] sm:text-xs print:text-[7px] px-2.5 py-1 print:px-1 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : isMissed ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-100/50'}`}>
+                                          <div className="mt-1 md:mt-2 print:mt-1 flex">
+                                             <span className={`font-bold text-[8px] md:text-xs print:text-[7px] px-1.5 md:px-2.5 py-0.5 md:py-1 print:px-1 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : isMissed ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-100/50'}`}>
                                                Sec {cls.section}
                                              </span>
                                           </div>
@@ -920,6 +973,22 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Bottom Navigation for Mobile */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 z-50 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+        <button onClick={() => setActiveTab("schedule")} className={`flex flex-col items-center gap-1 p-2 w-full rounded-xl transition-colors ${activeTab === 'schedule' ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-bold' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+          <Calendar className="w-5 h-5" />
+          <span className="text-[10px]">Schedule</span>
+        </button>
+        <button onClick={() => setActiveTab("attendance")} className={`flex flex-col items-center gap-1 p-2 w-full rounded-xl transition-colors ${activeTab === 'attendance' ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-bold' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+          <CheckSquare className="w-5 h-5" />
+          <span className="text-[10px]">Attendance</span>
+        </button>
+        <button onClick={() => setActiveTab("clashes")} className={`flex flex-col items-center gap-1 p-2 w-full rounded-xl transition-colors ${activeTab === 'clashes' ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-bold' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+          <List className="w-5 h-5" />
+          <span className="text-[10px]">Clash Management</span>
+        </button>
+      </div>
     </div>
   );
 }
