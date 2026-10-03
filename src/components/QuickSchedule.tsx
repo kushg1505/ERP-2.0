@@ -478,6 +478,17 @@ export default function QuickSchedule() {
              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400">
                No more missing classes or guessing clash resolutions. Get your personalized timetable, clash alerts, and attendance tracking all in one place.
              </p>
+             
+             <div className="mt-8 bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 p-4 rounded-2xl inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 shadow-md shadow-blue-500/10 transition-transform hover:scale-[1.02]">
+                <span className="font-black text-blue-950 dark:text-blue-50 text-lg sm:text-xl tracking-tight">
+                   Developed by{' '}
+                   <a href="https://www.linkedin.com/in/kush-goyal-5218661b4" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline decoration-blue-600/30 hover:decoration-blue-600 underline-offset-4 transition-all">
+                     Kush Goyal
+                   </a>
+                </span>
+                <span className="hidden sm:inline text-blue-400 dark:text-blue-600 font-bold text-xl">&bull;</span>
+                <span className="font-black text-blue-950 dark:text-blue-50 text-lg sm:text-xl tracking-tight">Batch 2025-27</span>
+             </div>
           </div>
           
           {/* Right Side: Image */}
