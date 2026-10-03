@@ -173,21 +173,24 @@ export default function DashboardPage() {
           }
         });
 
-        if (p.program === "2nd-core") {
-           const hasThursday = Array.from(daysSet).some(d => d.toLowerCase().includes("thursday"));
-           if (!hasThursday && daysSet.size > 0) {
-              const anyDay = Array.from(daysSet)[0];
-              const dateStr = anyDay.split(',')[1]?.trim();
-              let thursdayStr = "Thursday";
-              if (dateStr) {
-                 const d = new Date(dateStr);
-                 if (!isNaN(d.getTime())) {
-                    const diff = 4 - d.getDay();
-                    d.setDate(d.getDate() + diff);
-                    thursdayStr = `Thursday, ${d.toISOString().split('T')[0]}`;
+        if (daysSet.size > 0) {
+           const anyDay = Array.from(daysSet)[0];
+           const dateStr = anyDay.split(',')[1]?.trim();
+           if (dateStr) {
+              const d = new Date(dateStr);
+              if (!isNaN(d.getTime())) {
+                 const dayOfWeek = d.getDay() === 0 ? 7 : d.getDay();
+                 const monday = new Date(d);
+                 monday.setDate(d.getDate() - dayOfWeek + 1);
+                 
+                 const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                 for (let i = 0; i < 7; i++) {
+                    const currentD = new Date(monday);
+                    currentD.setDate(monday.getDate() + i);
+                    const dayString = `${dayNames[i]}, ${currentD.toISOString().split('T')[0]}`;
+                    daysSet.add(dayString);
                  }
               }
-              daysSet.add(thursdayStr);
            }
         }
 
@@ -712,7 +715,7 @@ export default function DashboardPage() {
                    return start >= 8.5 && start < 11.5;
                 });
                 
-                if (dayClasses.length === 0 && !isSSRThursday && !isADPThursday) return null;
+                const hasNoEvents = dayClasses.length === 0 && !isSSRThursday && !isADPThursday;
 
                 return (
                   <div key={day} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden break-inside-avoid">
@@ -723,6 +726,13 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="p-4 sm:p-6 flex flex-col gap-4">
+                      {hasNoEvents && (
+                         <div className="flex flex-col items-center justify-center py-8 text-center bg-green-50/50 dark:bg-green-900/10 rounded-xl border border-green-100 dark:border-green-800/30">
+                            <span className="text-4xl mb-3">🎉</span>
+                            <h4 className="text-xl font-extrabold text-green-700 dark:text-green-400">Yayy! No Classes</h4>
+                            <p className="text-sm font-medium text-green-600/70 dark:text-green-500/70 mt-1">Enjoy your free time!</p>
+                         </div>
+                      )}
                       {isSSRThursday && dayClasses.length === 0 && (
                         <div className="flex items-center gap-4 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30">
                           <div className="bg-amber-100 dark:bg-amber-800/50 p-3 rounded-lg">
