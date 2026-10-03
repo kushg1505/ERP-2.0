@@ -437,8 +437,17 @@ export default function DashboardPage() {
                             No classes scheduled for this day.
                           </div>
                         ) : (
-                          dayPlan.classes.map((cls, cIdx) => (
-                            <div key={cIdx} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                          dayPlan.classes.map((cls, cIdx) => {
+                            let isFuture = false;
+                            const dateStr = cls.date || (cls.day ? cls.day.split(',')[1]?.trim() : "");
+                            const endTimeStr = cls.endTime || (cls.timeSlot ? cls.timeSlot.split('-')[1]?.trim() : "");
+                            if (dateStr && endTimeStr) {
+                               const endDateTime = new Date(`${dateStr}T${endTimeStr}:00+05:30`).getTime();
+                               isFuture = Date.now() < endDateTime;
+                            }
+                            
+                            return (
+                            <div key={cIdx} className={`p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors ${isFuture ? 'opacity-70' : ''}`}>
                               <div className="flex items-center gap-6">
                                 <div className="w-24 text-right shrink-0">
                                   <span className="text-sm font-medium block text-slate-700 dark:text-slate-300">{cls.timeSlot}</span>
@@ -455,14 +464,18 @@ export default function DashboardPage() {
                               </div>
                               <div className="flex gap-3 mt-4 md:mt-0">
                                 {cls.courseAbb !== "SSR" && (
-                                  <>
-                                    <button onClick={() => handleAttendance(getClassId(cls), "attended")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'attended' ? 'bg-emerald-500 text-white border-emerald-600' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}><CheckCircle2 className="w-4 h-4" /> Attended</button>
-                                    <button onClick={() => handleAttendance(getClassId(cls), "missed")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'missed' ? 'bg-red-500 text-white border-red-600' : 'border-red-200 text-red-700 hover:bg-red-50'}`}><XCircle className="w-4 h-4" /> Missed</button>
-                                  </>
+                                  isFuture ? (
+                                    <span className="text-xs font-bold text-slate-500 bg-slate-200 dark:bg-slate-800 px-4 py-2 rounded-xl uppercase tracking-wider flex items-center gap-1.5"><Calendar className="w-4 h-4"/> Upcoming Class</span>
+                                  ) : (
+                                    <>
+                                      <button onClick={() => handleAttendance(getClassId(cls), "attended")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'attended' ? 'bg-emerald-500 text-white border-emerald-600' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}><CheckCircle2 className="w-4 h-4" /> Attended</button>
+                                      <button onClick={() => handleAttendance(getClassId(cls), "missed")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${attendance[getClassId(cls)]?.status === 'missed' ? 'bg-red-500 text-white border-red-600' : 'border-red-200 text-red-700 hover:bg-red-50'}`}><XCircle className="w-4 h-4" /> Missed</button>
+                                    </>
+                                  )
                                 )}
                               </div>
                             </div>
-                          ))
+                          )})
                         )}
                       </div>
                     </div>
