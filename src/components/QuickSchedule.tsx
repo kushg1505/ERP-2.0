@@ -23,6 +23,7 @@ interface ParsedClass {
   faculty: string;
   date: string;
   sessionNo?: string;
+  dtiGroup?: string;
 }
 
 export default function QuickSchedule() {
@@ -563,7 +564,7 @@ export default function QuickSchedule() {
                         <div>
                           <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
                           <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                             {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Section {s}</option>)}
+                             {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Section {s}</option>)}
                           </select>
                         </div>
                         <div>

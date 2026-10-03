@@ -18,6 +18,9 @@ interface ParsedClass {
   date: string;
   sessionNo?: string;
   id?: string;
+  dtiGroup?: string;
+  classId?: string;
+  weekId?: string;
 }
 
 interface DayPlan {
