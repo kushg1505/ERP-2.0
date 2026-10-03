@@ -126,7 +126,7 @@ export default function DashboardPage() {
           : master.filter(cls => 
             p.courses?.some(c => 
               c.courseCode === cls.courseAbb && 
-              (c.section === cls.section || !cls.section || cls.section.includes(c.section))
+              (c.courseCode === "FINPrep" || c.section === cls.section || !cls.section || cls.section.includes(c.section))
             )
           );
         

@@ -32,6 +32,7 @@ export default function ProfilePage() {
   // Manual Course Edit State
   const [newCourseCode, setNewCourseCode] = useState("");
   const [newCourseSection, setNewCourseSection] = useState("A");
+  const [isFinPrep, setIsFinPrep] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -46,6 +47,9 @@ export default function ProfilePage() {
             setYear(y);
             setSpec(s);
           }
+          if (profileData.courses?.some((c: any) => c.courseCode === "FINPrep")) {
+            setIsFinPrep(true);
+          }
         } else {
           setProfile(prev => ({ ...prev, name: user.displayName || "" }));
         }
@@ -56,6 +60,16 @@ export default function ProfilePage() {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    if (year === "2nd" && spec === "core") {
+       if (isFinPrep && !profile.courses.some(c => c.courseCode === "FINPrep")) {
+           setProfile(prev => ({ ...prev, courses: [...prev.courses, { courseCode: "FINPrep", section: "" }] }));
+       } else if (!isFinPrep && profile.courses.some(c => c.courseCode === "FINPrep")) {
+           setProfile(prev => ({ ...prev, courses: prev.courses.filter(c => c.courseCode !== "FINPrep") }));
+       }
+    }
+  }, [isFinPrep, year, spec]);
 
   const handleSave = async () => {
     if (!user) return;
@@ -98,6 +112,9 @@ export default function ProfilePage() {
           courseCode: c.abbreviation,
           section: c.section
        }));
+       if (year === "2nd" && spec === "core" && isFinPrep) {
+           formattedCourses.push({ courseCode: "FINPrep", section: "" });
+       }
        setProfile(prev => ({ ...prev, name: masterData.name || prev.name, courses: formattedCourses }));
        setSyncMessage({ type: "success", text: "Successfully synced with master database!" });
     } else {
@@ -198,7 +215,14 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="flex gap-4 items-center">
+            {year === "2nd" && spec === "core" && (
+              <div className="flex items-center gap-3 mt-4 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                 <input type="checkbox" id="finprepProfile" checked={isFinPrep} onChange={(e) => setIsFinPrep(e.target.checked)} className="w-5 h-5 text-blue-600 rounded bg-white border-slate-300" />
+                 <label htmlFor="finprepProfile" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">I am enrolled in FINPrep</label>
+              </div>
+            )}
+
+            <div className="flex gap-4 items-center mt-6">
               <button 
                 onClick={handleSyncDatabase}
                 disabled={syncing}

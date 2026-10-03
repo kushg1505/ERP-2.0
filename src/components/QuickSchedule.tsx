@@ -40,6 +40,7 @@ export default function QuickSchedule() {
   
   const [bfsSection, setBfsSection] = useState("A");
   const [bfsElective, setBfsElective] = useState("BF");
+  const [isFinPrep, setIsFinPrep] = useState(false);
 
   const [myClasses, setMyClasses] = useState<ParsedClass[]>([]);
   const [allDays, setAllDays] = useState<string[]>([]);
@@ -81,13 +82,16 @@ export default function QuickSchedule() {
           courseCode: c.abbreviation,
           section: c.section
         }));
+        if (year === "2nd" && spec === "core" && isFinPrep) {
+           enrolledCourses.push({ courseCode: "FINPrep", section: "" });
+        }
       }
 
       // Filter master schedule
       const filtered = year === "1st" ? master.filter(cls => !cls.section || cls.section.includes(bfsSection)) : master.filter(cls => 
         enrolledCourses.some(c => 
           c.courseCode === cls.courseAbb && 
-          (c.section === cls.section || !cls.section || cls.section.includes(c.section))
+          (c.courseCode === "FINPrep" || c.section === cls.section || !cls.section || cls.section.includes(c.section))
         )
       );
 
@@ -515,15 +519,23 @@ export default function QuickSchedule() {
                         <p className="text-xs text-blue-500 font-medium mt-2 bg-blue-50 p-2 rounded">Roll Number is not required for 1st-year students.</p>
                       </div>
                     ) : (spec === "core" || spec === "dcp") ? (
-                      <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
-                        <input 
-                          type="text" 
-                          value={rollNo}
-                          onChange={(e) => setRollNo(e.target.value)}
-                          className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
-                          onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
-                        />
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
+                          <input 
+                            type="text" 
+                            value={rollNo}
+                            onChange={(e) => setRollNo(e.target.value)}
+                            className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
+                            onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+                          />
+                        </div>
+                        {year === "2nd" && spec === "core" && (
+                          <div className="flex items-center gap-2 mt-2">
+                             <input type="checkbox" id="finprep" checked={isFinPrep} onChange={(e) => setIsFinPrep(e.target.checked)} className="w-4 h-4 text-blue-600 rounded bg-slate-50 border-slate-300" />
+                             <label htmlFor="finprep" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">I am enrolled in FINPrep</label>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <>
