@@ -110,7 +110,10 @@ export default function DashboardPage() {
 
           historicalSessions.push(...myWClasses.map(cls => {
              const classId = cls.id || `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
-             return { ...cls, weekId: w, classId };
+             const date = cls.date || (cls.day ? cls.day.split(',')[1]?.trim() : "");
+             const startTime = cls.startTime || (cls.timeSlot ? cls.timeSlot.split('-')[0]?.trim() : "");
+             const endTime = cls.endTime || (cls.timeSlot ? cls.timeSlot.split('-')[1]?.trim() : "");
+             return { ...cls, weekId: w, classId, date, startTime, endTime };
           }));
         }));
         
@@ -681,7 +684,7 @@ export default function DashboardPage() {
                                    #{rec.sessionNumber}
                                 </div>
                                 <div className="flex flex-col">
-                                  <span className="font-bold text-slate-800 dark:text-slate-200 text-base">{rec.date} <span className="font-medium text-slate-500 ml-1">({rec.day})</span></span>
+                                  <span className="font-bold text-slate-800 dark:text-slate-200 text-base">{rec.date} <span className="font-medium text-slate-500 ml-1">({rec.day ? rec.day.split(',')[0] : ""})</span></span>
                                   <span className="text-sm font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1 mt-0.5">
                                     <Clock className="w-3.5 h-3.5" /> {rec.timeSlot}
                                   </span>
