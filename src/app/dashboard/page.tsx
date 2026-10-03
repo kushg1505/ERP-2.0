@@ -564,6 +564,25 @@ export default function DashboardPage() {
                          let adpStarted = false;
                          const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
                          
+                         const hasNoEvents = myClasses.filter(c => c.day === day).length === 0 && !isSSRThursday && !isADPThursday;
+
+                         if (hasNoEvents && allTimeSlots.length > 0) {
+                            cells.push(
+                              <td key="no-classes" colSpan={allTimeSlots.length} className="p-1 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
+                                 <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-green-50 rounded-lg md:rounded-xl border border-green-100/50 mx-0.5 md:mx-1">
+                                   <div className="flex items-center gap-1 md:gap-2">
+                                      <span className="text-sm md:text-xl print:text-[10px]">🎉</span>
+                                      <span className="font-extrabold text-green-700 tracking-wide text-xs md:text-lg print:text-[10px]">
+                                        <span className="md:hidden print:hidden">Free</span>
+                                        <span className="hidden md:inline print:inline">Yayy! No Classes</span>
+                                      </span>
+                                   </div>
+                                 </div>
+                              </td>
+                            );
+                            return cells;
+                         }
+
                          for (let i = 0; i < allTimeSlots.length; i++) {
                            const slot = allTimeSlots[i];
                            const slotStart = getStartHour(slot);
