@@ -5,8 +5,13 @@ import * as xlsx from "xlsx";
 import path from "path";
 import fs from "fs";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const authHeader = request.headers.get('x-api-key');
+    if (authHeader !== process.env.ADMIN_API_KEY) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const basePath = process.cwd();
     
     // Parse Courses
