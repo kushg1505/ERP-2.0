@@ -251,7 +251,7 @@ export default function QuickSchedule() {
                  <tbody>
                    {allDays.map(day => (
                      <tr key={day} className="border-t border-slate-200 print:border-slate-200">
-                       <td className="p-4 print:p-2 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-blue-50/30 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center">
+                       <td className="p-4 print:p-2 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-slate-900 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center">
                          <span className="font-extrabold text-base print:text-sm block text-blue-900">{day.split(',')[0]}</span>
                          <span className="text-xs font-medium text-slate-500 mt-1 block print:mt-0">{day.split(',')[1]?.trim()}</span>
                        </td>
