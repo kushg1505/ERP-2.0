@@ -534,7 +534,7 @@ export default function DashboardPage() {
                      {allTimeSlots.map(slot => (
                        <th key={slot} className="p-1 md:p-3 print:p-1 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-[10px] md:text-sm print:text-[9px] print-no-sticky align-middle">
                          <span className="hidden md:inline print:hidden">{slot}</span>
-                         <span className="md:hidden block whitespace-pre-line">{slot.replace('-', '\n')}</span>
+                         <span className="md:hidden block whitespace-pre-line print:hidden">{slot.replace('-', '\n')}</span>
                          <span className="hidden print:block whitespace-pre-line">{slot.replace('-', '\n')}</span>
                        </th>
                      ))}
