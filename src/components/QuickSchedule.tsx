@@ -245,7 +245,7 @@ export default function QuickSchedule() {
                    {/* Week Pill */}
                    <div className="flex items-center gap-2 bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">
                      <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 print:w-3.5 print:h-3.5" />
-                     {activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                     {activeWeek === "week-1-2026" ? (year === "2nd" ? "Week 1 Term 5" : "Week 1 Term 2") : activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                    </div>
                    {/* Specialization Pill */}
                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">

@@ -43,6 +43,13 @@ export default function DashboardPage() {
   const toggleCourse = (course: string) => {
     setExpandedCourses(prev => ({ ...prev, [course]: !prev[course] }));
   };
+
+  const formatWeek = (w: string) => {
+    if (w === "week-1-2026") {
+      return profile?.program?.startsWith("1st") ? "Week 1 Term 2" : "Week 1 Term 5";
+    }
+    return w.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
   
   // Tabular View State
   const [viewMode, setViewMode] = useState<"list" | "table">("table");
@@ -390,7 +397,7 @@ export default function DashboardPage() {
               ) : (
                 availableWeeks.map(w => (
                   <option key={w} value={w} className="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800">
-                    {w.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    {formatWeek(w)}
                   </option>
                 ))
               )}
@@ -444,7 +451,7 @@ export default function DashboardPage() {
                  <div className="flex items-center gap-4 mt-2">
                     <div className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full font-bold text-sm">
                       <Calendar className="w-4 h-4" />
-                      {selectedWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || "Current Week"}
+                      {selectedWeek ? formatWeek(selectedWeek) : "Current Week"}
                     </div>
                     <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm text-slate-700 px-4 py-2 rounded-full font-bold border border-slate-200 text-sm">
                       <Users className="w-4 h-4 text-slate-500" />
