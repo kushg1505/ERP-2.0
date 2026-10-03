@@ -74,7 +74,7 @@ body {
 @media print {
   @page {
     margin: 1cm;
-    size: landscape;
+    size: portrait;
   }
   body {
     background: white;
@@ -95,17 +95,8 @@ body {
     border: none !important;
     box-shadow: none !important;
   }
-  .print-header {
-    background: white !important;
-    color: black !important;
-    border-bottom: 2px solid #e2e8f0;
-  }
-  .print-bg-gray {
-    background: #f8fafc !important;
-  }
   .print-no-shadow {
     box-shadow: none !important;
-    border-color: #cbd5e1 !important;
   }
   .print-overflow-visible {
     overflow: visible !important;

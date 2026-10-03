@@ -197,33 +197,33 @@ export default function QuickSchedule() {
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden print-no-border">
-          <div className="p-6 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-center print-header">
+          <div className="p-6 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-end print:bg-transparent print:text-black print:pb-4 print:pt-0">
              <div>
-                <h2 className="text-2xl font-bold">My Quick Schedule</h2>
+                <h2 className="text-2xl font-bold print:text-black">My Quick Schedule</h2>
                 <div className="mt-3 flex items-center gap-3">
-                   <span className="font-extrabold text-xl text-blue-400 bg-blue-900/40 px-3 py-1 rounded-lg border border-blue-800/50 print:text-blue-700 print:bg-blue-50 print:border-blue-200">
+                   <span className="font-extrabold text-xl text-blue-400 bg-blue-900/40 px-3 py-1 rounded-lg border border-blue-800/50 print:text-blue-600 print:bg-transparent print:border-blue-200 print:rounded-xl">
                      {activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                    </span> 
-                   <span className="text-slate-500">•</span> 
+                   <span className="text-slate-500 print:text-slate-600">•</span> 
                    <span className="font-medium text-slate-300 print:text-slate-600">{year} Year {spec.toUpperCase()}</span>
                 </div>
              </div>
-             {rollNo && <div className="text-slate-400 font-medium">Roll No: {rollNo}</div>}
+             {rollNo && <div className="text-slate-400 font-medium print:text-slate-600 print:mb-2">Roll No: {rollNo}</div>}
           </div>
           
-          <div className="overflow-x-auto print-overflow-visible">
+          <div className="overflow-x-auto print-overflow-visible print:border-t print:border-slate-200">
             <table className="w-full text-left border-collapse min-w-[800px] xl:min-w-0">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-950 print-bg-gray">
-                  <th className="p-4 font-semibold text-slate-500 w-28 border-r border-b border-slate-200 sticky left-0 bg-slate-50 z-20 text-sm print-no-sticky">Day / Time</th>
-                  {allTimeSlots.map(slot => <th key={slot} className="p-3 font-bold text-slate-800 border-r border-b border-slate-200 text-center bg-slate-50 text-sm print-no-sticky">{slot}</th>)}
+                <tr className="bg-slate-50 dark:bg-slate-950 print:bg-white">
+                  <th className="p-4 font-semibold text-slate-500 w-28 border-r border-b border-slate-200 sticky left-0 bg-slate-50 z-20 text-sm print-no-sticky print:bg-white print:text-slate-600">Day / Time</th>
+                  {allTimeSlots.map(slot => <th key={slot} className="p-3 font-bold text-slate-800 border-r border-b border-slate-200 text-center bg-slate-50 text-sm print-no-sticky print:bg-white print:text-black">{slot}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {allDays.map(day => (
                   <tr key={day} className="border-b border-slate-200">
-                    <td className="p-4 font-medium text-sm text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-50 sticky left-0 z-10 print-no-sticky">
-                      <span className="font-bold text-base block">{day.split(',')[0]}</span>
+                    <td className="p-4 font-medium text-sm text-slate-800 border-r border-slate-200 whitespace-nowrap bg-slate-50 sticky left-0 z-10 print-no-sticky print:bg-white print:text-black">
+                      <span className="font-bold text-base block print:text-blue-950">{day.split(',')[0]}</span>
                       <span className="text-xs text-slate-500">{day.split(',')[1]?.trim()}</span>
                     </td>
                     {(() => {
@@ -244,9 +244,9 @@ export default function QuickSchedule() {
                              const ssrColSpan = j - i;
                              
                              cells.push(
-                               <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 align-middle bg-slate-50/50 print-bg-gray">
+                               <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 border-r border-slate-200 align-middle bg-slate-50/50 print:bg-white">
                                   <div className="flex items-center justify-center h-full min-h-[4rem]">
-                                    <span className="font-bold text-slate-700 tracking-widest text-lg bg-white px-8 py-2 rounded-full border border-slate-200 shadow-sm print-no-shadow">
+                                    <span className="font-bold text-slate-700 tracking-widest text-lg bg-white px-8 py-2 rounded-full border border-slate-200 shadow-sm print-no-shadow print:text-slate-800">
                                       SSR Visit
                                     </span>
                                   </div>
@@ -255,24 +255,24 @@ export default function QuickSchedule() {
                              i = j - 1; // skip the handled slots
                            } else {
                              cells.push(
-                               <td key={slot} className="p-3 border-r border-slate-200">
+                               <td key={slot} className="p-3 border-r border-slate-200 print:bg-white">
                                  <div className="min-h-[4rem] w-full" />
                                </td>
                              );
                            }
                         } else {
                           cells.push(
-                            <td key={slot} className="p-3 border-r border-slate-200 align-top">
+                            <td key={slot} className="p-3 border-r border-slate-200 align-top print:bg-white">
                               {classesInSlot.length === 0 ? (
                                 <div className="min-h-[4rem] w-full" />
                               ) : (
                                 <div className="flex flex-col gap-2 h-full">
                                   {classesInSlot.map((cls, idx) => (
-                                    <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-white shadow-sm print-no-shadow">
+                                    <div key={idx} className="p-3 rounded-xl border border-slate-200 bg-white shadow-sm print-no-shadow print:border-slate-300">
                                       <div className="font-bold text-sm text-slate-900 leading-tight">
                                         {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
                                       </div>
-                                      <div className="text-xs text-slate-500 flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
+                                      <div className="text-xs text-slate-500 flex items-center justify-between mt-2 pt-2 border-t border-slate-100 print:border-slate-200">
                                         <span>{cls.venue || 'TBA'}</span>
                                         <span className="font-bold text-blue-600">Sec {cls.section}</span>
                                       </div>
