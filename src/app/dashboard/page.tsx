@@ -144,7 +144,7 @@ export default function DashboardPage() {
               const code = c.courseCode ? c.courseCode.toLowerCase().replace(/[\s-]/g, '') : '';
               const abb = cls.courseAbb ? cls.courseAbb.toLowerCase().replace(/[\s-]/g, '') : '';
               return (code === abb || (code === "finprep" && abb.startsWith("finprep"))) && 
-              (code.startsWith("finprep") || c.section === cls.section || !cls.section || cls.section.includes(c.section));
+              (code.startsWith("finprep") || code === "bf" || code === "serm" || c.section === cls.section || !cls.section || cls.section.includes(c.section));
             })
           );
         

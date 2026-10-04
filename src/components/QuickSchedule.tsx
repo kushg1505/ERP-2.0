@@ -7,10 +7,11 @@ import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
 import { DisclaimerModal } from "./DisclaimerModal";
+import bfsElectivesData from '@/data/bfs_electives.json';
+const bfsElectives = bfsElectivesData as Record<string, string>;
 
 const AVAILABLE_SECTIONS = ["A", "B", "C", "D", "E", "F"];
 const BFS_FIXED_COURSES = ["MLBFSI", "FIS", "VCPE", "HRM", "BFSI&STY"];
-const BFS_ELECTIVE_COURSES = ["BF", "SERM"];
 
 interface ParsedClass {
   courseAbb: string;
@@ -65,7 +66,7 @@ export default function QuickSchedule() {
   const [rollNo, setRollNo] = useState("");
   
   const [bfsSection, setBfsSection] = useState("A");
-  const [bfsElective, setBfsElective] = useState("BF");
+
   const [dtiGroup, setDtiGroup] = useState("1");
   const [isFinPrep, setIsFinPrep] = useState(false);
 
@@ -95,10 +96,14 @@ export default function QuickSchedule() {
       if (year === "1st") {
         // 1st years don't need roll no, we just filter the master table by their section
       } else if (spec === "bfs") {
+        if (!rollNo) throw new Error("Please enter your Roll Number.");
+        const elective = bfsElectives[rollNo.trim()];
+        if (!elective) throw new Error("Roll Number not found in BFS electives list.");
+        
         for (const c of BFS_FIXED_COURSES) {
           enrolledCourses.push({ courseCode: c, section: bfsSection });
         }
-        enrolledCourses.push({ courseCode: bfsElective, section: bfsSection });
+        enrolledCourses.push({ courseCode: elective, section: "" });
       } else {
         if (!rollNo) throw new Error("Please enter your Roll Number.");
         const masterData = await getStudentFromMasterDB(rollNo.trim());
@@ -125,7 +130,7 @@ export default function QuickSchedule() {
           const code = c.courseCode ? c.courseCode.toLowerCase().replace(/[\s-]/g, '') : '';
           const abb = cls.courseAbb ? cls.courseAbb.toLowerCase().replace(/[\s-]/g, '') : '';
           return (code === abb || (code === "finprep" && abb.startsWith("finprep"))) && 
-          (code.startsWith("finprep") || c.section === cls.section || !cls.section || cls.section.includes(c.section));
+          (code.startsWith("finprep") || code === "bf" || code === "serm" || c.section === cls.section || !cls.section || cls.section.includes(c.section));
         })
       );
 
@@ -637,10 +642,15 @@ export default function QuickSchedule() {
                           </select>
                         </div>
                         <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Choose Elective</label>
-                          <select value={bfsElective} onChange={(e) => setBfsElective(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                             {BFS_ELECTIVE_COURSES.map(c => <option key={c} value={c}>{c}</option>)}
-                          </select>
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
+                          <input 
+                            type="text" 
+                            value={rollNo}
+                            onChange={(e) => setRollNo(e.target.value)}
+                            className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
+                            onKeyDown={(e) => e.key === 'Enter' && onGenerateClick()}
+                            placeholder="Required for electives"
+                          />
                         </div>
                       </>
                     )}
