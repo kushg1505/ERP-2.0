@@ -24,6 +24,8 @@ export function AuthButton() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
   if (user) {
     return (
       <div className="flex items-center gap-3" ref={dropdownRef}>
@@ -82,8 +84,6 @@ export function AuthButton() {
       </div>
     );
   }
-
-  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   const handleSignIn = () => {
     setShowDisclaimer(true);
