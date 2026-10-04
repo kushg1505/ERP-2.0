@@ -1,4 +1,8 @@
+"use client";
+
 import { AlertTriangle } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { useEffect, useState } from 'react';
 
 interface DisclaimerModalProps {
   isOpen: boolean;
@@ -7,9 +11,15 @@ interface DisclaimerModalProps {
 }
 
 export function DisclaimerModal({ isOpen, onAccept, onCancel }: DisclaimerModalProps) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
   
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-6">
@@ -46,6 +56,7 @@ export function DisclaimerModal({ isOpen, onAccept, onCancel }: DisclaimerModalP
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
