@@ -488,7 +488,7 @@ export default function QuickSchedule() {
       <>
         <DisclaimerModal isOpen={showDisclaimer} onAccept={onDisclaimerAccept} onCancel={() => { setShowDisclaimer(false); setPendingAction(null); }} />
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in slide-in-from-bottom-8 duration-700 no-print flex flex-col items-center relative">
-        <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none z-0 opacity-50"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] dark:bg-[radial-gradient(#475569_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none z-0 opacity-80"></div>
         
         {/* Top Row: Hero Text & Image */}
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full relative z-10 mb-12 sm:mb-16">
