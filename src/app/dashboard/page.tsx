@@ -500,7 +500,7 @@ export default function DashboardPage() {
             <div className="hidden print:block w-full bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden relative mb-6">
               <div className="p-8 pb-6 relative z-10">
                  <div className="flex justify-between items-center mb-6">
-                    <span className="font-extrabold text-sm tracking-widest text-slate-700">Bunkwise</span>
+                    <span className="font-extrabold text-sm tracking-widest text-slate-700">BunkWise</span>
                     <span className="text-sm font-medium text-slate-500">{new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
                  </div>
 
