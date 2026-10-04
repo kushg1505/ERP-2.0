@@ -245,7 +245,7 @@ export default function QuickSchedule() {
           <div className="p-4 sm:p-8 pb-4 sm:pb-6 relative z-10 print:p-6 print:pb-4">
              {/* Top info row */}
              <div className="hidden print:flex justify-between items-center mb-4">
-                <span className="font-extrabold text-sm tracking-widest text-slate-700">ERP 2.0</span>
+                <span className="font-extrabold text-sm tracking-widest text-slate-700">Bunkwise</span>
                 <span className="text-sm font-medium text-slate-500">{new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
              </div>
 
@@ -499,7 +499,7 @@ export default function QuickSchedule() {
 
         {/* Print Footer */}
         <div className="hidden print:flex px-8 pb-8 justify-end items-center relative z-10">
-           <span className="text-slate-500 font-bold text-xs tracking-wide">Generated from ERP 2.0</span>
+           <span className="text-slate-500 font-bold text-xs tracking-wide">Generated from Bunkwise</span>
            <div className="w-8 h-[3px] bg-blue-600 ml-4 rounded-full"></div>
         </div>
       </div>

@@ -30,10 +30,10 @@ export function DisclaimerModal({ isOpen, onAccept, onCancel }: DisclaimerModalP
           
           <div className="space-y-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
             <p>
-              ERP 2.0 is designed to provide accurate and up-to-date academic schedules. However, in rare cases, data or technical discrepancies may occur.
+              Bunkwise is designed to provide accurate and up-to-date academic schedules. However, in rare cases, data or technical discrepancies may occur.
             </p>
             <p>
-              Please verify important classes with the official college timetable. ERP 2.0 cannot be held responsible for missed classes resulting from any such discrepancies.
+              Please verify important classes with the official college timetable. Bunkwise cannot be held responsible for missed classes resulting from any such discrepancies.
             </p>
             <p className="text-slate-800 dark:text-slate-200 font-bold">
               Thank you for understanding!

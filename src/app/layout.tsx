@@ -13,7 +13,7 @@ import { AdminLink } from "@/components/AdminLink";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "ERP 2.0",
+  title: "Bunkwise",
   description: "Personalized timetable and clash management made exclusively for IMT Ghaziabad students.",
 };
 
@@ -37,8 +37,8 @@ export default function RootLayout({
                 <div className="flex justify-between h-16">
                   <div className="flex">
                     <Link href="/" className="flex-shrink-0 flex items-center gap-2 group">
-                      <img src="/logo.png" alt="ERP 2.0 Logo" className="h-10 w-auto group-hover:scale-105 transition-transform" />
-                      <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">ERP 2.0</span>
+                      <img src="/logo.png" alt="Bunkwise Logo" className="h-10 w-auto group-hover:scale-105 transition-transform" />
+                      <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">Bunkwise</span>
                     </Link>
                     <div className="hidden md:flex ml-4 sm:ml-8 space-x-4 sm:space-x-8">
                       <Link href="/dashboard" className="border-transparent text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-bold transition-all">
@@ -69,7 +69,7 @@ export default function RootLayout({
                   <div className="flex flex-col items-center md:items-start text-center md:text-left">
                     <div className="flex items-center gap-2 mb-2">
                       <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                      <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">ERP 2.0</span>
+                      <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">Bunkwise</span>
                     </div>
                     <p className="text-sm text-slate-500 dark:text-slate-400">Intelligent Timetable & Clash Management, made exclusively for IMT Ghaziabad students.</p>
                   </div>
