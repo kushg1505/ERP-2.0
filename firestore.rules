@@ -26,8 +26,28 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && request.auth.uid == userId;
     }
 
-    // 3. Master Schedules (All Programs): Anyone can read, only Admins can write
-    match /master_schedules_{program}/{document=**} {
+    // 3. Master Schedules: Anyone can read, only Admins can write
+    match /master_schedules_1st-core/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /master_schedules_1st-bfs/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /master_schedules_1st-dcp/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /master_schedules_2nd-core/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /master_schedules_2nd-bfs/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /master_schedules_2nd-dcp/{document=**} {
       allow read: if true;
       allow write: if isAdmin();
     }
