@@ -5,6 +5,7 @@ import { User, LogIn, LogOut, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
+import { DisclaimerModal } from "./DisclaimerModal";
 
 export function AuthButton() {
   const { user, signInWithGoogle, logout } = useAuth();
@@ -82,7 +83,14 @@ export function AuthButton() {
     );
   }
 
-  const handleSignIn = async () => {
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  const handleSignIn = () => {
+    setShowDisclaimer(true);
+  };
+
+  const onDisclaimerAccept = async () => {
+    setShowDisclaimer(false);
     await signInWithGoogle();
     if (pathname === "/") {
       router.push("/profile");
@@ -90,9 +98,16 @@ export function AuthButton() {
   };
 
   return (
-    <button onClick={handleSignIn} className="btn-primary flex items-center justify-center gap-2 text-sm px-3 sm:px-4 py-2 whitespace-nowrap">
-      <LogIn className="h-4 w-4 shrink-0" />
-      <span>Sign In</span>
-    </button>
+    <>
+      <DisclaimerModal 
+        isOpen={showDisclaimer} 
+        onAccept={onDisclaimerAccept} 
+        onCancel={() => setShowDisclaimer(false)} 
+      />
+      <button onClick={handleSignIn} className="btn-primary flex items-center justify-center gap-2 text-sm px-3 sm:px-4 py-2 whitespace-nowrap">
+        <LogIn className="h-4 w-4 shrink-0" />
+        <span>Sign In</span>
+      </button>
+    </>
   );
 }

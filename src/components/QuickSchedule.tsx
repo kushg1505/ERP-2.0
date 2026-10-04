@@ -6,6 +6,7 @@ import { RefreshCw, Download, Calendar, ArrowRight, GraduationCap, Crown, Sparkl
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
+import { DisclaimerModal } from "./DisclaimerModal";
 
 const AVAILABLE_SECTIONS = ["A", "B", "C", "D", "E", "F"];
 const BFS_FIXED_COURSES = ["MLBFSI", "FIS", "VCPE", "HRM", "BFSI&STY"];
@@ -34,6 +35,30 @@ export default function QuickSchedule() {
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"generate" | "signin" | null>(null);
+
+  const onGenerateClick = () => {
+    setPendingAction("generate");
+    setShowDisclaimer(true);
+  };
+
+  const onSignInClick = () => {
+    setPendingAction("signin");
+    setShowDisclaimer(true);
+  };
+
+  const onDisclaimerAccept = async () => {
+    setShowDisclaimer(false);
+    if (pendingAction === "generate") {
+      handleGenerate();
+    } else if (pendingAction === "signin") {
+      await signInWithGoogle();
+      router.push('/profile');
+    }
+    setPendingAction(null);
+  };
 
   const [year, setYear] = useState("2nd");
   const [spec, setSpec] = useState("core");
@@ -198,6 +223,7 @@ export default function QuickSchedule() {
   if (step === 2) {
     return (
       <div className="w-full max-w-6xl mx-auto mt-16 print:mt-0 print-fullscreen print:bg-white print:text-black flex flex-col justify-center">
+        <DisclaimerModal isOpen={showDisclaimer} onAccept={onDisclaimerAccept} onCancel={() => { setShowDisclaimer(false); setPendingAction(null); }} />
         <div className="flex flex-col sm:flex-row justify-between items-center mb-8 no-print gap-4">
           <button onClick={() => setStep(1)} className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-medium px-4 py-2">&larr; Back to setup</button>
           <div className="flex items-center gap-3">
@@ -205,7 +231,7 @@ export default function QuickSchedule() {
              {user ? (
                <Link href="/dashboard" className="btn-primary px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">Go to Dashboard <ArrowRight className="w-4 h-4"/></Link>
              ) : (
-               <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="btn-primary px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">Sign In to Edit <ArrowRight className="w-4 h-4"/></button>
+               <button onClick={onSignInClick} className="btn-primary px-6 py-2.5 rounded-lg font-bold flex items-center gap-2">Sign In to Edit <ArrowRight className="w-4 h-4"/></button>
              )}
           </div>
         </div>
@@ -451,7 +477,7 @@ export default function QuickSchedule() {
       <div className="mt-8 text-center bg-blue-50 border border-blue-200 rounded-xl p-6 no-print">
            <h3 className="text-lg font-bold text-blue-900 mb-2">Want to save this schedule?</h3>
            <p className="text-blue-700 mb-4">Sign in to edit classes, track your attendance, and manage schedule clashes permanently.</p>
-           <Link href="/dashboard" className="btn-primary inline-flex px-8 py-3 rounded-lg font-bold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50">Create Free Account</Link>
+           <button onClick={onSignInClick} className="btn-primary inline-flex px-8 py-3 rounded-lg font-bold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50">Create Free Account</button>
         </div>
       </div>
     );
@@ -460,6 +486,7 @@ export default function QuickSchedule() {
   if (step === 1) {
     return (
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in slide-in-from-bottom-8 duration-700 no-print flex flex-col items-center relative">
+        <DisclaimerModal isOpen={showDisclaimer} onAccept={onDisclaimerAccept} onCancel={() => { setShowDisclaimer(false); setPendingAction(null); }} />
         <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:linear-gradient(to_bottom,white,transparent)] pointer-events-none z-0 opacity-50"></div>
         
         {/* Top Row: Hero Text & Image */}
@@ -560,7 +587,7 @@ export default function QuickSchedule() {
                             value={rollNo}
                             onChange={(e) => setRollNo(e.target.value)}
                             className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
-                            onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+                            onKeyDown={(e) => e.key === 'Enter' && onGenerateClick()}
                           />
                         </div>
                         {year === "2nd" && spec === "core" && (
@@ -592,7 +619,7 @@ export default function QuickSchedule() {
                 {error && <div className="mt-4 text-center text-red-500 font-medium text-sm bg-red-50 dark:bg-red-900/20 py-2 rounded-lg">{error}</div>}
 
                  <button 
-                  onClick={handleGenerate}
+                  onClick={onGenerateClick}
                   disabled={loading}
                   className="mt-6 btn-primary w-full py-4 rounded-xl font-bold text-base shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 inline-flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
                 >
@@ -620,7 +647,7 @@ export default function QuickSchedule() {
                       <p className="text-blue-100 text-sm sm:text-base leading-relaxed">
                         Sign in to create your permanent profile. Get access to fully customizable timetables, personalized attendance tracking, and smart clash management.
                       </p>
-                      <button onClick={async () => { await signInWithGoogle(); router.push('/profile'); }} className="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto justify-center group mt-2">
+                      <button onClick={onSignInClick} className="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-bold text-sm sm:text-base shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1 active:translate-y-0 w-full sm:w-auto justify-center group mt-2">
                         Create Profile <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </button>
                     </div>
