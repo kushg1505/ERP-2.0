@@ -121,10 +121,12 @@ export default function QuickSchedule() {
          }
          return !cls.section || cls.section.includes(bfsSection);
       }) : master.filter(cls => 
-        enrolledCourses.some(c => 
-          (c.courseCode.toLowerCase() === cls.courseAbb.toLowerCase() || (c.courseCode.toLowerCase() === "finprep" && cls.courseAbb.toLowerCase().startsWith("finprep"))) && 
-          (c.courseCode.toLowerCase() === "finprep" || c.section === cls.section || !cls.section || cls.section.includes(c.section))
-        )
+        enrolledCourses.some(c => {
+          const code = c.courseCode ? c.courseCode.toLowerCase().replace(/[\s-]/g, '') : '';
+          const abb = cls.courseAbb ? cls.courseAbb.toLowerCase().replace(/[\s-]/g, '') : '';
+          return (code === abb || (code === "finprep" && abb.startsWith("finprep"))) && 
+          (code.startsWith("finprep") || c.section === cls.section || !cls.section || cls.section.includes(c.section));
+        })
       );
 
       // Add SSR Visit for 2nd core

@@ -140,10 +140,12 @@ export default function DashboardPage() {
               return !cls.section || (p.section && cls.section.includes(p.section));
           })
           : master.filter(cls => 
-            p.courses?.some(c => 
-              (c.courseCode.toLowerCase() === cls.courseAbb.toLowerCase() || (c.courseCode.toLowerCase() === "finprep" && cls.courseAbb.toLowerCase().startsWith("finprep"))) && 
-              (c.courseCode.toLowerCase() === "finprep" || c.section === cls.section || !cls.section || cls.section.includes(c.section))
-            )
+            p.courses?.some(c => {
+              const code = c.courseCode ? c.courseCode.toLowerCase().replace(/[\s-]/g, '') : '';
+              const abb = cls.courseAbb ? cls.courseAbb.toLowerCase().replace(/[\s-]/g, '') : '';
+              return (code === abb || (code === "finprep" && abb.startsWith("finprep"))) && 
+              (code.startsWith("finprep") || c.section === cls.section || !cls.section || cls.section.includes(c.section));
+            })
           );
         
         const currentWeekOverrides = p.scheduleOverrides?.filter((o: any) => o.weekId === targetWeek) || [];
