@@ -42,7 +42,7 @@ export default function MigrateDashboard() {
       
       coursesData.slice(1).forEach((row: any) => {
         if (!row[3] || !row[4]) return; // Need Name and Abb
-        const courseName = row[3].trim();
+        const courseName = row[3].trim().toLowerCase();
         const abb = row[4].trim();
         const faculty = row[5] ? row[5].trim() : "";
         
@@ -73,7 +73,7 @@ export default function MigrateDashboard() {
            const section = row[i];
            
            if (section && courseName) {
-              const abb = coursesMap.get(courseName.trim());
+              const abb = coursesMap.get(courseName.trim().toLowerCase());
               if (abb) {
                  enrolledCourses.push({
                     abbreviation: abb,
