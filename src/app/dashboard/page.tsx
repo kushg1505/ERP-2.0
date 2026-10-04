@@ -574,8 +574,8 @@ export default function DashboardPage() {
                                    <div className="flex items-center gap-1 md:gap-2">
                                       <span className="text-sm md:text-xl print:text-[10px]">🎉</span>
                                       <span className="font-extrabold text-green-700 tracking-wide text-xs md:text-lg print:text-[10px]">
-                                        <span className="md:hidden print:hidden">Free</span>
-                                        <span className="hidden md:inline print:inline">Yayy! No Classes</span>
+                                      <span className="md:hidden print:hidden">No Classes🎉</span>
+                                      <span className="hidden md:inline print:inline">Yayy! No Classes</span>
                                       </span>
                                    </div>
                                  </div>

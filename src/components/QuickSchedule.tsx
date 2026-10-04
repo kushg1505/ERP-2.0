@@ -324,6 +324,25 @@ export default function QuickSchedule() {
                          let ssrStarted = false;
                          const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
                          
+                         const hasNoEvents = myClasses.filter(c => c.day === day).length === 0 && !isSSRThursday;
+
+                         if (hasNoEvents && allTimeSlots.length > 0) {
+                            cells.push(
+                              <td key="no-classes" colSpan={allTimeSlots.length} className="p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
+                                 <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[2.5rem] bg-green-50 rounded-xl border border-green-100/50 mx-1">
+                                   <div className="flex items-center gap-2">
+                                      <span className="text-xl print:text-[10px]">🎉</span>
+                                      <span className="font-extrabold text-green-700 tracking-wide text-lg print:text-[10px]">
+                                        <span className="md:hidden print:hidden">No Classes🎉</span>
+                                        <span className="hidden md:inline print:inline">Yayy! No Classes</span>
+                                      </span>
+                                   </div>
+                                 </div>
+                              </td>
+                            );
+                            return cells;
+                         }
+                         
                          for (let i = 0; i < allTimeSlots.length; i++) {
                            const slot = allTimeSlots[i];
                            const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
@@ -399,7 +418,7 @@ export default function QuickSchedule() {
                   const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
                   const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
                   
-                  if (dayClasses.length === 0 && !isSSRThursday) return null;
+                  const hasNoEvents = dayClasses.length === 0 && !isSSRThursday;
 
                   return (
                     <div key={day} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden print:border-slate-300 print:bg-transparent break-inside-avoid">
@@ -410,6 +429,15 @@ export default function QuickSchedule() {
                         </div>
                       </div>
                       <div className="p-4 sm:p-6 flex flex-col gap-4">
+                        {hasNoEvents && (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="text-center">
+                              <span className="text-4xl block mb-3">🎉</span>
+                              <h4 className="font-extrabold text-green-700 text-lg">Yayy! No Classes 🎉</h4>
+                              <p className="text-green-600/80 text-sm font-medium mt-1">Enjoy your day off!</p>
+                            </div>
+                          </div>
+                        )}
                         {isSSRThursday && dayClasses.length === 0 && (
                           <div className="flex items-center gap-4 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30 print:border-amber-200">
                             <div className="bg-amber-100 dark:bg-amber-800/50 p-3 rounded-lg print:bg-amber-50">
