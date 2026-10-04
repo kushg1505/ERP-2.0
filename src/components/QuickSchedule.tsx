@@ -122,7 +122,7 @@ export default function QuickSchedule() {
          return !cls.section || cls.section.includes(bfsSection);
       }) : master.filter(cls => 
         enrolledCourses.some(c => 
-          c.courseCode.toLowerCase() === cls.courseAbb.toLowerCase() && 
+          (c.courseCode.toLowerCase() === cls.courseAbb.toLowerCase() || (c.courseCode.toLowerCase() === "finprep" && cls.courseAbb.toLowerCase().startsWith("finprep"))) && 
           (c.courseCode.toLowerCase() === "finprep" || c.section === cls.section || !cls.section || cls.section.includes(c.section))
         )
       );
