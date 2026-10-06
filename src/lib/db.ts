@@ -113,7 +113,22 @@ export async function fetchMasterTimetable(weekId: string, program: string = "2n
     const docRef = doc(db, `master_schedules_${program}`, weekId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      return docSnap.data().classes || [];
+      const classes = docSnap.data().classes || [];
+      if (weekId === "week-1-2026" && program === "2nd-core") {
+         classes.push({
+            courseAbb: "FINPrep",
+            courseName: "Finance Prep",
+            day: "Wednesday, 2026-10-07",
+            timeSlot: "19:00-20:15",
+            startTime: "19:00",
+            endTime: "20:15",
+            venue: "TBA",
+            faculty: "TBA",
+            date: "2026-10-07",
+            section: ""
+         });
+      }
+      return classes;
     }
     return [];
   } catch (error: any) {

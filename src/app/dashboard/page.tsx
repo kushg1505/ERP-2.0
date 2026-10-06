@@ -170,11 +170,11 @@ export default function DashboardPage() {
           grouped[cls.day].push(cls);
         });
 
-        // Extract ALL unique days and timeslots from the Master Timetable to build a perfect Grid
+        // Extract ALL unique days and timeslots from the Master Timetable and overrides to build a perfect Grid
         const daysSet = new Set<string>();
         const slotsSet = new Set<string>();
         
-        master.forEach((cls: ParsedClass) => {
+        [...master, ...myFilteredClasses].forEach((cls: ParsedClass) => {
           if (cls.day && cls.day.trim() !== "") daysSet.add(cls.day);
           if (cls.timeSlot && cls.timeSlot.trim() !== "" && cls.timeSlot.toLowerCase() !== "full day" && cls.timeSlot !== "09:00-11:45") {
             slotsSet.add(cls.timeSlot);
