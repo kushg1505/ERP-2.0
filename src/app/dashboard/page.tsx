@@ -110,13 +110,15 @@ export default function DashboardPage() {
           );
           
           const weekOverrides = p.scheduleOverrides?.filter((o: any) => o.weekId === w) || [];
-          const canceledIds = weekOverrides.filter((o: any) => o.type === 'cancel' || o.type === 'reschedule').map((o: any) => o.originalClassId);
-          myWClasses = myWClasses.filter(cls => {
-            const classId = `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
-            return !canceledIds.includes(classId);
-          });
+          
           const addedClasses = weekOverrides.filter((o: any) => o.type === 'add' || o.type === 'reschedule').map((o: any) => o.newClassDetails);
           myWClasses.push(...addedClasses);
+
+          const canceledIds = weekOverrides.filter((o: any) => o.type === 'cancel' || o.type === 'reschedule').map((o: any) => o.originalClassId);
+          myWClasses = myWClasses.filter(cls => {
+            const classId = cls.id || `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
+            return !canceledIds.includes(classId);
+          });
 
           historicalSessions.push(...myWClasses.map(cls => {
              const classId = cls.id || `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
@@ -149,13 +151,17 @@ export default function DashboardPage() {
           );
         
         const currentWeekOverrides = p.scheduleOverrides?.filter((o: any) => o.weekId === targetWeek) || [];
-        const currentCanceledIds = currentWeekOverrides.filter((o: any) => o.type === 'cancel' || o.type === 'reschedule').map((o: any) => o.originalClassId);
-        myFilteredClasses = myFilteredClasses.filter(cls => {
-          const classId = `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
-          return !currentCanceledIds.includes(classId);
-        });
+        
+        // First add the overrides
         const currentAddedClasses = currentWeekOverrides.filter((o: any) => o.type === 'add' || o.type === 'reschedule').map((o: any) => o.newClassDetails);
         myFilteredClasses.push(...currentAddedClasses);
+
+        // Then cancel/filter
+        const currentCanceledIds = currentWeekOverrides.filter((o: any) => o.type === 'cancel' || o.type === 'reschedule').map((o: any) => o.originalClassId);
+        myFilteredClasses = myFilteredClasses.filter(cls => {
+          const classId = cls.id || `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
+          return !currentCanceledIds.includes(classId);
+        });
 
         // Group by day
         const grouped: Record<string, ParsedClass[]> = {};
@@ -273,8 +279,32 @@ export default function DashboardPage() {
     if (!confirm("Are you sure you want to remove this class from your personal schedule?")) return;
     
     const classId = (cls as any).id || `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
-    const newOverride: ScheduleOverride = { type: 'cancel', originalClassId: classId, weekId: selectedWeek };
-    const overrides = [...(profile.scheduleOverrides || []), newOverride];
+    
+    let overrides = [...(profile.scheduleOverrides || [])];
+    
+    // Check if this class was created by an 'add' or 'reschedule' override
+    const existingAddIndex = overrides.findIndex(o => 
+      (o.type === 'add' || o.type === 'reschedule') && 
+      o.weekId === selectedWeek &&
+      o.newClassDetails && 
+      `${o.newClassDetails.courseAbb}-${o.newClassDetails.day}-${o.newClassDetails.timeSlot}`.replace(/\s+/g, '-') === classId
+    );
+
+    if (existingAddIndex >= 0) {
+      // If it was an 'add', we just remove the add override completely.
+      // If it was a 'reschedule', removing it will bring back the original class. To prevent bringing back the original class,
+      // we can convert the 'reschedule' into a simple 'cancel' for the original class.
+      const existingOverride = overrides[existingAddIndex];
+      if (existingOverride.type === 'reschedule' && existingOverride.originalClassId) {
+         overrides[existingAddIndex] = { type: 'cancel', originalClassId: existingOverride.originalClassId, weekId: existingOverride.weekId };
+      } else {
+         overrides.splice(existingAddIndex, 1);
+      }
+    } else {
+      // It's a master schedule class, so we add a cancel override
+      const newOverride: ScheduleOverride = { type: 'cancel', originalClassId: classId, weekId: selectedWeek };
+      overrides.push(newOverride);
+    }
     
     setProfile({ ...profile, scheduleOverrides: overrides });
     await updateStudentOverrides(user.uid, overrides);
