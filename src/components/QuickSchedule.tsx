@@ -64,6 +64,7 @@ export default function QuickSchedule() {
   const [year, setYear] = useState("2nd");
   const [spec, setSpec] = useState("core");
   const [rollNo, setRollNo] = useState("");
+  const [selectedWeekInput, setSelectedWeekInput] = useState("latest");
   
   const [bfsSection, setBfsSection] = useState("A");
 
@@ -86,7 +87,10 @@ export default function QuickSchedule() {
         throw new Error("No schedule uploaded for this program yet.");
       }
       
-      const targetWeek = weeks[weeks.length - 1]; // Latest week
+      const targetWeek = selectedWeekInput === "latest" ? weeks[weeks.length - 1] : selectedWeekInput;
+      if (!weeks.includes(targetWeek)) {
+        throw new Error("No schedule updated for this week.");
+      }
       setActiveWeek(targetWeek);
       
       const master = await fetchMasterTimetable(targetWeek, program) as ParsedClass[];
@@ -591,6 +595,15 @@ export default function QuickSchedule() {
                         <option value="core">Core</option>
                         <option value="bfs">BFS</option>
                         <option value="dcp">DCP</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Week</label>
+                      <select value={selectedWeekInput} onChange={(e) => setSelectedWeekInput(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
+                        <option value="latest">Latest Available Week</option>
+                        {[...Array(10)].map((_, i) => (
+                           <option key={i} value={`week-${i+1}-2026`}>Week {i+1} {i === 0 ? (year === "1st" ? "Term 2" : "Term 5") : ""}</option>
+                        ))}
                       </select>
                     </div>
                   </div>
