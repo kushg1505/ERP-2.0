@@ -102,20 +102,33 @@ export default function DashboardPage() {
         
         await Promise.all(weeks.map(async (w) => {
           const wMaster = await fetchMasterTimetable(w, userProgram) as ParsedClass[];
-          let myWClasses = wMaster.filter(cls => 
-            p.courses.some(c => 
-              c.courseCode === cls.courseAbb && 
-              (c.section === cls.section || !cls.section || cls.section.includes(c.section))
-            )
-          );
+          let myWClasses = wMaster.filter(cls => {
+            if (p.program?.startsWith('1st-')) {
+               if (cls.courseAbb.startsWith('DTI') && p.program === '1st-core') {
+                  if (!p.dtiGroup) return false;
+                  return cls.dtiGroup === `G-${p.dtiGroup}`;
+               }
+               return !cls.section || (p.section && cls.section.includes(p.section));
+            } else {
+               return p.courses.some(c => {
+                  const code = c.courseCode ? c.courseCode.toLowerCase().replace(/[\s-]/g, '') : '';
+                  const abb = cls.courseAbb ? cls.courseAbb.toLowerCase().replace(/[\s-]/g, '') : '';
+                  return (code === abb || (code === "finprep" && abb.startsWith("finprep"))) && 
+                  (code.startsWith("finprep") || code === "bf" || code === "serm" || c.section === cls.section || !cls.section || cls.section.includes(c.section));
+               });
+            }
+          });
           
           const weekOverrides = p.scheduleOverrides?.filter((o: any) => o.weekId === w) || [];
           
-          const addedClasses = weekOverrides.filter((o: any) => o.type === 'add' || o.type === 'reschedule').map((o: any) => o.newClassDetails);
+          const addedClasses = weekOverrides.filter((o: any) => o.type === 'add' || o.type === 'reschedule').map((o: any) => {
+             return { ...o.newClassDetails, isOverride: true };
+          });
           myWClasses.push(...addedClasses);
 
           const canceledIds = weekOverrides.filter((o: any) => o.type === 'cancel' || o.type === 'reschedule').map((o: any) => o.originalClassId);
           myWClasses = myWClasses.filter(cls => {
+            if ((cls as any).isOverride) return true;
             const classId = cls.id || `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
             return !canceledIds.includes(classId);
           });
