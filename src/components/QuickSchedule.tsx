@@ -64,7 +64,19 @@ export default function QuickSchedule() {
   const [year, setYear] = useState("2nd");
   const [spec, setSpec] = useState("core");
   const [rollNo, setRollNo] = useState("");
-  const [selectedWeekInput, setSelectedWeekInput] = useState("latest");
+  const [selectedWeekInput, setSelectedWeekInput] = useState("");
+  
+  useEffect(() => {
+    async function initWeek() {
+      const program = `${year}-${spec}`;
+      const weeks = await fetchAvailableWeeks(program);
+      if (weeks.length > 0) {
+         const ongoing = await resolveOngoingWeek(program, weeks);
+         setSelectedWeekInput(ongoing);
+      }
+    }
+    initWeek();
+  }, [year, spec]);
   
   const [bfsSection, setBfsSection] = useState("A");
 
@@ -87,7 +99,10 @@ export default function QuickSchedule() {
         throw new Error("No schedule uploaded for this program yet.");
       }
       
-      const targetWeek = selectedWeekInput === "latest" ? await resolveOngoingWeek(program, weeks) : selectedWeekInput;
+      const targetWeek = selectedWeekInput;
+      if (!targetWeek) {
+        throw new Error("Please wait for the week options to load.");
+      }
       if (!weeks.includes(targetWeek)) {
         throw new Error("No schedule updated for this week.");
       }
@@ -621,9 +636,9 @@ export default function QuickSchedule() {
                     <div>
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Week</label>
                       <select value={selectedWeekInput} onChange={(e) => setSelectedWeekInput(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                        <option value="latest">Latest Available Week</option>
+                        {selectedWeekInput === "" && <option value="">Loading...</option>}
                         {[...Array(10)].map((_, i) => (
-                           <option key={i} value={`week-${i+1}-2026`}>Week {i+1} {i === 0 ? (year === "1st" ? "Term 2" : "Term 5") : ""}</option>
+                           <option key={i} value={`week-${i+1}-2026`}>Week {i+1}</option>
                         ))}
                       </select>
                     </div>
