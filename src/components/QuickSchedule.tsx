@@ -190,6 +190,27 @@ export default function QuickSchedule() {
         if (cls.timeSlot && cls.timeSlot.trim() !== "" && cls.timeSlot !== "Full Day") slotsSet.add(cls.timeSlot);
       });
 
+      if (daysSet.size > 0) {
+         const anyDay = Array.from(daysSet)[0];
+         const dateStr = anyDay.split(',')[1]?.trim();
+         if (dateStr) {
+            const d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+               const dayOfWeek = d.getDay() === 0 ? 7 : d.getDay();
+               const monday = new Date(d);
+               monday.setDate(d.getDate() - dayOfWeek + 1);
+               
+               const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+               for (let i = 0; i < 6; i++) {
+                  const currentD = new Date(monday);
+                  currentD.setDate(monday.getDate() + i);
+                  const dayString = `${dayNames[i]}, ${currentD.toISOString().split('T')[0]}`;
+                  daysSet.add(dayString);
+               }
+            }
+         }
+      }
+
       const parseTime = (slot: string) => {
         const ampmMatch = slot.match(/(\d+)[:.](\d+)\s*(am|pm)/i);
         if (ampmMatch) {
