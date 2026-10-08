@@ -5,6 +5,9 @@ import { useAuth } from "@/lib/AuthContext";
 import { getStudentProfile, saveStudentProfile, StudentProfile, fetchAllCourses, getStudentFromMasterDB } from "@/lib/db";
 import { Save, RefreshCw, AlertCircle, CheckCircle2, ArrowRight, Trash2, Plus } from "lucide-react";
 import Link from "next/link";
+import bfsElectivesData from '@/data/bfs_electives.json';
+
+const bfsElectives = bfsElectivesData as Record<string, string>;
 
 const AVAILABLE_SECTIONS = ["A", "B", "C", "D", "E", "F"];
 const BFS_FIXED_COURSES = ["MLBFSI", "FIS", "VCPE", "HRM", "BFSI&STY"];
@@ -47,6 +50,10 @@ export default function ProfilePage() {
             const [y, s] = profileData.program.split("-");
             setYear(y);
             setSpec(s);
+            if (s === "bfs" && profileData.rollNo) {
+               const elective = bfsElectives[profileData.rollNo.trim()];
+               if (elective) setBfsElective(elective);
+            }
           }
           if (profileData.courses?.some((c: any) => c.courseCode === "FINPrep")) {
             setIsFinPrep(true);
@@ -85,12 +92,24 @@ export default function ProfilePage() {
       finalProfile.section = bfsSection;
       if (spec === "core") finalProfile.dtiGroup = dtiGroup;
     } else if (spec === "bfs") {
+      if (!profile.rollNo || profile.rollNo.trim() === "") {
+        alert("Please enter your Roll Number to automatically map your elective.");
+        setSaving(false);
+        return;
+      }
+      const elective = bfsElectives[profile.rollNo.trim()];
+      if (!elective) {
+        alert("Roll Number not found in BFS electives list. Please verify your roll number.");
+        setSaving(false);
+        return;
+      }
+
       // Build courses list manually
       const courses = [];
       for (const c of BFS_FIXED_COURSES) {
          courses.push({ courseCode: c, section: bfsSection });
       }
-      courses.push({ courseCode: bfsElective, section: bfsSection });
+      courses.push({ courseCode: elective, section: "" });
       finalProfile.courses = courses;
     }
 
@@ -307,7 +326,7 @@ export default function ProfilePage() {
         {year !== "1st" && spec === "bfs" && (
            <div className="space-y-6">
               <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300">
-               <p className="text-sm font-medium">As a BFS student, you have 5 fixed courses. Please select your 1 Elective and your Section.</p>
+               <p className="text-sm font-medium">As a BFS student, you have 5 fixed courses. Please enter your Roll Number to automatically map your Elective.</p>
              </div>
 
              <div className="grid md:grid-cols-2 gap-6">
@@ -318,10 +337,19 @@ export default function ProfilePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Choose Elective</label>
-                  <select value={bfsElective} onChange={(e) => setBfsElective(e.target.value)} className="input-field w-full">
-                     {BFS_ELECTIVE_COURSES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
+                  <input 
+                    type="text" 
+                    value={profile.rollNo}
+                    onChange={(e) => {
+                       setProfile({ ...profile, rollNo: e.target.value });
+                       const elective = bfsElectives[e.target.value.trim()];
+                       if (elective) setBfsElective(elective);
+                       else setBfsElective("");
+                    }}
+                    placeholder="e.g. 2402001"
+                    className="input-field w-full"
+                  />
                 </div>
              </div>
 
@@ -334,10 +362,10 @@ export default function ProfilePage() {
                          <div className="text-xs text-slate-500">Fixed</div>
                       </div>
                    ))}
-                   <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-3 text-center ring-2 ring-blue-500">
-                         <div className="font-bold text-blue-700 dark:text-blue-400">{bfsElective}</div>
-                         <div className="text-xs text-blue-500">Elective</div>
-                      </div>
+                   <div className={`border rounded-lg p-3 text-center ${bfsElective ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 ring-2 ring-blue-500' : 'bg-slate-50 border-dashed border-slate-300'}`}>
+                         <div className={`font-bold ${bfsElective ? 'text-blue-700 dark:text-blue-400' : 'text-slate-400'}`}>{bfsElective || 'Pending'}</div>
+                         <div className={`text-xs ${bfsElective ? 'text-blue-500' : 'text-slate-400'}`}>Elective</div>
+                   </div>
                 </div>
              </div>
            </div>
