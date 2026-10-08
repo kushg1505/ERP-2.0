@@ -151,10 +151,12 @@ export default function DashboardPage() {
           );
         
         const currentWeekOverrides = p.scheduleOverrides?.filter((o: any) => o.weekId === targetWeek) || [];
+        console.log("Current Week Overrides:", currentWeekOverrides);
         
         // First add the overrides
         const currentAddedClasses = currentWeekOverrides.filter((o: any) => o.type === 'add' || o.type === 'reschedule').map((o: any) => o.newClassDetails);
         myFilteredClasses.push(...currentAddedClasses);
+        console.log("After additions:", myFilteredClasses.length);
 
         // Then cancel/filter
         const currentCanceledIds = currentWeekOverrides.filter((o: any) => o.type === 'cancel' || o.type === 'reschedule').map((o: any) => o.originalClassId);
@@ -162,6 +164,8 @@ export default function DashboardPage() {
           const classId = cls.id || `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
           return !currentCanceledIds.includes(classId);
         });
+        console.log("After cancellations:", myFilteredClasses.length);
+        console.log("Final myClasses:", myFilteredClasses);
 
         // Group by day
         const grouped: Record<string, ParsedClass[]> = {};
@@ -317,13 +321,14 @@ export default function DashboardPage() {
       courseAbb: profile?.courses[0]?.courseCode || "NEW",
       courseName: "New Session",
       section: profile?.courses[0]?.section || "A",
-      day: "Monday",
+      day: "Monday, 2026-10-05",
       timeSlot: "08:45-10:00",
       startTime: "08:45",
       endTime: "10:00",
       venue: "TBA",
       faculty: "TBA",
-      date: "2026-10-05"
+      date: "2026-10-05",
+      sessionNo: "1"
     });
     setEditModalOpen(true);
   };
@@ -338,7 +343,8 @@ export default function DashboardPage() {
   const saveEditForm = async () => {
     if (!profile || !user) return;
     
-    const cleanEditForm = JSON.parse(JSON.stringify(editForm)); // Remove any undefined properties deeply
+    console.log("Saving edit form...", editForm);
+    const cleanEditForm = JSON.parse(JSON.stringify(editForm));
     
     const newOverride: ScheduleOverride = {
        type: originalClassIdToReschedule ? 'reschedule' : 'add',
@@ -349,8 +355,10 @@ export default function DashboardPage() {
        newOverride.originalClassId = originalClassIdToReschedule;
     }
     const overrides = [...(profile.scheduleOverrides || []), newOverride];
+    console.log("New overrides array:", overrides);
     setProfile({ ...profile, scheduleOverrides: overrides });
     await updateStudentOverrides(user.uid, overrides);
+    console.log("Successfully updated firestore");
     setEditModalOpen(false);
     setRefreshKey(k => k + 1);
   };
@@ -691,13 +699,14 @@ export default function DashboardPage() {
                                             courseAbb: profile?.courses[0]?.courseCode || "NEW",
                                             courseName: "New Session",
                                             section: profile?.courses[0]?.section || "A",
-                                            day: day.split(',')[0],
+                                            day: day,
                                             timeSlot: slot,
                                             startTime: slot.split('-')[0] || "09:00",
                                             endTime: slot.split('-')[1] || "10:15",
                                             venue: "TBA",
                                             faculty: "TBA",
-                                            date: day.split(',')[1]?.trim() || "2026-10-05"
+                                            date: day.split(',')[1]?.trim() || "2026-10-05",
+                                            sessionNo: "1"
                                           });
                                           setEditModalOpen(true);
                                        }} className="w-10 h-10 rounded-full border-2 border-dashed border-blue-300 dark:border-blue-700 text-blue-500 flex items-center justify-center hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
@@ -1048,8 +1057,12 @@ export default function DashboardPage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">Course Code (incl. session, e.g. LDM-1)</label>
+                <label className="text-xs font-bold text-slate-500 block mb-1">Course Code (e.g. LDM)</label>
                 <input name="courseAbb" value={editForm.courseAbb || ""} onChange={(e) => setEditForm({...editForm, courseAbb: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 dark:bg-slate-800 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500"/>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 block mb-1">Session No.</label>
+                <input name="sessionNo" type="number" min="1" value={editForm.sessionNo || ""} onChange={(e) => setEditForm({...editForm, sessionNo: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 dark:bg-slate-800 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500"/>
               </div>
               <div>
                 <label className="text-xs font-bold text-slate-500 block mb-1">Section</label>
