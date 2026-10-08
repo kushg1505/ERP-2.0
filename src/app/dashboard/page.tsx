@@ -338,12 +338,16 @@ export default function DashboardPage() {
   const saveEditForm = async () => {
     if (!profile || !user) return;
     
+    const cleanEditForm = JSON.parse(JSON.stringify(editForm)); // Remove any undefined properties deeply
+    
     const newOverride: ScheduleOverride = {
        type: originalClassIdToReschedule ? 'reschedule' : 'add',
-       originalClassId: originalClassIdToReschedule || undefined,
-       newClassDetails: editForm,
+       newClassDetails: cleanEditForm,
        weekId: selectedWeek
     };
+    if (originalClassIdToReschedule) {
+       newOverride.originalClassId = originalClassIdToReschedule;
+    }
     const overrides = [...(profile.scheduleOverrides || []), newOverride];
     setProfile({ ...profile, scheduleOverrides: overrides });
     await updateStudentOverrides(user.uid, overrides);
