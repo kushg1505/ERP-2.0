@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getStudentFromMasterDB, fetchMasterTimetable, fetchAvailableWeeks } from "@/lib/db";
+import { getStudentFromMasterDB, fetchMasterTimetable, fetchAvailableWeeks, resolveOngoingWeek } from "@/lib/db";
 import { RefreshCw, Download, Calendar, ArrowRight, GraduationCap, Crown, Sparkles, Clock, BarChart2, AlertTriangle, ShieldCheck, IdCard, Users } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
@@ -87,7 +87,7 @@ export default function QuickSchedule() {
         throw new Error("No schedule uploaded for this program yet.");
       }
       
-      const targetWeek = selectedWeekInput === "latest" ? weeks[weeks.length - 1] : selectedWeekInput;
+      const targetWeek = selectedWeekInput === "latest" ? await resolveOngoingWeek(program, weeks) : selectedWeekInput;
       if (!weeks.includes(targetWeek)) {
         throw new Error("No schedule updated for this week.");
       }

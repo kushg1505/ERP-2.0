@@ -138,6 +138,49 @@ export async function fetchMasterTimetable(weekId: string, program: string = "2n
   }
 }
 
+export async function resolveOngoingWeek(program: string, weeks: string[]): Promise<string> {
+  if (!weeks || weeks.length === 0) return "";
+  
+  let targetWeek = weeks[weeks.length - 1]; // default to latest
+  const now = new Date().getTime();
+
+  for (let i = weeks.length - 1; i >= 0; i--) {
+     const wMaster = await fetchMasterTimetable(weeks[i], program);
+     if (wMaster.length > 0) {
+        let minDate = new Date("2099-01-01").getTime();
+        let maxDate = new Date("2000-01-01").getTime();
+        
+        wMaster.forEach(cls => {
+           const dateStr = cls.date || (cls.day ? cls.day.split(',')[1]?.trim() : "");
+           if (dateStr) {
+              const d = new Date(dateStr).getTime();
+              if (!isNaN(d)) {
+                 if (d < minDate) minDate = d;
+                 if (d > maxDate) maxDate = d;
+              }
+           }
+        });
+        
+        // Add one full day to maxDate to cover Sunday entirely
+        const endOfWeek = maxDate + (24 * 60 * 60 * 1000);
+        
+        if (now >= minDate && now <= endOfWeek) {
+           targetWeek = weeks[i];
+           break; // Found the active week
+        }
+        
+        if (now > endOfWeek) {
+           // We are scanning backwards. If the current week we are checking is ALREADY in the past,
+           // all previous weeks will also be in the past. This means no future week is active,
+           // and the closest past week is the best default. We break early.
+           targetWeek = weeks[i];
+           break;
+        }
+     }
+  }
+  return targetWeek;
+}
+
 export async function saveClashSchedule(weekId: string, data: any[]) {
   try {
     const docRef = doc(db, "clashes", weekId);

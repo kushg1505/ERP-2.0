@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
-import { getStudentProfile, fetchMasterTimetable, StudentProfile, fetchAttendance, fetchAllAttendanceStats, markAttendance, fetchAvailableWeeks, updateStudentOverrides, ScheduleOverride } from "@/lib/db";
+import { getStudentProfile, fetchMasterTimetable, StudentProfile, fetchAttendance, fetchAllAttendanceStats, markAttendance, fetchAvailableWeeks, updateStudentOverrides, ScheduleOverride, resolveOngoingWeek } from "@/lib/db";
 import { Clock, MapPin, CheckCircle2, XCircle, Calendar, CheckSquare, List, Edit3, Trash2, Plus, Settings2, X, Download, Users } from "lucide-react";
 
 interface ParsedClass {
@@ -83,7 +83,7 @@ export default function DashboardPage() {
       
       let targetWeek = selectedWeek;
       if ((!targetWeek || !weeks.includes(targetWeek)) && weeks.length > 0) {
-        targetWeek = weeks[weeks.length - 1];
+        targetWeek = await resolveOngoingWeek(userProgram, weeks);
         setSelectedWeek(targetWeek);
       }
 
