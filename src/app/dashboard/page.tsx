@@ -1048,7 +1048,7 @@ export default function DashboardPage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div>
-                <label className="text-xs font-bold text-slate-500 block mb-1">Course Code</label>
+                <label className="text-xs font-bold text-slate-500 block mb-1">Course Code (incl. session, e.g. LDM-1)</label>
                 <input name="courseAbb" value={editForm.courseAbb || ""} onChange={(e) => setEditForm({...editForm, courseAbb: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 dark:bg-slate-800 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500"/>
               </div>
               <div>
@@ -1057,19 +1057,20 @@ export default function DashboardPage() {
               </div>
               <div>
                 <label className="text-xs font-bold text-slate-500 block mb-1">Date (YYYY-MM-DD)</label>
-                <input name="date" type="date" value={editForm.date || ""} onChange={(e) => setEditForm({...editForm, date: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 dark:bg-slate-800 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500"/>
+                <input name="date" type="date" value={editForm.date || ""} onChange={(e) => {
+                  const newDate = e.target.value;
+                  const d = new Date(newDate);
+                  let dayStr = editForm.day || "";
+                  if (!isNaN(d.getTime())) {
+                    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                    dayStr = `${days[d.getDay()]}, ${newDate}`;
+                  }
+                  setEditForm({...editForm, date: newDate, day: dayStr});
+                }} className="w-full border border-slate-300 rounded-lg px-3 py-2 dark:bg-slate-800 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500"/>
               </div>
               <div>
                 <label className="text-xs font-bold text-slate-500 block mb-1">Day</label>
-                <select name="day" value={editForm.day || ""} onChange={(e) => setEditForm({...editForm, day: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 dark:bg-slate-800 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                  <option value="Sunday">Sunday</option>
-                </select>
+                <input name="day" value={editForm.day || ""} readOnly className="w-full border border-slate-200 bg-slate-50 text-slate-500 rounded-lg px-3 py-2 dark:bg-slate-800/50 dark:border-slate-700 outline-none cursor-not-allowed"/>
               </div>
               <div>
                 <label className="text-xs font-bold text-slate-500 block mb-1">Time Slot (e.g., 08:45-10:00)</label>
