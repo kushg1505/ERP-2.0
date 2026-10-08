@@ -154,18 +154,18 @@ export default function DashboardPage() {
         console.log("Current Week Overrides:", currentWeekOverrides);
         
         // First add the overrides
-        const currentAddedClasses = currentWeekOverrides.filter((o: any) => o.type === 'add' || o.type === 'reschedule').map((o: any) => o.newClassDetails);
+        const currentAddedClasses = currentWeekOverrides.filter((o: any) => o.type === 'add' || o.type === 'reschedule').map((o: any) => {
+           return { ...o.newClassDetails, isOverride: true };
+        });
         myFilteredClasses.push(...currentAddedClasses);
-        console.log("After additions:", myFilteredClasses.length);
 
         // Then cancel/filter
         const currentCanceledIds = currentWeekOverrides.filter((o: any) => o.type === 'cancel' || o.type === 'reschedule').map((o: any) => o.originalClassId);
         myFilteredClasses = myFilteredClasses.filter(cls => {
+          if ((cls as any).isOverride) return true; // Never accidentally filter out explicitly added/rescheduled classes
           const classId = cls.id || `${cls.courseAbb}-${cls.day}-${cls.timeSlot}`.replace(/\s+/g, '-');
           return !currentCanceledIds.includes(classId);
         });
-        console.log("After cancellations:", myFilteredClasses.length);
-        console.log("Final myClasses:", myFilteredClasses);
 
         // Group by day
         const grouped: Record<string, ParsedClass[]> = {};
@@ -343,7 +343,6 @@ export default function DashboardPage() {
   const saveEditForm = async () => {
     if (!profile || !user) return;
     
-    console.log("Saving edit form...", editForm);
     const cleanEditForm = JSON.parse(JSON.stringify(editForm));
     
     const newOverride: ScheduleOverride = {
@@ -355,10 +354,8 @@ export default function DashboardPage() {
        newOverride.originalClassId = originalClassIdToReschedule;
     }
     const overrides = [...(profile.scheduleOverrides || []), newOverride];
-    console.log("New overrides array:", overrides);
     setProfile({ ...profile, scheduleOverrides: overrides });
     await updateStudentOverrides(user.uid, overrides);
-    console.log("Successfully updated firestore");
     setEditModalOpen(false);
     setRefreshKey(k => k + 1);
   };
