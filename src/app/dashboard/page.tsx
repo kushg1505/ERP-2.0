@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { getStudentProfile, fetchMasterTimetable, StudentProfile, fetchAttendance, fetchAllAttendanceStats, markAttendance, fetchAvailableWeeks, updateStudentOverrides, ScheduleOverride, resolveOngoingWeek } from "@/lib/db";
-import { Clock, MapPin, CheckCircle2, XCircle, Calendar, CheckSquare, List, Edit3, Trash2, Plus, Settings2, X, Download, Users } from "lucide-react";
+import { Clock, MapPin, CheckCircle2, XCircle, Calendar, CheckSquare, List, Edit3, Trash2, Plus, Settings2, X, Download, Users, Utensils } from "lucide-react";
+import MessMenu from "@/components/MessMenu";
 
 interface ParsedClass {
   courseAbb: string;
@@ -37,11 +38,12 @@ export default function DashboardPage() {
   // Week, Tabs & Attendance State
   const [availableWeeks, setAvailableWeeks] = useState<string[]>([]);
   const [selectedWeek, setSelectedWeek] = useState("");
-  const [activeTab, setActiveTab] = useState<"schedule" | "attendance" | "clashes">("schedule");
+  const [activeTab, setActiveTab] = useState<"schedule" | "attendance" | "clashes" | "mess">("schedule");
   const [attendance, setAttendance] = useState<Record<string, {status: "attended" | "missed", timestamp: string}>>({});
   const [attendanceStats, setAttendanceStats] = useState({ attended: 0, missed: 0, records: [] as any[] });
   const [allHistoricalSessions, setAllHistoricalSessions] = useState<any[]>([]);
   const [expandedCourses, setExpandedCourses] = useState<Record<string, boolean>>({});
+  const [showMessPopup, setShowMessPopup] = useState(true);
 
   const toggleCourse = (course: string) => {
     setExpandedCourses(prev => ({ ...prev, [course]: !prev[course] }));
@@ -521,6 +523,7 @@ export default function DashboardPage() {
         <button onClick={() => setActiveTab("schedule")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap ${activeTab === 'schedule' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}>My Schedule</button>
         <button onClick={() => setActiveTab("attendance")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'attendance' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}><CheckSquare className="w-4 h-4" /> Attendance</button>
         <button onClick={() => setActiveTab("clashes")} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'clashes' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}><List className="w-4 h-4" /> Clash Management</button>
+        <button onClick={() => { setActiveTab("mess"); setShowMessPopup(false); }} className={`px-6 py-4 font-bold text-sm transition-colors border-b-2 whitespace-nowrap flex items-center gap-2 ${activeTab === 'mess' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-blue-600 dark:text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse bg-blue-50/50 dark:bg-blue-900/20'}`}><Utensils className="w-4 h-4" /> Mess Menu</button>
       </div>
 
       {activeTab === "schedule" && (
@@ -1139,9 +1142,42 @@ export default function DashboardPage() {
         </button>
         <button onClick={() => setActiveTab("clashes")} className={`flex flex-col items-center gap-1 p-2 w-full rounded-xl transition-colors ${activeTab === 'clashes' ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-bold' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
           <List className="w-5 h-5" />
-          <span className="text-[10px]">Clash Management</span>
+          <span className="text-[10px]">Clashes</span>
+        </button>
+        <button onClick={() => { setActiveTab("mess"); setShowMessPopup(false); }} className={`flex flex-col items-center gap-1 p-2 w-full rounded-xl transition-colors ${activeTab === 'mess' ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-bold' : 'text-blue-600 bg-blue-100/50 dark:bg-blue-900/40 shadow-[0_0_10px_rgba(59,130,246,0.6)] animate-pulse font-bold'}`}>
+          <Utensils className="w-5 h-5" />
+          <span className="text-[10px]">Mess Menu</span>
         </button>
       </div>
+
+      {showMessPopup && activeTab !== "mess" && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm cursor-pointer animate-in fade-in duration-300"
+          onClick={() => setShowMessPopup(false)}
+        >
+          <div className="bg-white dark:bg-slate-800 p-8 sm:p-12 rounded-3xl shadow-2xl max-w-lg mx-4 text-center transform transition-transform scale-100 cursor-default" onClick={(e) => e.stopPropagation()}>
+             <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+               <Utensils className="w-10 h-10 animate-bounce" />
+             </div>
+             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-4">New Feature! 🎉</h2>
+             <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
+               You can now check the <strong>Mess Menu</strong> directly from your dashboard!
+             </p>
+             <button 
+               onClick={() => { setActiveTab("mess"); setShowMessPopup(false); }}
+               className="w-full py-4 rounded-xl font-bold text-lg text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02]"
+             >
+               View Mess Menu Now
+             </button>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "mess" && (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8">
+          <MessMenu />
+        </div>
+      )}
     </div>
   );
 }

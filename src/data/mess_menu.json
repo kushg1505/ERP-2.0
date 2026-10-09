@@ -1,0 +1,130 @@
+[
+  {
+    "date": "01-10-2026",
+    "day": "Thursday",
+    "breakfast": "Vada, Sambhar, Chutney, Bread, Papaya, Jam, Milk, Cornflakes, Tea, Coffee, Horlicks",
+    "lunch": "Chole Puri, Aloo Sabji, Plain Raita, Rice, Salad",
+    "snacks": "Dhokla, Bread, Jam, Ginger Tea, Namkeen lassi",
+    "dinner": "Aloo Soyabean, Dal Tadka, Roti, Rice, Salad, Rasgulla"
+  },
+  {
+    "date": "02-10-2026",
+    "day": "Friday",
+    "breakfast": "Omelette, Paneer Toast, Orange, Bread, Jam, Milk, Cornflakes, Tea, Coffee",
+    "lunch": "Aloo Bhindi, Arahar Dal, Roti, Rice, Salad, Fryums, Pineapple Raita",
+    "snacks": "Pyaz Kachori, Bread, Jam, Tea, Coffee",
+    "dinner": "Chicken Curry Homestyle, Matar Paneer, Dal Tadka, Roti, Rice, Salad"
+  },
+  {
+    "date": "03-10-2026",
+    "day": "Saturday",
+    "breakfast": "Poha, Apple, Bread, Jam, Tea, Coffee, Milk, Cornflakes, Horlicks",
+    "lunch": "Shahi Paneer, Yellow Dal, Rice, curd, Roti, Salad",
+    "snacks": "Masala Bhel, Bread, Jam, Ginger Tea, Thandai",
+    "dinner": "Mushroom Matar, Chole Dal, Roti, Rice, Salad, Vanilla Icecream"
+  },
+  {
+    "date": "04-10-2026",
+    "day": "Sunday",
+    "breakfast": "Chole Puri, Jalebi, Bread, Jam, Tea, Coffee, Milk, Cornflakes",
+    "lunch": "Spicy Aloo Fry, Arahar Dal, Boondi Raita, Roti, Salad, Lemon Rice, Papad",
+    "snacks": "Bread Pakora, Bread, Jam, Ginger Tea, Coffee",
+    "dinner": "Paneer Bhurji, Egg Masala, Dal Tadka, Roti, Rice, Salad"
+  },
+  {
+    "date": "05-10-2026",
+    "day": "Monday",
+    "breakfast": "Aloo Pyaz Paratha, Curd, Orange, Bread, Jam, Tea, Coffee, Milk, Cornflakes, Horlicks",
+    "lunch": "Mix Veg, Moong Dal, Roti, Rice, Plain Raita, salad, Papad",
+    "snacks": "Chowmein, Bread, Jam, Ginger Tea, Cold Chocolate",
+    "dinner": "Gatte ki Sabzi, Dal Tadka, Roti, Rice, Salad, Fruit Custard"
+  },
+  {
+    "date": "06-10-2026",
+    "day": "Tuesday",
+    "breakfast": "Upma, Chutney, Sambar, Banana, Bread, Jam, Tea, Coffee, Milk, Cornflakes",
+    "lunch": "Kadhi Pakoda, Aloo Matar, Roti, Rice, Salad, Papad",
+    "snacks": "Stuffed Kulcha, Bread, Jam, Ginger Tea, namkeen Lassi",
+    "dinner": "Chowmein, Fried Rice, Machurian, Salad, Boondi Laddu"
+  },
+  {
+    "date": "07-10-2026",
+    "day": "Wednesday",
+    "breakfast": "Boiled egg, Aloo Toast, Apple, Bread, Jam, Tea, Coffee, Milk, Cornflakes, Horlicks",
+    "lunch": "Rajma, Fry Aloo, Boondi Raita, Roti, Jeera Rice, Salad, Papad",
+    "snacks": "Samosa, Bread, Jam, Ginger Tea, Coffee",
+    "dinner": "Chicken Curry, Matar Paneer, Dal Tadka, Tandori Roti, Rice, Salad"
+  },
+  {
+    "date": "08-10-2026",
+    "day": "Thursday",
+    "breakfast": "Uttapam, Chutney, Sambar, Banana, Bread, Jam, Tea, Coffee, Milk, Cornflakes",
+    "lunch": "Chole, Dal Tadka, Roti, Rice, Salad, Fryums, Boondi Raita",
+    "snacks": "Macroni, Bread, Jam, Ginger Tea, Nimbu Pani",
+    "dinner": "Soya Chaap, Arhar Dal, Roti, Rice, Salad, Butter Scotch Icecream"
+  },
+  {
+    "date": "09-10-2026",
+    "day": "Friday",
+    "breakfast": "Omlette, Paneer Toast, Apple, Bread, Jam, Milk, Cornflakes, Tea, Coffee, Horlicks",
+    "lunch": "Arhar Dal, Aloo Tamatar Sabji, curd, Rice, Roti, Papad, Salad",
+    "snacks": "Pyaj Kachori, Bread, Jam, Tea, Coffee",
+    "dinner": "Sukha Chicken, Paneer Masala, Chana Dal, Roti, Rice, Salad"
+  },
+  {
+    "date": "10-10-2026",
+    "day": "Saturday",
+    "breakfast": "Poha, Orange, Bread, Jam, Tea, Coffee, Milk, Cornflakes",
+    "lunch": "Aloo Jeera, Arhar Dal, Roti, Lemon Rice, Salad, Plain Raita, Papad",
+    "snacks": "Chana Chaat, Bread, Jam, Ginger Tea, Thandai",
+    "dinner": "Kadhai Paneer, Mix Dal, Roti, Rice, Salad, Besan LAddu"
+  },
+  {
+    "date": "11-10-2026",
+    "day": "Sunday",
+    "breakfast": "Chole Bhature, Jalebi, Bread, Jam, Tea, Coffee, Milk, Cornflakes, Horlicks",
+    "lunch": "Kala Chana Dry, Dal Tadka, Mix Veg Raita, Roti, Salad, Rice, Papad",
+    "snacks": "Vada Pav, Chutney, Bread, Jam, Ginger Tea, Coffee",
+    "dinner": "Paneer Butter Masala, Dal Tadka, Roti, Rice, Salad"
+  },
+  {
+    "date": "12-10-2026",
+    "day": "Monday",
+    "breakfast": "Paneer Paratha, Curd, Banana, Bread, Jam, Tea, Coffee, Horlicks, Milk, Cornflakes",
+    "lunch": "Aloo Dum, Dal Makhni, Roti, Rice, Salad, Pineapple Raita, Fryums",
+    "snacks": "Samosa, Bread, Jam, Ginger Tea, Cold Coffee",
+    "dinner": "Pattagobi matar, Masoor Dal, Roti, Rice, Salad, Rice Kheer"
+  },
+  {
+    "date": "13-10-2026",
+    "day": "Tuesday",
+    "breakfast": "Vada, Chutney, Sambar, Papaya, Bread, Jam, Tea, Coffee, Milk, Cornflakes, Horlicks",
+    "lunch": "Kadhi Pakoda, Aloo Matar, Roti, Jeera Rice, Salad, Papad",
+    "snacks": "Aloo Tikki, Bread, Jam, Ginger Tea, Coffee",
+    "dinner": "Aloo Matar, Chole Dal, Fried Rice, Roti, Salad, Rasgulla"
+  },
+  {
+    "date": "14-10-2026",
+    "day": "Wednesday",
+    "breakfast": "Paneer Toast Aloo Toast, Apple, Bread, Jam, Tea, Coffee, Milk, Cornflakes",
+    "lunch": "Rajma, Fry Aloo, Boondi Raita, Roti, Jeera Rice, Salad, Papad",
+    "snacks": "Dhokla, Bread, Jam, Ginger Tea, Coffee",
+    "dinner": "Veg Biryani, Green Chutney, Raita, Salad, Besan Ladoo"
+  },
+  {
+    "date": "15-10-2026",
+    "day": "Thursday",
+    "breakfast": "Idli, Sambhar, Chutney, Bread, Papaya, Jam, Milk, Cornflakes, Tea, Coffee, Horlicks",
+    "lunch": "Chole Puri, Aloo Sabji, Plain Raita, Rice, Salad",
+    "snacks": "Corn Chaat, Bread, Jam, Ginger Tea, Namkeen lassi",
+    "dinner": "Aloo Soyabean, Dal Tadka, Roti, Rice, Salad, Boondi Laddoo"
+  },
+  {
+    "date": "16-10-2026",
+    "day": "Friday",
+    "breakfast": "Poha, Orange, Bread, Jam, Milk, Cornflakes, Tea, Coffee",
+    "lunch": "Aloo Dum, Arahar Dal, Roti, Rice, Salad, Fryums, Pineapple Raita",
+    "snacks": "Pyaz Kachori, Bread, Jam, Tea, Coffee",
+    "dinner": "Matar Paneer, Dal Tadka, Roti, Rice, Salad"
+  }
+]
