@@ -53,7 +53,7 @@ export default function RootLayout({
                 <div className="flex justify-between h-16">
                   <div className="flex">
                     <Link href="/" className="flex-shrink-0 flex items-center gap-2 group">
-                      <img src="/logo.png" alt="BunkWise Logo" className="h-10 w-auto group-hover:scale-105 transition-transform" />
+                      <img src="/icon.png" alt="BunkWise Logo" className="h-10 w-auto group-hover:scale-105 transition-transform" />
                       <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">BunkWise</span>
                     </Link>
                     <div className="hidden md:flex ml-4 sm:ml-8 space-x-4 sm:space-x-8">
