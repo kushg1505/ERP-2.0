@@ -749,18 +749,18 @@ export default function DashboardPage() {
                                           )}
                                           <div>
                                              <div className="flex justify-between items-start gap-1">
-                                               <div className="font-extrabold text-[10px] md:text-sm print:text-[9px] text-slate-900 leading-tight">
+                                               <div className="font-extrabold text-[10px] md:text-sm print:text-[9px] text-slate-900 dark:text-slate-100 leading-tight">
                                                  {cls.courseAbb}{cls.sessionNo ? <span className="md:inline hidden">-{cls.sessionNo}</span> : ''}
                                                </div>
                                                {!isEditMode && isAttended && <span className="text-[8px] md:text-[10px] print:text-[8px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1 py-0.5 rounded leading-none">P</span>}
                                                {!isEditMode && isMissed && <span className="text-[8px] md:text-[10px] print:text-[8px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1 py-0.5 rounded leading-none">A</span>}
                                              </div>
-                                             <div className="text-[8px] md:text-xs print:text-[8px] text-slate-500 mt-0.5 md:mt-1 print:mt-0 font-medium break-words leading-tight hidden md:block">
+                                             <div className="text-[8px] md:text-xs print:text-[8px] text-slate-500 dark:text-slate-400 mt-0.5 md:mt-1 print:mt-0 font-medium break-words leading-tight hidden md:block">
                                                {cls.venue || 'TBA'}
                                              </div>
                                           </div>
                                           <div className="mt-1 md:mt-2 print:mt-1 flex">
-                                             <span className={`font-bold text-[8px] md:text-xs print:text-[7px] px-1.5 md:px-2.5 py-0.5 md:py-1 print:px-1 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : isMissed ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-100/50'}`}>
+                                             <span className={`font-bold text-[8px] md:text-xs print:text-[7px] px-1.5 md:px-2.5 py-0.5 md:py-1 print:px-1 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800' : isMissed ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800' : 'bg-blue-50 text-blue-700 border-blue-100/50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'}`}>
                                                {cls.courseAbb.startsWith('DTI') && cls.dtiGroup ? `Group ${cls.dtiGroup}` : `Sec ${cls.section}`}
                                              </span>
                                           </div>
