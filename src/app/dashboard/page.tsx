@@ -496,7 +496,7 @@ export default function DashboardPage() {
                   ))
                 )}
               </select>
-              <div className="text-xs text-slate-500 font-medium mt-0.5">
+              <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                 5 Oct 2026 - 11 Oct 2026
               </div>
             </div>
@@ -586,13 +586,13 @@ export default function DashboardPage() {
             </div>
 
             {/* Table View (Hidden on screen if in list mode, NEVER visible on print if in list mode) */}
-            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 mt-4 sm:mt-6 ${viewMode === "table" ? "block print:block" : "hidden print:hidden"}`}>
-               <table className="w-full text-left border-collapse bg-white min-w-[max-content] md:min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
+            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 dark:border-slate-800 print:border-slate-200 mt-4 sm:mt-6 ${viewMode === "table" ? "block print:block" : "hidden print:hidden"}`}>
+               <table className="w-full text-left border-collapse bg-white dark:bg-slate-950 dark:bg-slate-950 min-w-[max-content] md:min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
-                     <th className="p-2 md:p-4 print:p-1 font-bold text-white w-20 md:w-32 print:w-16 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-[10px] md:text-sm print:text-[10px] print-no-sticky text-center align-middle">Day / Time</th>
+                     <th className="p-2 md:p-4 print:p-1 font-bold text-white w-20 md:w-32 print:w-16 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 bg-slate-700 dark:bg-[#1e293b] print:bg-[#2c4062] sticky left-0 z-20 text-[10px] md:text-sm print:text-[10px] print-no-sticky text-center align-middle">Day / Time</th>
                      {allTimeSlots.map(slot => (
-                       <th key={slot} className="p-1 md:p-3 print:p-1 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-[10px] md:text-sm print:text-[9px] print-no-sticky align-middle">
+                       <th key={slot} className="p-1 md:p-3 print:p-1 font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 text-center bg-blue-50/50 dark:bg-[#1e293b] print:bg-[#f4f7fb] text-[10px] md:text-sm print:text-[9px] print-no-sticky align-middle">
                          <span className="hidden md:inline print:hidden">{slot}</span>
                          <span className="md:hidden block whitespace-pre-line print:hidden">{slot.replace('-', '\n')}</span>
                          <span className="hidden print:block whitespace-pre-line">{slot.replace('-', '\n')}</span>
@@ -602,10 +602,10 @@ export default function DashboardPage() {
                  </thead>
                  <tbody>
                    {allDays.map(day => (
-                     <tr key={day} className="border-t border-slate-200 print:border-slate-200">
-                       <td className="p-2 md:p-4 print:p-1 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-slate-900 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center align-middle">
-                         <span className="font-extrabold text-[11px] md:text-base print:text-[10px] block text-blue-900">{day.split(',')[0]}</span>
-                         <span className="text-[9px] md:text-xs font-medium text-slate-500 mt-0.5 md:mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
+                     <tr key={day} className="border-t border-slate-200 dark:border-slate-800 print:border-slate-200">
+                       <td className="p-2 md:p-4 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-[#1e293b] print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center align-middle">
+                         <span className="font-extrabold text-[11px] md:text-base print:text-[10px] block text-blue-900 dark:text-slate-200">{day.split(',')[0]}</span>
+                         <span className="text-[9px] md:text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-0.5 md:mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
                        </td>
                        {(() => {
                          const actualProgram = profile?.program || "2nd-core";
@@ -624,13 +624,13 @@ export default function DashboardPage() {
                          
                          const hasNoEvents = myClasses.filter(c => c.day === day).length === 0 && !isSSRThursday && !isADPThursday;
 
-                         if (hasNoEvents && allTimeSlots.length > 0) {
+                          if (hasNoEvents && allTimeSlots.length > 0) {
                             cells.push(
-                              <td key="no-classes" colSpan={allTimeSlots.length} className="p-1 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
-                                 <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-green-50 rounded-lg md:rounded-xl border border-green-100/50 mx-0.5 md:mx-1">
+                              <td key="no-classes" colSpan={allTimeSlots.length} className="p-1 md:p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 align-middle">
+                                 <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-green-50 dark:bg-[#064e3b]/30 rounded-lg md:rounded-xl border border-green-100/50 dark:border-[#064e3b]/50 mx-0.5 md:mx-1">
                                    <div className="flex items-center gap-1 md:gap-2">
                                       <span className="text-sm md:text-xl print:text-[10px]">🎉</span>
-                                      <span className="font-extrabold text-green-700 tracking-wide text-xs md:text-lg print:text-[10px]">
+                                      <span className="font-extrabold text-green-700 dark:text-emerald-400 tracking-wide text-xs md:text-lg print:text-[10px]">
                                       <span className="md:hidden print:hidden">No Classes🎉</span>
                                       <span className="hidden md:inline print:inline">Yayy! No Classes</span>
                                       </span>
@@ -655,11 +655,11 @@ export default function DashboardPage() {
                                 const ssrColSpan = j - i;
                                 
                                 cells.push(
-                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-1 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
-                                     <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-amber-50 rounded-lg md:rounded-xl border border-amber-100/50 mx-0.5 md:mx-1">
+                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-1 md:p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-amber-50 dark:bg-amber-900/20 rounded-lg md:rounded-xl border border-amber-100/50 dark:border-amber-800/50 mx-0.5 md:mx-1">
                                        <div className="flex items-center gap-1 md:gap-2">
-                                          <Users className="w-3 h-3 md:w-5 md:h-5 print:w-3 print:h-3 text-amber-500" />
-                                          <span className="font-extrabold text-slate-800 tracking-wide text-xs md:text-lg print:text-[10px]">
+                                          <Users className="w-3 h-3 md:w-5 md:h-5 print:w-3 print:h-3 text-amber-500 dark:text-amber-400" />
+                                          <span className="font-extrabold text-slate-800 dark:text-amber-400 tracking-wide text-xs md:text-lg print:text-[10px]">
                                             <span className="md:hidden">SSR</span>
                                             <span className="hidden md:inline">SSR Visit</span>
                                           </span>
@@ -670,8 +670,8 @@ export default function DashboardPage() {
                                 i = j - 1; 
                               } else {
                                 cells.push(
-                                  <td key={slot} className="p-1 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200">
-                                    <div className="min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] w-full flex items-center justify-center text-slate-300">
+                                  <td key={slot} className="p-1 md:p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200">
+                                    <div className="min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] w-full flex items-center justify-center text-slate-300 dark:text-slate-700">
                                       <span className="md:hidden">-</span>
                                     </div>
                                   </td>
@@ -685,11 +685,11 @@ export default function DashboardPage() {
                                 const adpColSpan = j - i;
                                 
                                 cells.push(
-                                  <td key={`adp-${slot}`} colSpan={adpColSpan} className="p-1 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
-                                     <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-indigo-50 rounded-lg md:rounded-xl border border-indigo-100/50 mx-0.5 md:mx-1">
+                                  <td key={`adp-${slot}`} colSpan={adpColSpan} className="p-1 md:p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] bg-indigo-50 dark:bg-indigo-900/20 rounded-lg md:rounded-xl border border-indigo-100/50 dark:border-indigo-800/50 mx-0.5 md:mx-1">
                                        <div className="flex items-center gap-1 md:gap-2">
-                                          <Users className="w-3 h-3 md:w-5 md:h-5 print:w-3 print:h-3 text-indigo-600" />
-                                          <span className="font-extrabold text-slate-800 tracking-wide text-xs md:text-lg print:text-[10px]">
+                                          <Users className="w-3 h-3 md:w-5 md:h-5 print:w-3 print:h-3 text-indigo-600 dark:text-indigo-400" />
+                                          <span className="font-extrabold text-slate-800 dark:text-indigo-400 tracking-wide text-xs md:text-lg print:text-[10px]">
                                             <span className="md:hidden print:hidden">ADP</span>
                                             <span className="hidden md:inline print:inline">ADP Placement</span>
                                           </span>
@@ -701,9 +701,9 @@ export default function DashboardPage() {
                               }
                            } else {
                              cells.push(
-                               <td key={slot} className="p-1 sm:p-2 md:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-top bg-white relative">
+                               <td key={slot} className="p-1 sm:p-2 md:p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 align-top bg-white dark:bg-transparent relative">
                                  {classesInSlot.length === 0 ? (
-                                   <div className="min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] w-full flex items-center justify-center text-slate-200">
+                                   <div className="min-h-[3rem] md:min-h-[4.5rem] print:min-h-[2.5rem] w-full flex items-center justify-center text-slate-200 dark:text-slate-700">
                                      {!isEditMode && <span className="md:hidden">-</span>}
                                      {isEditMode && (
                                        <button onClick={() => {
@@ -734,13 +734,13 @@ export default function DashboardPage() {
                                         const isAttended = attendance[cId]?.status === 'attended' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'attended';
                                         const isMissed = attendance[cId]?.status === 'missed' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'missed';
                                         
-                                        let cardClasses = "bg-white border-blue-100 border-l-blue-600 shadow-sm";
-                                        if (isEditMode) cardClasses = "bg-white border-blue-300 border-l-blue-600 ring-2 ring-blue-500/30 shadow-md";
-                                        else if (isAttended) cardClasses = "bg-emerald-50/50 border-emerald-200 border-l-emerald-500 shadow-sm";
-                                        else if (isMissed) cardClasses = "bg-red-50/50 border-red-200 border-l-red-500 shadow-sm";
+                                        let cardClasses = "bg-white dark:bg-slate-900 border-blue-100 dark:border-slate-700 shadow-sm";
+                                        if (isEditMode) cardClasses = "bg-white dark:bg-slate-900 border-blue-300 dark:border-blue-700 ring-2 ring-blue-500/30 shadow-md";
+                                        else if (isAttended) cardClasses = "bg-emerald-50/50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/80 shadow-sm";
+                                        else if (isMissed) cardClasses = "bg-red-50/50 dark:bg-red-900/20 border-red-200 dark:border-red-800/80 shadow-sm";
 
                                         return (
-                                        <div key={idx} className={`p-1.5 md:p-3 print:p-1 print:px-1.5 rounded-lg md:rounded-xl print:rounded border-y border-r border-l-[3px] md:border-l-4 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
+                                        <div key={idx} className={`p-1.5 md:p-3 print:p-1 print:px-1.5 rounded-lg md:rounded-xl print:rounded border md:border-2 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
                                           {isEditMode && (
                                             <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-1.5 md:-mx-3 -mt-1.5 md:-mt-3 p-1.5 md:p-2 rounded-t-xl mb-1.5 md:mb-2 border-b border-slate-200 dark:border-slate-700">
                                               <button onClick={() => openRescheduleModal(cls)} className="p-1 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3 h-3 md:w-3.5 md:h-3.5"/></button>
@@ -917,7 +917,7 @@ export default function DashboardPage() {
             
             {allHistoricalSessions.length === 0 ? (
               <div className="text-center py-16 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-                 <p className="text-slate-500 font-medium">No sessions recorded yet.</p>
+                 <p className="text-slate-500 dark:text-slate-400 font-medium">No sessions recorded yet.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6">
@@ -969,7 +969,7 @@ export default function DashboardPage() {
                              <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold px-4 py-1.5 rounded-lg border border-blue-100 dark:border-blue-800/50">
                                 {courseAttended} / {totalOccurred} Attended
                              </div>
-                             <span className="text-sm text-slate-500 font-medium">(Out of {totalOccurred} occurred so far)</span>
+                             <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">(Out of {totalOccurred} occurred so far)</span>
                           </div>
                         </div>
                         <div className={`w-20 h-20 shrink-0 rounded-full flex items-center justify-center border-[5px] ${pct >= 75 ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-amber-500 text-amber-600 dark:text-amber-400'} bg-white dark:bg-slate-950 shadow-inner`}>
