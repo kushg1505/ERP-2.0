@@ -53,6 +53,9 @@ export default function DashboardPage() {
     if (w === "week-1-2026") {
       return profile?.program?.startsWith("1st") ? "Week 1 Term 2" : "Week 1 Term 5";
     }
+    if (w === "week-2-2026") {
+      return profile?.program?.startsWith("1st") ? "Week 2 Term 2" : "Week 2 Term 5";
+    }
     return w.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
   
@@ -497,7 +500,7 @@ export default function DashboardPage() {
                 )}
               </select>
               <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                5 Oct 2026 - 11 Oct 2026
+                {selectedWeek === "week-2-2026" ? "12 Oct 2026 - 18 Oct 2026" : "5 Oct 2026 - 11 Oct 2026"}
               </div>
             </div>
             {/* Arrows for Next/Prev Week */}

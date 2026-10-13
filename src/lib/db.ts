@@ -128,6 +128,23 @@ export async function fetchMasterTimetable(weekId: string, program: string = "2n
             section: ""
          });
       }
+      if ((weekId === "week-2-2026" || classes.some((c: any) => c.date === "2026-10-14" || c.day?.includes("2026-10-14"))) && program === "2nd-core") {
+         if (!classes.some((c: any) => c.courseAbb?.toLowerCase().startsWith("finprep") && (c.date === "2026-10-14" || c.day?.includes("2026-10-14")))) {
+           classes.push({
+              courseAbb: "FINPrep",
+              courseName: "Finance Prep",
+              sessionNo: "11",
+              day: "Wednesday, 2026-10-14",
+              timeSlot: "19:00-20:15",
+              startTime: "19:00",
+              endTime: "20:15",
+              venue: "C-001",
+              faculty: "TK",
+              date: "2026-10-14",
+              section: ""
+           });
+         }
+      }
       return classes;
     }
     return [];
