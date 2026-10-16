@@ -1,0 +1,913 @@
+[
+  {
+    "rollNo": "250601001",
+    "name": "Aakriti Berry",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601003",
+    "name": "Aastha Agarwal",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601004",
+    "name": "Abhinav Anand",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601007",
+    "name": "Aditya Kumar Jha",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601009",
+    "name": "Agrim Garg",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601011",
+    "name": "Akshaj Arora",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601013",
+    "name": "Akshansh Maheshwari",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601015",
+    "name": "Akshat Vansh Vashishth",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601017",
+    "name": "Alen Siddharth Roy",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601019",
+    "name": "Aman Gupta",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601020",
+    "name": "Anika Gupta",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601023",
+    "name": "Anna Mehta",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601025",
+    "name": "Ansh Gupta",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601026",
+    "name": "Anushka Deepak Sarkar",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601028",
+    "name": "Archi Ravindra Agrawal",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601030",
+    "name": "Arkajeet Ghosh",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601032",
+    "name": "Ashutosh Kumar Vishwakarma",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601035",
+    "name": "Aviral Joshi",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601037",
+    "name": "Ayussh Agarwal",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601038",
+    "name": "Bhumi Jaiswal",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601041",
+    "name": "Darshan Harsukh Faldu",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601042",
+    "name": "Deepshi Bansal",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601045",
+    "name": "Divyam Dudeja",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601046",
+    "name": "Garima Jindal",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601049",
+    "name": "Gayatri Dande",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601050",
+    "name": "Goplani Aman Jai",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601053",
+    "name": "Hrithik Tripathi",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601054",
+    "name": "Isha Yadava",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601057",
+    "name": "Janavi S Athreya",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601059",
+    "name": "Jatin Ahuja",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601061",
+    "name": "Jayesh Bothra",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601062",
+    "name": "Jayshree",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601064",
+    "name": "Karan Chawla",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601068",
+    "name": "Khasitiz Soni",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601070",
+    "name": "Khushi Mehta",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601072",
+    "name": "Krish Kapoor",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601074",
+    "name": "Krish Rajesh Bucha",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601077",
+    "name": "Lakshya Sanwal",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601078",
+    "name": "Mahika Khanna",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601081",
+    "name": "Manvi Goel",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601082",
+    "name": "Meghadri Mitra",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601084",
+    "name": "Mohit Singh",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601087",
+    "name": "Narayan Agarwal",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601089",
+    "name": "Prachi Tiwari",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601090",
+    "name": "Prajjwal Sahoo",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601092",
+    "name": "Pranshu Paliwal",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601094",
+    "name": "Pritam Roy",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601096",
+    "name": "Rishab P Dave",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601098",
+    "name": "Riyansh Ramanathan",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601100",
+    "name": "Rudraksh Sanjay Vora",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601103",
+    "name": "Saba Ayaz",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601104",
+    "name": "Sabhay Wadhwa",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601106",
+    "name": "Saksham Bhargava",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601109",
+    "name": "Sanya Gupta",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601110",
+    "name": "Satvik Pramendra Singh",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601113",
+    "name": "Shaurya Gupta",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601114",
+    "name": "Shitika Tuteja",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601117",
+    "name": "Shourya Makheja",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601119",
+    "name": "Shubhranshu Sekhar Roychowdhury",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601121",
+    "name": "Simarjeet Singh",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601123",
+    "name": "Srishti Malani",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601125",
+    "name": "Swayam Mukesh Nawal",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601126",
+    "name": "Tanisha Bansal",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601128",
+    "name": "Trishant Nagireddy",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601131",
+    "name": "Udit Khetawat",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601133",
+    "name": "Vani Jaiswal",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601134",
+    "name": "Vansh Kabra",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601137",
+    "name": "Vatsal Jain",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601139",
+    "name": "Vibhor Arora",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601140",
+    "name": "Vishakha Alwani",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601142",
+    "name": "Yash Chauhan",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601144",
+    "name": "Yash Pratap",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601147",
+    "name": "Riya Vishnoi",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601148",
+    "name": "Sanyam Jain",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601150",
+    "name": "Reeti Ghosh Choudhury",
+    "section": "A",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601153",
+    "name": "Aishna Agarwal",
+    "section": "A",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601002",
+    "name": "Aarushi",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601005",
+    "name": "Adit Thurumalla",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601006",
+    "name": "Aditi Gupta",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601008",
+    "name": "Aditya Mohan Mehrotra",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601010",
+    "name": "Aishik Adhikary",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601012",
+    "name": "Akshansh Baranwal",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601014",
+    "name": "Akshat Goel",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601016",
+    "name": "Akshat Vats",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601018",
+    "name": "Amaan Ahmad",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601021",
+    "name": "Ankan Bhakat",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601022",
+    "name": "Ankitha Chowdary Arumilli",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601024",
+    "name": "Anoushka Singh",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601027",
+    "name": "Anushka Dubey",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601029",
+    "name": "Arjun Singh Karakoti",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601031",
+    "name": "Ashish Saini",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601033",
+    "name": "Asmi Surjit Thakur",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601034",
+    "name": "Ateev Goel",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601036",
+    "name": "Ayushmaan Beniwal",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601039",
+    "name": "Chayanika Khattri",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601040",
+    "name": "Chinmay Singh Bharadwaj",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601043",
+    "name": "Dev Bhutani",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601044",
+    "name": "Dhwani Bansal",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601047",
+    "name": "Garima Joshi",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601048",
+    "name": "Gaurav Kumar Singh",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601051",
+    "name": "Harshita Sharma",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601052",
+    "name": "Himanshu Khaitan",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601055",
+    "name": "Ishwar Sudeepkumar Vyas",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601056",
+    "name": "Janapareddi Mani Deepika",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601058",
+    "name": "Japna Bhola",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601060",
+    "name": "Jatin Moolchandani",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601063",
+    "name": "Kanak Mayur Panchal",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601065",
+    "name": "Karthik Binu",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601066",
+    "name": "Keshav Jaswal",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601067",
+    "name": "Keshav Lahoti",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601069",
+    "name": "Khushi Jindal",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601071",
+    "name": "Krish Gambhir",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601073",
+    "name": "Krish Panwar",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601075",
+    "name": "Kuhu Singh",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601076",
+    "name": "Lakshya Agrawal",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601079",
+    "name": "Manasvi Chaturvedi",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601080",
+    "name": "Mandar Parfulla Bhole",
+    "section": "B"
+  },
+  {
+    "rollNo": "250601083",
+    "name": "Mohammed Abdul Razzak",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601085",
+    "name": "Nahush Narendra Vaze",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601086",
+    "name": "Nandini Gupta",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601088",
+    "name": "Nishanth Hari",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601091",
+    "name": "Pranil Jain",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601093",
+    "name": "Pratham Agarwal",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601095",
+    "name": "Pulkit Saxena",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601097",
+    "name": "Rishit Vaish",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601099",
+    "name": "Rohit Verma",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601101",
+    "name": "Saanvi Gupta",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601102",
+    "name": "Saatvik Sharma",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601105",
+    "name": "Sachin Khanna",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601107",
+    "name": "Saksham Sethi",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601108",
+    "name": "Sana Gupta",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601111",
+    "name": "Selina Yadav",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601112",
+    "name": "Shagun Somani",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601115",
+    "name": "Shivangi Pandey",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601116",
+    "name": "Shlok Mineshkumar Patel",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601118",
+    "name": "Shreya Agarwal",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601120",
+    "name": "Siddha Pugalia",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601122",
+    "name": "Sreebash Khan",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601124",
+    "name": "Subika Singh",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601127",
+    "name": "Tereen Kumar",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601129",
+    "name": "Trishika Bansal",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601130",
+    "name": "Tukej Kumar",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601132",
+    "name": "Vaibhav Dhingra",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601135",
+    "name": "Vanshika Rajput",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601136",
+    "name": "Varun Deshpande",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601138",
+    "name": "Vedant Agrawal",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601141",
+    "name": "Yash Bansal",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601145",
+    "name": "Zubin Relia",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  },
+  {
+    "rollNo": "250601146",
+    "name": "Mahima Singhal",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601149",
+    "name": "Devanshi Gupta",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601151",
+    "name": "Manikarna Saha",
+    "section": "B",
+    "elective": "Behavioural Finance"
+  },
+  {
+    "rollNo": "250601152",
+    "name": "Disha Rajesh Suvarna",
+    "section": "B",
+    "elective": "Service Excellence in Relationship Management"
+  }
+]

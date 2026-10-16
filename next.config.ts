@@ -8,7 +8,9 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  outputFileTracingIncludes: {
+    "/api/student-lookup": ["./database/**/*.xls*", "./database/roll-lookup/**/*.json"],
+  },
 };
 
 export default withPWA(nextConfig);

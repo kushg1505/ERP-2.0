@@ -29,6 +29,15 @@ interface DayPlan {
   classes: ParsedClass[];
 }
 
+function normalizeDtiGroup(value: string | undefined) {
+  const group = String(value ?? "").trim().toUpperCase().replace(/^(?:G|GROUP)\s*[- ]?\s*/, "");
+  return /^[A-C]$/.test(group) ? String(group.charCodeAt(0) - 64) : group;
+}
+
+function dtiGroupForClass(cls: ParsedClass, program: string | undefined) {
+  return normalizeDtiGroup(cls.dtiGroup || (program === "1st-dcp" ? cls.section : undefined));
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
@@ -92,7 +101,7 @@ export default function DashboardPage() {
         setSelectedWeek(targetWeek);
       }
 
-      if (p && p.courses.length > 0 && targetWeek) {
+      if (p && (p.courses.length > 0 || p.program?.startsWith("1st-")) && targetWeek) {
         // Fetch real data from Firestore
         const master = await fetchMasterTimetable(targetWeek, userProgram) as ParsedClass[];
         
@@ -109,9 +118,9 @@ export default function DashboardPage() {
           const wMaster = await fetchMasterTimetable(w, userProgram) as ParsedClass[];
           let myWClasses = wMaster.filter(cls => {
             if (p.program?.startsWith('1st-')) {
-               if (cls.courseAbb.startsWith('DTI') && p.program === '1st-core') {
+               if (cls.courseAbb.startsWith('DTI') && (p.program === '1st-core' || p.program === '1st-dcp')) {
                   if (!p.dtiGroup) return false;
-                  return cls.dtiGroup === `G-${p.dtiGroup}`;
+                  return dtiGroupForClass(cls, p.program) === normalizeDtiGroup(p.dtiGroup);
                }
                return !cls.section || (p.section && cls.section.includes(p.section));
             } else {
@@ -153,9 +162,9 @@ export default function DashboardPage() {
         const isFirstYear = p.program?.startsWith('1st-');
         let myFilteredClasses = isFirstYear 
           ? master.filter(cls => {
-              if (cls.courseAbb.startsWith('DTI') && p.program === '1st-core') {
+              if (cls.courseAbb.startsWith('DTI') && (p.program === '1st-core' || p.program === '1st-dcp')) {
                  if (!p.dtiGroup) return false;
-                 return cls.dtiGroup === `G-${p.dtiGroup}`;
+                 return dtiGroupForClass(cls, p.program) === normalizeDtiGroup(p.dtiGroup);
               }
               return !cls.section || (p.section && cls.section.includes(p.section));
           })
@@ -400,7 +409,7 @@ export default function DashboardPage() {
   let trueTotalAttended = 0;
   let trueTotalMissed = 0;
 
-  if (profile?.courses && allHistoricalSessions.length > 0) {
+  if (profile && allHistoricalSessions.length > 0) {
     const courseGroups = allHistoricalSessions.reduce((acc: any, session: any) => {
       let courseName = "Other";
       const sortedCourses = [...profile.courses].sort((a, b) => b.courseCode.length - a.courseCode.length);
@@ -436,18 +445,23 @@ export default function DashboardPage() {
     });
   }
 
-  if (!profile || profile.courses.length === 0) {
+  if (!profile) {
     return (
       <div className="text-center mt-20">
         <h2 className="text-2xl font-bold mb-2">Welcome!</h2>
-        <p className="text-slate-500 mb-6">You haven't set up your profile or selected any courses yet.</p>
-        <a href="/profile" className="btn-primary inline-flex">Go to My Courses</a>
+        <p className="text-slate-500 mb-6">Enter your roll number to load your student record and timetable.</p>
+        <a href="/profile" className="btn-primary inline-flex">Find my timetable</a>
       </div>
     );
   }
 
   return (
     <div className="space-y-8 md:space-y-12 pb-24 md:pb-0">
+      {(profile.program === "1st-core" || profile.program === "1st-dcp") && !profile.dtiGroup && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 px-4 py-3 text-sm font-medium text-amber-800 dark:text-amber-300">
+          Your base section is set. The DTI group roster has not been added yet, so DTI classes may be missing from your schedule.
+        </div>
+      )}
       <header className="flex flex-col gap-4 print:hidden">
         {/* Rich Hero Card */}
         <div className="w-full bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 rounded-2xl md:rounded-3xl p-6 md:p-8 flex items-center justify-between overflow-hidden relative border border-blue-100 dark:border-blue-800/30">

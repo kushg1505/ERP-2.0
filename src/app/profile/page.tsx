@@ -1,392 +1,229 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAuth } from "@/lib/AuthContext";
-import { getStudentProfile, saveStudentProfile, StudentProfile, fetchAllCourses, getStudentFromMasterDB } from "@/lib/db";
-import { Save, RefreshCw, AlertCircle, CheckCircle2, ArrowRight, Trash2, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import bfsElectivesData from '@/data/bfs_electives.json';
-
-const bfsElectives = bfsElectivesData as Record<string, string>;
-
-const AVAILABLE_SECTIONS = ["A", "B", "C", "D", "E", "F"];
-const BFS_FIXED_COURSES = ["MLBFSI", "FIS", "VCPE", "HRM", "BFSI&STY"];
-const BFS_ELECTIVE_COURSES = ["BF", "SERM"];
+import { useAuth } from "@/lib/AuthContext";
+import { getStudentProfile, saveStudentProfile } from "@/lib/db";
+import type { StudentProfile } from "@/lib/db";
+import type { StudentDirectoryRecord } from "@/lib/student-directory-types";
+import { ArrowRight, CheckCircle2, Search, Save, UserRound } from "lucide-react";
+import { AuthButton } from "@/components/AuthButton";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<StudentProfile>({ rollNo: "", name: "", courses: [], program: "2nd-core" });
+  const { user, loading: authLoading } = useAuth();
+  const [rollNo, setRollNo] = useState("");
+  const [student, setStudent] = useState<StudentDirectoryRecord | null>(null);
+  const [savedProfile, setSavedProfile] = useState<StudentProfile | null>(null);
+  const [includeFinPrep, setIncludeFinPrep] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [lookingUp, setLookingUp] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  
-  // UI State
-  const [year, setYear] = useState<string>("2nd");
-  const [spec, setSpec] = useState<string>("core"); // core, bfs, dcp
-  
-  const [availableCourses, setAvailableCourses] = useState<{abbreviation: string, name: string}[]>([]);
-  const [syncing, setSyncing] = useState(false);
-  const [syncMessage, setSyncMessage] = useState<{type: "success" | "error", text: string} | null>(null);
-
-  // BFS State
-  const [bfsSection, setBfsSection] = useState("A");
-  const [bfsElective, setBfsElective] = useState("BF");
-  const [dtiGroup, setDtiGroup] = useState("1");
-
-  // Manual Course Edit State
-  const [newCourseCode, setNewCourseCode] = useState("");
-  const [newCourseSection, setNewCourseSection] = useState("A");
-  const [isFinPrep, setIsFinPrep] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (user) {
-      Promise.all([
-        getStudentProfile(user.uid),
-        fetchAllCourses()
-      ]).then(([profileData, coursesData]) => {
-        if (profileData) {
-          setProfile(profileData);
-          if (profileData.program) {
-            const [y, s] = profileData.program.split("-");
-            setYear(y);
-            setSpec(s);
-            if (s === "bfs" && profileData.rollNo) {
-               const elective = bfsElectives[profileData.rollNo.trim()];
-               if (elective) setBfsElective(elective);
-            }
-          }
-          if (profileData.courses?.some((c: any) => c.courseCode === "FINPrep")) {
-            setIsFinPrep(true);
-          }
-          if (profileData.section) setBfsSection(profileData.section);
-          if (profileData.dtiGroup) setDtiGroup(profileData.dtiGroup);
-        } else {
-          setProfile(prev => ({ ...prev, name: user.displayName || "" }));
-        }
-        
-        const sortedCourses = (coursesData as any[]).sort((a, b) => a.abbreviation.localeCompare(b.abbreviation));
-        setAvailableCourses(sortedCourses);
+    let cancelled = false;
+    async function loadProfile() {
+      if (authLoading) return;
+      if (!user) {
+        const pendingRollNo = new URLSearchParams(window.location.search).get("rollNo")?.trim() || "";
+        if (pendingRollNo) setRollNo(pendingRollNo);
         setLoading(false);
-      });
-    }
-  }, [user]);
+        return;
+      }
 
-  useEffect(() => {
-    if (year === "2nd" && spec === "core") {
-       if (isFinPrep && !profile.courses.some(c => c.courseCode === "FINPrep")) {
-           setProfile(prev => ({ ...prev, courses: [...prev.courses, { courseCode: "FINPrep", section: "" }] }));
-       } else if (!isFinPrep && profile.courses.some(c => c.courseCode === "FINPrep")) {
-           setProfile(prev => ({ ...prev, courses: prev.courses.filter(c => c.courseCode !== "FINPrep") }));
-       }
+      setLoading(true);
+      const existing = await getStudentProfile(user.uid);
+      if (cancelled) return;
+      setSavedProfile(existing);
+      const queryRollNo = new URLSearchParams(window.location.search).get("rollNo")?.trim() || "";
+      const requestedFinPrep = new URLSearchParams(window.location.search).get("includeFinPrep") === "1";
+      const initialRollNo = queryRollNo || existing?.rollNo || "";
+      setRollNo(initialRollNo);
+      setIncludeFinPrep(Boolean(
+        requestedFinPrep || (existing?.rollNo === initialRollNo &&
+          existing.courses?.some((course) => course.courseCode.toLowerCase() === "finprep")),
+      ));
+
+      if (initialRollNo) {
+        setLookingUp(true);
+        try {
+          const response = await fetch("/api/student-lookup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rollNo: initialRollNo }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Could not find your student record.");
+          if (!cancelled) setStudent(result.student as StudentDirectoryRecord);
+        } catch (lookupError) {
+          if (!cancelled) setError(lookupError instanceof Error ? lookupError.message : "Student lookup failed.");
+        } finally {
+          if (!cancelled) setLookingUp(false);
+        }
+      }
+
+      if (!cancelled) setLoading(false);
     }
-  }, [isFinPrep, year, spec]);
+
+    loadProfile();
+    return () => { cancelled = true; };
+  }, [user, authLoading]);
+
+  const handleLookup = async () => {
+    if (!rollNo.trim()) {
+      setError("Enter your roll number.");
+      return;
+    }
+    setLookingUp(true);
+    setError("");
+    setSaved(false);
+    try {
+      const response = await fetch("/api/student-lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rollNo: rollNo.trim() }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not find your student record.");
+      setStudent(result.student as StudentDirectoryRecord);
+      setRollNo((result.student as StudentDirectoryRecord).rollNo);
+      setIncludeFinPrep(Boolean(
+        savedProfile?.rollNo === (result.student as StudentDirectoryRecord).rollNo &&
+        savedProfile.courses?.some((course) => course.courseCode.toLowerCase() === "finprep"),
+      ));
+    } catch (lookupError) {
+      setStudent(null);
+      setError(lookupError instanceof Error ? lookupError.message : "Student lookup failed.");
+    } finally {
+      setLookingUp(false);
+    }
+  };
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user || !student) return;
     setSaving(true);
-    
-    const programStr = `${year}-${spec}`;
-    let finalProfile = { ...profile, program: programStr };
-
-    if (year === "1st") {
-      finalProfile.section = bfsSection;
-      if (spec === "core") finalProfile.dtiGroup = dtiGroup;
-    } else if (spec === "bfs") {
-      if (!profile.rollNo || profile.rollNo.trim() === "") {
-        alert("Please enter your Roll Number to automatically map your elective.");
-        setSaving(false);
-        return;
-      }
-      const elective = bfsElectives[profile.rollNo.trim()];
-      if (!elective) {
-        alert("Roll Number not found in BFS electives list. Please verify your roll number.");
-        setSaving(false);
-        return;
-      }
-
-      // Build courses list manually
-      const courses = [];
-      for (const c of BFS_FIXED_COURSES) {
-         courses.push({ courseCode: c, section: bfsSection });
-      }
-      courses.push({ courseCode: elective, section: "" });
-      finalProfile.courses = courses;
+    setError("");
+    const courses = student.courses.filter((course) => course.courseCode.toLowerCase() !== "finprep");
+    if (student.program === "2nd-core" && includeFinPrep) {
+      courses.push({ courseCode: "FINPrep", section: "" });
     }
-
-    await saveStudentProfile(user.uid, finalProfile);
-    setProfile(finalProfile);
+    const profile: StudentProfile = {
+      rollNo: student.rollNo,
+      name: student.name,
+      program: student.program,
+      ...(student.section ? { section: student.section } : {}),
+      ...(student.dtiGroup ? { dtiGroup: student.dtiGroup } : {}),
+      courses,
+      scheduleOverrides: savedProfile?.rollNo === student.rollNo ? savedProfile.scheduleOverrides ?? [] : [],
+    };
+    await saveStudentProfile(user.uid, profile);
+    setSavedProfile(profile);
     setSaving(false);
     setSaved(true);
-    // Don't auto hide the saved state immediately, give them time to click the dashboard link
-    setTimeout(() => setSaved(false), 8000);
   };
 
-  const handleSyncDatabase = async () => {
-    if (!profile.rollNo || profile.rollNo.trim() === "") {
-       setSyncMessage({ type: "error", text: "Please enter your Roll Number first." });
-       return;
-    }
-    setSyncing(true);
-    setSyncMessage(null);
-    
-    const masterData = await getStudentFromMasterDB(profile.rollNo.trim());
-    if (masterData && masterData.enrolledCourses) {
-       const formattedCourses = masterData.enrolledCourses.map((c: any) => ({
-          courseCode: c.abbreviation,
-          section: c.section
-       }));
-       if (year === "2nd" && spec === "core" && isFinPrep) {
-           formattedCourses.push({ courseCode: "FINPrep", section: "" });
-       }
-       setProfile(prev => ({ ...prev, name: masterData.name || prev.name, courses: formattedCourses }));
-       setSyncMessage({ type: "success", text: "Successfully synced with master database!" });
-    } else {
-       setSyncMessage({ type: "error", text: "Roll number not found in master database." });
-    }
-    setSyncing(false);
-  };
-
-  const handleAddCourse = () => {
-    if (!newCourseCode) return;
-    if (profile.courses.some(c => c.courseCode === newCourseCode)) return; // Already exists
-    setProfile(prev => ({
-      ...prev,
-      courses: [...prev.courses, { courseCode: newCourseCode, section: newCourseSection }]
-    }));
-    setNewCourseCode(""); // Reset after add
-  };
-
-  const handleRemoveCourse = (courseCode: string) => {
-    setProfile(prev => ({
-      ...prev,
-      courses: prev.courses.filter(c => c.courseCode !== courseCode)
-    }));
-  };
-
-  if (loading) return <div className="flex justify-center p-20"><div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" /></div>;
+  if (authLoading || loading) {
+    return <div className="flex justify-center p-20"><div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" /></div>;
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 animate-fade-in pb-20">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Student Profile</h1>
-        <p className="text-slate-500">Configure your program details to view your personalized schedule.</p>
+        <h1 className="text-3xl font-bold mb-2">Set Up Your Timetable</h1>
+        <p className="text-slate-500">Enter your roll number once. We’ll identify your program, courses, and sections automatically.</p>
       </div>
 
-      <div className="glass-panel p-6 rounded-2xl space-y-6">
-        <h2 className="text-xl font-bold border-b border-slate-200 dark:border-slate-800 pb-4">1. Select Your Program</h2>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Year</label>
-            <select value={year} onChange={(e) => setYear(e.target.value)} className="input-field w-full">
-              <option value="1st">1st Year</option>
-              <option value="2nd">2nd Year</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Specialization</label>
-            <select value={spec} onChange={(e) => setSpec(e.target.value)} className="input-field w-full">
-              <option value="core">Core</option>
-              <option value="bfs">BFS</option>
-              <option value="dcp">DCP</option>
-            </select>
-          </div>
+      <div className="glass-panel p-6 rounded-2xl space-y-5">
+        <label htmlFor="profile-roll-number" className="text-sm font-bold text-slate-500 uppercase tracking-wider block">Enrollment / Roll Number</label>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            id="profile-roll-number"
+            type="text"
+            value={rollNo}
+            onChange={(event) => setRollNo(event.target.value)}
+            onKeyDown={(event) => event.key === "Enter" && handleLookup()}
+            placeholder="Enter your roll number"
+            autoComplete="off"
+            className="input-field flex-1"
+          />
+          <button onClick={handleLookup} disabled={lookingUp} className="btn-secondary flex justify-center items-center gap-2 rounded-xl">
+            <Search className={`w-4 h-4 ${lookingUp ? "animate-pulse" : ""}`} />
+            {lookingUp ? "Finding you…" : "Find my record"}
+          </button>
         </div>
-      </div>
 
-      <div className="glass-panel p-6 rounded-2xl space-y-6">
-        <h2 className="text-xl font-bold border-b border-slate-200 dark:border-slate-800 pb-4">2. Course Setup</h2>
+        {error && <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>}
 
-        {year === "1st" ? (
-          <div className="space-y-6">
-             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300">
-               <p className="text-sm font-medium">1st-year students do not need a Roll Number. Just select your Section.</p>
-             </div>
-             <div className="grid md:grid-cols-2 gap-6">
-               <div>
-                 <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
-                 <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full">
-                   {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Section {s}</option>)}
-                 </select>
-               </div>
-               {spec === 'core' && (
-                 <div>
-                   <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your DTI Group</label>
-                   <select value={dtiGroup} onChange={(e) => setDtiGroup(e.target.value)} className="input-field w-full">
-                     {[...Array(11)].map((_, i) => <option key={i+1} value={(i+1).toString()}>Group {i+1}</option>)}
-                   </select>
-                 </div>
-               )}
-             </div>
-          </div>
-        ) : (spec === "core" || spec === "dcp") ? (
-          <div className="space-y-6">
-             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300">
-               <p className="text-sm font-medium">For Core and DCP students, simply enter your Roll Number and click Sync. Your courses will be automatically fetched.</p>
-             </div>
-             
-             <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
-                <input 
-                  type="text" 
-                  value={profile.rollNo}
-                  onChange={(e) => setProfile({ ...profile, rollNo: e.target.value })}
-                  placeholder="e.g. 2402001"
-                  className="input-field w-full"
-                />
+        {student && (
+          <div className="space-y-5 border-t border-slate-200 dark:border-slate-800 pt-5">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 shrink-0 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                <UserRound className="w-6 h-6" />
               </div>
               <div>
-                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Name (Optional)</label>
-                <input 
-                  type="text" 
-                  value={profile.name}
-                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                  placeholder="Your Name"
-                  className="input-field w-full"
-                />
+                <h2 className="text-xl font-bold">{student.name || "Student"}</h2>
+                <p className="text-sm text-slate-500">{student.program.split("-")[0]} Year {student.program.split("-")[1].toUpperCase()} · Roll No. {student.rollNo}</p>
+                <p className="text-sm text-slate-500 mt-1">
+                  Section {student.section || "—"}{student.dtiGroup ? ` · DTI Group ${student.dtiGroup}` : ""}
+                </p>
               </div>
             </div>
 
-            {year === "2nd" && spec === "core" && (
-              <div className="flex items-center gap-3 mt-4 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                 <input type="checkbox" id="finprepProfile" checked={isFinPrep} onChange={(e) => setIsFinPrep(e.target.checked)} className="w-5 h-5 text-blue-600 rounded bg-white border-slate-300" />
-                 <label htmlFor="finprepProfile" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">I am enrolled in FINPrep</label>
+            {student.warnings.map((warning) => (
+              <div key={warning} className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 px-4 py-3 text-sm font-medium text-amber-800 dark:text-amber-300">
+                {warning === "dti-group-pending"
+                  ? "Your base section is available. The DTI group roster has not been added yet, so DTI classes may be missing until that file is provided."
+                  : warning === "elective-pending"
+                    ? "Your section and fixed courses are available, but the roster does not include your elective choice yet."
+                      : "Your elective could not be matched to a timetable course. Please contact the administrator."}
+              </div>
+            ))}
+
+            {student.program === "2nd-core" && (
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={includeFinPrep}
+                  onChange={(event) => setIncludeFinPrep(event.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                Include FINPrep in my timetable
+              </label>
+            )}
+
+            {student.courses.length > 0 && (
+              <div>
+                <h3 className="font-bold mb-3">Courses found ({student.courses.length})</h3>
+                <div className="flex flex-wrap gap-2">
+                  {student.courses.map((course, index) => (
+                    <span key={`${course.courseCode}-${course.section}-${index}`} className="rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 px-3 py-1.5 text-sm font-semibold text-blue-800 dark:text-blue-300">
+                      {course.courseCode}{course.section ? ` · Sec ${course.section}` : ""}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
 
-            <div className="flex gap-4 items-center mt-6">
-              <button 
-                onClick={handleSyncDatabase}
-                disabled={syncing}
-                className="btn-secondary px-6 py-2.5 rounded-xl font-medium flex items-center gap-2"
-              >
-                <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
-                {syncing ? "Syncing..." : "Sync from Master Database"}
-              </button>
-              {syncMessage && (
-                <div className={`flex items-center gap-2 text-sm font-medium ${syncMessage.type === "success" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-                  {syncMessage.type === "success" ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-                  {syncMessage.text}
-                </div>
-              )}
-            </div>
-
-            {profile.courses.length > 0 && (
-               <div className="mt-6 border-t border-slate-200 dark:border-slate-800 pt-6">
-                  <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-4">Enrolled Courses ({profile.courses.length})</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                     {profile.courses.map((c, i) => (
-                        <div key={i} className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 flex justify-between items-center group">
-                           <div>
-                             <div className="font-bold text-lg">{c.courseCode}</div>
-                             <div className="text-xs text-slate-500 font-medium">Section {c.section}</div>
-                           </div>
-                           <button onClick={() => handleRemoveCourse(c.courseCode)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100" title="Remove course">
-                             <Trash2 className="w-5 h-5" />
-                           </button>
-                        </div>
-                     ))}
-                  </div>
-                  
-                  <div className="mt-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
-                    <h4 className="text-sm font-bold text-slate-600 dark:text-slate-400 mb-3">Add / Override Course</h4>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <select 
-                        value={newCourseCode}
-                        onChange={(e) => setNewCourseCode(e.target.value)}
-                        className="input-field flex-grow"
-                      >
-                        <option value="">-- Select Course --</option>
-                        {availableCourses.filter(c => !profile.courses.some(pc => pc.courseCode === c.abbreviation)).map(c => (
-                          <option key={c.abbreviation} value={c.abbreviation}>{c.abbreviation} - {c.name}</option>
-                        ))}
-                      </select>
-                      <select
-                        value={newCourseSection}
-                        onChange={(e) => setNewCourseSection(e.target.value)}
-                        className="input-field w-full sm:w-32"
-                      >
-                        {AVAILABLE_SECTIONS.map(s => <option key={s} value={s}>Sec {s}</option>)}
-                      </select>
-                      <button 
-                        onClick={handleAddCourse}
-                        disabled={!newCourseCode}
-                        className="btn-secondary px-6 rounded-lg font-bold flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Plus className="w-4 h-4" /> Add
-                      </button>
-                    </div>
-                  </div>
-               </div>
+            {user ? (
+              <div className="flex flex-col sm:flex-row justify-end items-center gap-4 pt-2">
+                {saved && (
+                  <Link href="/dashboard" className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 px-5 py-3 rounded-xl flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5" /> Profile saved · Open dashboard <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
+                <button onClick={handleSave} disabled={saving} className="btn-primary px-8 py-3 rounded-xl font-bold flex items-center gap-2">
+                  <Save className="w-5 h-5" /> {saving ? "Saving…" : saved ? "Saved" : "Save profile"}
+                </button>
+              </div>
+            ) : (
+              <div className="border-t border-slate-200 dark:border-slate-800 pt-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p className="text-sm text-slate-500">Your schedule is ready. Sign in to save it and track attendance.</p>
+                <AuthButton />
+              </div>
             )}
           </div>
-        ) : null}
-
-        {year !== "1st" && spec === "bfs" && (
-           <div className="space-y-6">
-              <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300">
-               <p className="text-sm font-medium">As a BFS student, you have 5 fixed courses. Please enter your Roll Number to automatically map your Elective.</p>
-             </div>
-
-             <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
-                  <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full">
-                     {['A', 'B'].map(s => <option key={s} value={s}>Section {s}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
-                  <input 
-                    type="text" 
-                    value={profile.rollNo}
-                    onChange={(e) => {
-                       setProfile({ ...profile, rollNo: e.target.value });
-                       const elective = bfsElectives[e.target.value.trim()];
-                       if (elective) setBfsElective(elective);
-                       else setBfsElective("");
-                    }}
-                    placeholder="e.g. 2402001"
-                    className="input-field w-full"
-                  />
-                </div>
-             </div>
-
-             <div className="mt-6">
-                <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-3">Your 6 Courses</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                   {BFS_FIXED_COURSES.map((c, i) => (
-                      <div key={i} className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-center">
-                         <div className="font-bold">{c}</div>
-                         <div className="text-xs text-slate-500">Fixed</div>
-                      </div>
-                   ))}
-                   <div className={`border rounded-lg p-3 text-center ${bfsElective ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 ring-2 ring-blue-500' : 'bg-slate-50 border-dashed border-slate-300'}`}>
-                         <div className={`font-bold ${bfsElective ? 'text-blue-700 dark:text-blue-400' : 'text-slate-400'}`}>{bfsElective || 'Pending'}</div>
-                         <div className={`text-xs ${bfsElective ? 'text-blue-500' : 'text-slate-400'}`}>Elective</div>
-                   </div>
-                </div>
-             </div>
-           </div>
         )}
-      </div>
-
-      <div className="flex flex-col sm:flex-row justify-end items-center gap-4 pt-4">
-        {saved && (
-          <Link href="/dashboard" className="text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-6 py-3 rounded-xl flex items-center gap-2 transition-all hover:bg-emerald-100 hover:shadow-lg hover:shadow-emerald-500/20">
-            <CheckCircle2 className="w-5 h-5" />
-            Profile Saved! Go to Dashboard <ArrowRight className="w-5 h-5" />
-          </Link>
-        )}
-        <button 
-          onClick={handleSave} 
-          disabled={saving}
-          className="btn-primary px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all"
-        >
-          {saving ? <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" /> : <Save className="w-5 h-5" />}
-          {saved ? "Saved!" : "Save Profile"}
-        </button>
       </div>
     </div>
   );

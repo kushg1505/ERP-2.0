@@ -1,17 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getStudentFromMasterDB, fetchMasterTimetable, fetchAvailableWeeks, resolveOngoingWeek } from "@/lib/db";
+import { useState } from "react";
+import { fetchMasterTimetable, fetchAvailableWeeks, resolveOngoingWeek } from "@/lib/db";
 import { RefreshCw, Download, Calendar, ArrowRight, GraduationCap, Crown, Sparkles, Clock, BarChart2, AlertTriangle, ShieldCheck, IdCard, Users } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
 import { DisclaimerModal } from "./DisclaimerModal";
-import bfsElectivesData from '@/data/bfs_electives.json';
-const bfsElectives = bfsElectivesData as Record<string, string>;
-
-const AVAILABLE_SECTIONS = ["A", "B", "C", "D", "E", "F"];
-const BFS_FIXED_COURSES = ["MLBFSI", "FIS", "VCPE", "HRM", "BFSI&STY"];
+import type { StudentDirectoryRecord } from "@/lib/student-directory-types";
 
 interface ParsedClass {
   courseAbb: string;
@@ -26,6 +22,11 @@ interface ParsedClass {
   date: string;
   sessionNo?: string;
   dtiGroup?: string;
+}
+
+function normalizeDtiGroup(value: string | undefined) {
+  const group = String(value ?? "").trim().toUpperCase().replace(/^(?:G|GROUP)\s*[- ]?\s*/, "");
+  return /^[A-C]$/.test(group) ? String(group.charCodeAt(0) - 64) : group;
 }
 
 export default function QuickSchedule() {
@@ -56,32 +57,18 @@ export default function QuickSchedule() {
       handleGenerate();
     } else if (pendingAction === "signin") {
       await signInWithGoogle();
-      router.push('/profile');
+      const profileParams = new URLSearchParams();
+      if (rollNo.trim()) profileParams.set("rollNo", rollNo.trim());
+      if (includeFinPrep) profileParams.set("includeFinPrep", "1");
+      const query = profileParams.toString();
+      router.push(query ? `/profile?${query}` : "/profile");
     }
     setPendingAction(null);
   };
 
-  const [year, setYear] = useState("2nd");
-  const [spec, setSpec] = useState("core");
   const [rollNo, setRollNo] = useState("");
-  const [selectedWeekInput, setSelectedWeekInput] = useState("");
-  
-  useEffect(() => {
-    async function initWeek() {
-      const program = `${year}-${spec}`;
-      const weeks = await fetchAvailableWeeks(program);
-      if (weeks.length > 0) {
-         const ongoing = await resolveOngoingWeek(program, weeks);
-         setSelectedWeekInput(ongoing);
-      }
-    }
-    initWeek();
-  }, [year, spec]);
-  
-  const [bfsSection, setBfsSection] = useState("A");
-
-  const [dtiGroup, setDtiGroup] = useState("1");
-  const [isFinPrep, setIsFinPrep] = useState(false);
+  const [student, setStudent] = useState<StudentDirectoryRecord | null>(null);
+  const [includeFinPrep, setIncludeFinPrep] = useState(false);
 
   const [myClasses, setMyClasses] = useState<ParsedClass[]>([]);
   const [allDays, setAllDays] = useState<string[]>([]);
@@ -93,57 +80,44 @@ export default function QuickSchedule() {
     setLoading(true);
 
     try {
-      const program = `${year}-${spec}`;
+      if (!rollNo.trim()) throw new Error("Enter your roll number.");
+
+      const lookupResponse = await fetch("/api/student-lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rollNo: rollNo.trim() }),
+      });
+      const lookupResult = await lookupResponse.json();
+      if (!lookupResponse.ok) throw new Error(lookupResult.error || "Could not find your student record.");
+
+      const resolvedStudent = lookupResult.student as StudentDirectoryRecord;
+      setStudent(resolvedStudent);
+      setRollNo(resolvedStudent.rollNo);
+      const program = resolvedStudent.program;
       const weeks = await fetchAvailableWeeks(program);
       if (weeks.length === 0) {
         throw new Error("No schedule uploaded for this program yet.");
       }
-      
-      const targetWeek = selectedWeekInput;
-      if (!targetWeek) {
-        throw new Error("Please wait for the week options to load.");
-      }
-      if (!weeks.includes(targetWeek)) {
-        throw new Error("No schedule updated for this week.");
-      }
+
+      const targetWeek = await resolveOngoingWeek(program, weeks);
+      if (!targetWeek || !weeks.includes(targetWeek)) throw new Error("No current schedule is available for your program.");
       setActiveWeek(targetWeek);
       
       const master = await fetchMasterTimetable(targetWeek, program) as ParsedClass[];
-      
-      let enrolledCourses: {courseCode: string, section: string}[] = [];
-
-      if (year === "1st") {
-        // 1st years don't need roll no, we just filter the master table by their section
-      } else if (spec === "bfs") {
-        if (!rollNo) throw new Error("Please enter your Roll Number.");
-        const elective = bfsElectives[rollNo.trim()];
-        if (!elective) throw new Error("Roll Number not found in BFS electives list.");
-        
-        for (const c of BFS_FIXED_COURSES) {
-          enrolledCourses.push({ courseCode: c, section: bfsSection });
-        }
-        enrolledCourses.push({ courseCode: elective, section: "" });
-      } else {
-        if (!rollNo) throw new Error("Please enter your Roll Number.");
-        const masterData = await getStudentFromMasterDB(rollNo.trim());
-        if (!masterData || !masterData.enrolledCourses) {
-          throw new Error("Roll Number not found in master database.");
-        }
-        enrolledCourses = masterData.enrolledCourses.map((c: any) => ({
-          courseCode: c.abbreviation,
-          section: c.section
-        }));
-        if (year === "2nd" && spec === "core" && isFinPrep) {
-           enrolledCourses.push({ courseCode: "FINPrep", section: "" });
-        }
+      const enrolledCourses = [...resolvedStudent.courses];
+      if (program === "2nd-core" && includeFinPrep) {
+        enrolledCourses.push({ courseCode: "FINPrep", section: "" });
       }
+      setStudent(resolvedStudent);
 
       // Filter master schedule
-      const filtered = year === "1st" ? master.filter(cls => {
-         if (cls.courseAbb.startsWith('DTI') && spec === 'core') {
-            return cls.dtiGroup === `G-${dtiGroup}`;
+      const isFirstYear = program.startsWith("1st-");
+      const filtered = isFirstYear ? master.filter(cls => {
+         if (cls.courseAbb.startsWith('DTI') && (program === '1st-core' || program === '1st-dcp')) {
+            const classGroup = cls.dtiGroup || (program === "1st-dcp" ? cls.section : "");
+            return Boolean(resolvedStudent.dtiGroup) && normalizeDtiGroup(classGroup) === normalizeDtiGroup(resolvedStudent.dtiGroup);
          }
-         return !cls.section || cls.section.includes(bfsSection);
+         return !cls.section || Boolean(resolvedStudent.section && cls.section.includes(resolvedStudent.section));
       }) : master.filter(cls => 
         enrolledCourses.some(c => {
           const code = c.courseCode ? c.courseCode.toLowerCase().replace(/[\s-]/g, '') : '';
@@ -297,9 +271,9 @@ export default function QuickSchedule() {
              {/* Title & View Toggle */}
              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-4 sm:mb-6 relative">
                <div className="relative inline-block">
-                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight print:text-4xl">
-                     <span className="text-slate-900 dark:text-white border-b-4 border-slate-900 dark:border-white pb-1 mr-2">My</span>
-                     <span className="text-blue-600">Quick Schedule</span>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight print:text-4xl flex flex-col">
+                     <span className="text-slate-900 dark:text-white">Hi {student?.name || "there"}</span>
+                     <span className="text-blue-600 text-xl sm:text-2xl print:text-2xl">Here&apos;s your quick schedule</span>
                   </h2>
                </div>
                
@@ -325,14 +299,20 @@ export default function QuickSchedule() {
                    {/* Week Pill */}
                    <div className="flex items-center gap-2 bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">
                      <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 print:w-3.5 print:h-3.5" />
-                     {activeWeek === "week-1-2026" ? (year === "2nd" ? "Week 1 Term 5" : "Week 1 Term 2") : activeWeek === "week-2-2026" ? (year === "2nd" ? "Week 2 Term 5" : "Week 2 Term 2") : activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                     {activeWeek === "week-1-2026" ? (student?.program.startsWith("2nd-") ? "Week 1 Term 5" : "Week 1 Term 2") : activeWeek === "week-2-2026" ? (student?.program.startsWith("2nd-") ? "Week 2 Term 5" : "Week 2 Term 2") : activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                    </div>
                    {/* Specialization Pill */}
                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">
                      <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 print:w-3.5 print:h-3.5" />
-                     {year} Year {spec.toUpperCase()}
+                     {student?.program.split("-")[0]} Year {student?.program.split("-")[1].toUpperCase()}
                    </div>
                 </div>
+                {student?.name && (
+                   <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 text-xs sm:text-base print:text-sm print:px-3 print:py-1.5 mt-1 sm:mt-0">
+                     <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 print:w-3.5 print:h-3.5" />
+                     {student.name}
+                   </div>
+                )}
                 {/* Roll No Pill */}
                 {rollNo && (
                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 text-xs sm:text-base print:text-sm print:px-3 print:py-1.5 mt-1 sm:mt-0">
@@ -341,6 +321,15 @@ export default function QuickSchedule() {
                    </div>
                 )}
              </div>
+             {student?.warnings.map((warning) => (
+               <div key={warning} className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 no-print">
+                 {warning === "dti-group-pending"
+                   ? "Your section is set, but the DTI group roster has not been added yet. DTI classes may be missing from this schedule."
+                   : warning === "elective-pending"
+                     ? "Your base schedule is ready, but your elective choice is missing from the roster."
+                     : "Your elective could not be matched to a timetable course. Please contact the administrator."}
+               </div>
+             ))}
           </div>
           
           <div className="px-4 sm:px-8 pb-4 sm:pb-8 relative z-10 flex-1 print:px-6 print:pb-6 print:flex-none">
@@ -366,7 +355,7 @@ export default function QuickSchedule() {
                          <span className="text-xs font-medium text-slate-500 mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
                        </td>
                        {(() => {
-                         const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
+                         const isSSRThursday = student?.program === "2nd-core" && day.toLowerCase().includes("thursday");
                          const cells = [];
                          let ssrStarted = false;
                          const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
@@ -462,7 +451,7 @@ export default function QuickSchedule() {
             {/* List View (Hidden on screen if in table mode, NEVER visible on print) */}
             <div className={`flex flex-col gap-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
                 {allDays.map(day => {
-                  const isSSRThursday = year === "2nd" && spec === "core" && day.toLowerCase().includes("thursday");
+                  const isSSRThursday = student?.program === "2nd-core" && day.toLowerCase().includes("thursday");
                   const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
                   
                   const hasNoEvents = dayClasses.length === 0 && !isSSRThursday;
@@ -612,99 +601,33 @@ export default function QuickSchedule() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-slate-900 dark:text-white">Generate Quick Schedule</h2>
-                    <p className="text-sm text-slate-500">No sign-up required. Just enter your details to view and download your timetable.</p>
+                    <p className="text-sm text-slate-500">No sign-up required. Enter your roll number and we’ll find your program, section, and courses.</p>
                   </div>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-6 w-full">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Year</label>
-                      <select value={year} onChange={(e) => setYear(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                        <option value="1st">1st Year</option>
-                        <option value="2nd">2nd Year</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Specialization</label>
-                      <select value={spec} onChange={(e) => setSpec(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                        <option value="core">Core</option>
-                        <option value="bfs">BFS</option>
-                        <option value="dcp">DCP</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Week</label>
-                      <select value={selectedWeekInput} onChange={(e) => setSelectedWeekInput(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                        {selectedWeekInput === "" && <option value="">Loading...</option>}
-                        {[...Array(10)].map((_, i) => (
-                           <option key={i} value={`week-${i+1}-2026`}>Week {i+1}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    {year === "1st" ? (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
-                          <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                             {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Section {s}</option>)}
-                          </select>
-                        </div>
-                        {spec === 'core' && (
-                          <div>
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your DTI Group</label>
-                            <select value={dtiGroup} onChange={(e) => setDtiGroup(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                              {[...Array(11)].map((_, i) => <option key={i+1} value={(i+1).toString()}>Group {i+1}</option>)}
-                            </select>
-                          </div>
-                        )}
-                        <p className="text-xs text-blue-500 font-medium mt-2 bg-blue-50 p-2 rounded">Roll Number is not required for 1st-year students.</p>
-                      </div>
-                    ) : (spec === "core" || spec === "dcp") ? (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
-                          <input 
-                            type="text" 
-                            value={rollNo}
-                            onChange={(e) => setRollNo(e.target.value)}
-                            className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
-                            onKeyDown={(e) => e.key === 'Enter' && onGenerateClick()}
-                          />
-                        </div>
-                        {year === "2nd" && spec === "core" && (
-                          <div className="flex items-center gap-2 mt-2">
-                             <input type="checkbox" id="finprep" checked={isFinPrep} onChange={(e) => setIsFinPrep(e.target.checked)} className="w-4 h-4 text-blue-600 rounded bg-slate-50 border-slate-300" />
-                             <label htmlFor="finprep" className="text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">I am enrolled in FINPrep</label>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <>
-                        <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Your Section</label>
-                          <select value={bfsSection} onChange={(e) => setBfsSection(e.target.value)} className="input-field w-full bg-slate-50 dark:bg-slate-800/50">
-                             {(spec === 'bfs' ? ['A', 'B'] : AVAILABLE_SECTIONS).map(s => <option key={s} value={s}>Section {s}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Roll Number</label>
-                          <input 
-                            type="text" 
-                            value={rollNo}
-                            onChange={(e) => setRollNo(e.target.value)}
-                            className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
-                            onKeyDown={(e) => e.key === 'Enter' && onGenerateClick()}
-                            placeholder="Required for electives"
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
+                <div className="w-full">
+                  <label htmlFor="quick-roll-number" className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Enrollment / Roll Number</label>
+                  <input
+                    id="quick-roll-number"
+                    type="text"
+                    value={rollNo}
+                    onChange={(e) => setRollNo(e.target.value)}
+                    className="input-field w-full bg-slate-50 dark:bg-slate-800/50"
+                    onKeyDown={(e) => e.key === "Enter" && onGenerateClick()}
+                    placeholder="Enter your roll number"
+                    autoComplete="off"
+                  />
                 </div>
+
+                <label className="flex items-center gap-2 mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={includeFinPrep}
+                    onChange={(event) => setIncludeFinPrep(event.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  Include FINPrep (second-year Core only)
+                </label>
 
                 {error && <div className="mt-4 text-center text-red-500 font-medium text-sm bg-red-50 dark:bg-red-900/20 py-2 rounded-lg">{error}</div>}
 
