@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import messMenuData from "@/data/mess_menu.json";
-import { format } from "date-fns";
+import { format, isAfter, parse } from "date-fns";
 import { Coffee, Utensils, Pizza, Moon, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function MessMenu() {
@@ -19,11 +19,19 @@ export default function MessMenu() {
     
     if (todayMenu) {
       setCurrentDayMenu(todayMenu);
-      setOtherDays(messMenuData.filter((m) => m.date !== todayStr));
+      setOtherDays(
+        messMenuData.filter((m) =>
+          isAfter(parse(m.date, "dd-MM-yyyy", today), today),
+        ),
+      );
     } else {
       // If today is not in the menu, default to the first day
       setCurrentDayMenu(messMenuData[0]);
-      setOtherDays(messMenuData.slice(1));
+      setOtherDays(
+        messMenuData.filter((m) =>
+          isAfter(parse(m.date, "dd-MM-yyyy", today), today),
+        ),
+      );
     }
   }, []);
 
