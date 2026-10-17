@@ -5,6 +5,9 @@ import { useAuth } from "@/lib/AuthContext";
 import { getStudentProfile, fetchMasterTimetable, StudentProfile, fetchAttendance, fetchAllAttendanceStats, markAttendance, fetchAvailableWeeks, updateStudentOverrides, ScheduleOverride, resolveOngoingWeek } from "@/lib/db";
 import { Clock, MapPin, CheckCircle2, XCircle, Calendar, CheckSquare, List, Edit3, Trash2, Plus, Settings2, X, Download, Users, Utensils } from "lucide-react";
 import MessMenu from "@/components/MessMenu";
+import { PrintScheduleFooter, PrintScheduleHeader } from "@/components/PrintScheduleHeader";
+import PrintableScheduleTable, { type PrintableActivity } from "@/components/PrintableScheduleTable";
+import { downloadSchedulePdf } from "@/lib/schedule-pdf";
 
 interface ParsedClass {
   courseAbb: string;
@@ -38,6 +41,22 @@ function dtiGroupForClass(cls: ParsedClass, program: string | undefined) {
   return normalizeDtiGroup(cls.dtiGroup || (program === "1st-dcp" ? cls.section : undefined));
 }
 
+function slotStartHour(slot: string) {
+  const match = slot.match(/(\d+)[:.](\d+)/);
+  return match ? parseInt(match[1]) + parseInt(match[2]) / 60 : 0;
+}
+
+function slotRangeLabel(slots: string[]) {
+  const rangeSlots = slots.filter((slot) => {
+    const start = slotStartHour(slot);
+    return start >= 8.5 && start < 11.5;
+  });
+  if (!rangeSlots.length) return "All day";
+  const first = rangeSlots[0].split(/\s*[-–]\s*/)[0]?.trim();
+  const last = rangeSlots[rangeSlots.length - 1].split(/\s*[-–]\s*/)[1]?.trim();
+  return first && last ? `${first} – ${last}` : "All day";
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
@@ -67,11 +86,19 @@ export default function DashboardPage() {
     }
     return w.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
-  
   // Tabular View State
   const [viewMode, setViewMode] = useState<"list" | "table">("table");
   const [allTimeSlots, setAllTimeSlots] = useState<string[]>([]);
   const [allDays, setAllDays] = useState<string[]>([]);
+
+  const printableActivities: PrintableActivity[] = allDays.flatMap((day) => {
+    const dayName = day.split(",")[0]?.trim().toLowerCase();
+    if (dayName !== "thursday") return [];
+    if (profile?.program === "2nd-bfs" && selectedWeek === "week-1-2026") {
+      return [{ day, title: "ADP Placement", time: slotRangeLabel(allTimeSlots), detail: "Academic activity" }];
+    }
+    return [];
+  });
   
   const [isEditMode, setIsEditMode] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -456,7 +483,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8 md:space-y-12 pb-24 md:pb-0">
+    <div className="space-y-8 md:space-y-12 pb-24 md:pb-0 print:space-y-0 print:pb-0">
       {(profile.program === "1st-core" || profile.program === "1st-dcp") && !profile.dtiGroup && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800 px-4 py-3 text-sm font-medium text-amber-800 dark:text-amber-300">
           Your base section is set. The DTI group roster has not been added yet, so DTI classes may be missing from your schedule.
@@ -553,7 +580,18 @@ export default function DashboardPage() {
                   <p className="text-sm text-slate-500 mt-1">View your class schedule for the selected week.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:gap-4">
-                  <button onClick={() => window.print()} className="no-print btn-secondary flex-1 md:flex-none justify-center px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30">
+                  <button onClick={() => downloadSchedulePdf({
+                    weekId: selectedWeek,
+                    weekLabel: selectedWeek ? formatWeek(selectedWeek) : "Current Week",
+                    days: allDays,
+                    classes: myClasses,
+                    activities: printableActivities,
+                    studentName: profile?.name,
+                    rollNo: profile?.rollNo,
+                    program: profile?.program,
+                    section: profile?.section,
+                    courses: profile?.courses.map((course) => course.courseCode),
+                  })} className="no-print btn-secondary flex-1 md:flex-none justify-center px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30">
                      <Download className="w-4 h-4"/> Download PDF
                   </button>
                   <button onClick={() => setIsEditMode(!isEditMode)} className={`no-print flex-1 md:flex-none justify-center px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${isEditMode ? 'bg-blue-600 shadow-lg shadow-blue-500/30 text-white hover:bg-blue-700' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'}`}>
@@ -568,42 +606,21 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Print Header (Only visible when printing) */}
-            <div className="hidden print:block w-full bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden relative mb-6">
-              <div className="p-8 pb-6 relative z-10">
-                 <div className="flex justify-between items-center mb-6">
-                    <span className="font-extrabold text-sm tracking-widest text-slate-700">BunkWise</span>
-                    <span className="text-sm font-medium text-slate-500">{new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
-                 </div>
+            <PrintScheduleHeader
+              weekId={selectedWeek}
+              weekLabel={selectedWeek ? formatWeek(selectedWeek) : "Current Week"}
+              days={allDays}
+              studentName={profile?.name}
+              rollNo={profile?.rollNo}
+              program={profile?.program}
+              section={profile?.section}
+              courses={profile?.courses}
+            />
 
-                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-6 relative">
-                   <div className="relative inline-block">
-                      <h2 className="text-5xl font-extrabold tracking-tight">
-                         <span className="text-slate-900 border-b-4 border-slate-900 pb-1 mr-3">My</span>
-                         <span className="text-blue-600">Schedule</span>
-                      </h2>
-                   </div>
-                 </div>
-
-                 <div className="flex items-center gap-4 mt-2">
-                    <div className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full font-bold text-sm">
-                      <Calendar className="w-4 h-4" />
-                      {selectedWeek ? formatWeek(selectedWeek) : "Current Week"}
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm text-slate-700 px-4 py-2 rounded-full font-bold border border-slate-200 text-sm">
-                      <Users className="w-4 h-4 text-slate-500" />
-                      {profile?.name || "Student"}
-                    </div>
-                    <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm text-slate-700 px-4 py-2 rounded-full font-bold border border-slate-200 text-sm">
-                      <Clock className="w-4 h-4 text-slate-500" />
-                      Roll No: {profile?.rollNo}
-                    </div>
-                 </div>
-              </div>
-            </div>
+            <PrintableScheduleTable days={allDays} classes={myClasses} activities={printableActivities} />
 
             {/* Table View (Hidden on screen if in list mode, NEVER visible on print if in list mode) */}
-            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 dark:border-slate-800 print:border-slate-200 mt-4 sm:mt-6 ${viewMode === "table" ? "block print:block" : "hidden print:hidden"}`}>
+            <div className={`print:hidden rounded-xl sm:rounded-2xl overflow-x-auto border border-slate-200 dark:border-slate-800 mt-4 sm:mt-6 ${viewMode === "table" ? "block" : "hidden"}`}>
                <table className="w-full text-left border-collapse bg-white dark:bg-slate-950 dark:bg-slate-950 min-w-[max-content] md:min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
@@ -757,7 +774,7 @@ export default function DashboardPage() {
                                         else if (isMissed) cardClasses = "bg-red-50/50 dark:bg-red-900/20 border-red-200 dark:border-red-800/80 shadow-sm";
 
                                         return (
-                                        <div key={idx} className={`p-1.5 md:p-3 print:p-1 print:px-1.5 rounded-lg md:rounded-xl print:rounded border md:border-2 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
+                                        <div key={idx} className={`print-class-card p-1.5 md:p-3 print:p-1 print:px-1.5 rounded-lg md:rounded-xl print:rounded border md:border-2 h-full flex flex-col justify-between relative print:shadow-none print:border-slate-200 print:border-l-slate-400 print:bg-white transition-all ${cardClasses}`}>
                                           {isEditMode && (
                                             <div className="flex justify-between items-center bg-slate-100 dark:bg-slate-900 -mx-1.5 md:-mx-3 -mt-1.5 md:-mt-3 p-1.5 md:p-2 rounded-t-xl mb-1.5 md:mb-2 border-b border-slate-200 dark:border-slate-700">
                                               <button onClick={() => openRescheduleModal(cls)} className="p-1 text-blue-600 bg-blue-100 hover:bg-blue-200 rounded-lg dark:bg-blue-900/40 dark:text-blue-400 dark:hover:bg-blue-900/60"><Edit3 className="w-3 h-3 md:w-3.5 md:h-3.5"/></button>
@@ -766,18 +783,18 @@ export default function DashboardPage() {
                                           )}
                                           <div>
                                              <div className="flex justify-between items-start gap-1">
-                                               <div className="font-extrabold text-[10px] md:text-sm print:text-[9px] text-slate-900 dark:text-slate-100 leading-tight">
-                                                 {cls.courseAbb}{cls.sessionNo ? <span className="md:inline hidden">-{cls.sessionNo}</span> : ''}
+                                               <div className="print-class-code font-extrabold text-[10px] md:text-sm print:text-[9px] text-slate-900 dark:text-slate-100 leading-tight">
+                                                 {cls.courseAbb}{cls.sessionNo ? <span className="md:inline hidden print:inline">-{cls.sessionNo}</span> : ''}
                                                </div>
-                                               {!isEditMode && isAttended && <span className="text-[8px] md:text-[10px] print:text-[8px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1 py-0.5 rounded leading-none">P</span>}
-                                               {!isEditMode && isMissed && <span className="text-[8px] md:text-[10px] print:text-[8px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1 py-0.5 rounded leading-none">A</span>}
+                                              {!isEditMode && isAttended && <span className="print-attendance print-attendance-present text-[8px] md:text-[10px] print:text-[8px] font-black text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1 py-0.5 rounded leading-none">P</span>}
+                                              {!isEditMode && isMissed && <span className="print-attendance print-attendance-absent text-[8px] md:text-[10px] print:text-[8px] font-black text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-1 py-0.5 rounded leading-none">A</span>}
                                              </div>
-                                             <div className="text-[8px] md:text-xs print:text-[8px] text-slate-500 dark:text-slate-400 mt-0.5 md:mt-1 print:mt-0 font-medium break-words leading-tight hidden md:block">
+                                             <div className="print-class-venue text-[8px] md:text-xs print:text-[8px] text-slate-500 dark:text-slate-400 mt-0.5 md:mt-1 print:mt-0 font-medium break-words leading-tight hidden md:block print:block">
                                                {cls.venue || 'TBA'}
                                              </div>
                                           </div>
                                           <div className="mt-1 md:mt-2 print:mt-1 flex">
-                                             <span className={`font-bold text-[8px] md:text-xs print:text-[7px] px-1.5 md:px-2.5 py-0.5 md:py-1 print:px-1 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800' : isMissed ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800' : 'bg-blue-50 text-blue-700 border-blue-100/50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'}`}>
+                                             <span className={`print-section font-bold text-[8px] md:text-xs print:text-[7px] px-1.5 md:px-2.5 py-0.5 md:py-1 print:px-1 print:py-0.5 rounded-full border whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600 ${isAttended ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800' : isMissed ? 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800' : 'bg-blue-50 text-blue-700 border-blue-100/50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'}`}>
                                                {cls.courseAbb.startsWith('DTI') && cls.dtiGroup ? `Group ${cls.dtiGroup}` : `Sec ${cls.section}`}
                                              </span>
                                           </div>
@@ -797,8 +814,10 @@ export default function DashboardPage() {
              </table>
             </div>
 
+            <PrintScheduleFooter />
+
             {/* List View */}
-            <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block print:block" : "hidden print:hidden"}`}>
+            <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
               {allDays.map(day => {
                 const actualProgram = profile?.program || "2nd-core";
                 const isSSRThursday = actualProgram === "2nd-core" && day.toLowerCase().includes("thursday");
@@ -1148,7 +1167,7 @@ export default function DashboardPage() {
       )}
 
       {/* Bottom Navigation for Mobile */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 z-50 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 flex justify-around items-center p-2 z-50 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] print:hidden">
         <button onClick={() => setActiveTab("schedule")} className={`flex flex-col items-center gap-1 p-2 w-full rounded-xl transition-colors ${activeTab === 'schedule' ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-bold' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
           <Calendar className="w-5 h-5" />
           <span className="text-[10px]">Schedule</span>

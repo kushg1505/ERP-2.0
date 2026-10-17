@@ -70,6 +70,17 @@ body {
   @apply px-4 py-3 rounded-xl border border-slate-200 text-slate-800 dark:border-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all bg-white dark:bg-slate-800;
 }
 
+.print-schedule-heading,
+.print-schedule-footer,
+.print-row-table-wrap {
+  display: none;
+}
+
+@page {
+  size: 297mm 210mm;
+  margin: 8mm;
+}
+
 /* Print Styles */
 @media print {
   * {
@@ -77,39 +88,353 @@ body {
     print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
-  @page {
-    margin: 1cm;
-    size: portrait;
-  }
+  html,
   body {
-    background: white;
-    color: black;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    color: #14243a !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+  }
+  .dark {
+    --background: #ffffff;
+    --foreground: #14243a;
+    --surface: #ffffff;
+    --border: #cbd5e1;
+  }
+  .print-fullscreen {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .print-schedule-heading {
+    display: block !important;
+    color: #14243a !important;
+    margin: 0 0 3mm !important;
+  }
+  .print-schedule-brandbar,
+  .print-schedule-brand,
+  .print-schedule-identity,
+  .print-schedule-facts,
+  .print-schedule-courses,
+  .print-schedule-footer {
+    display: flex !important;
+  }
+  .print-schedule-brandbar {
+    align-items: center;
+    justify-content: space-between;
+    min-height: 8mm;
+    padding-bottom: 2mm;
+    border-bottom: 0.35mm solid #dce4ee;
+  }
+  .print-schedule-brand {
+    align-items: center;
+    gap: 2mm;
+  }
+  .print-schedule-brand img {
+    display: block;
+    width: 8mm;
+    height: 8mm;
+    object-fit: contain;
+  }
+  .print-schedule-brand-name {
+    color: #122743;
+    font-size: 12pt;
+    font-weight: 800;
+    letter-spacing: -0.3pt;
+  }
+  .print-schedule-brand-divider {
+    width: 0.35mm;
+    height: 6mm;
+    margin: 0 1mm;
+    background: #cbd5e1;
+  }
+  .print-schedule-brand-subtitle,
+  .print-schedule-kicker {
+    color: #60738c;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 1.2pt;
+    text-transform: uppercase;
+  }
+  .print-schedule-identity {
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 8mm;
+    padding: 3mm 0 2mm;
+  }
+  .print-schedule-student {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 2mm 3mm;
+    border-radius: 2mm;
+    background: #f3f6fa !important;
+  }
+  .print-schedule-eyebrow {
+    display: block;
+    margin-bottom: 1mm;
+    color: #718198;
+    font-size: 7pt;
+    font-weight: 700;
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+  }
+  .print-schedule-student h1 {
+    margin: 0 0 3mm;
+    color: #14243a !important;
+    font-size: 23pt;
+    font-weight: 750;
+    letter-spacing: -0.7pt;
+    line-height: 1;
+  }
+  .print-schedule-facts {
+    flex-wrap: wrap;
+    gap: 2mm 6mm;
+  }
+  .print-schedule-facts > div {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5mm;
+  }
+  .print-schedule-facts span,
+  .print-schedule-courses > span {
+    color: #718198;
+    font-size: 7pt;
+  }
+  .print-schedule-facts strong {
+    color: #233a57;
+    font-size: 8pt;
+    font-weight: 700;
+  }
+  .print-schedule-week {
+    display: flex;
+    flex: 0 0 68mm;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3mm 4mm;
+    border: 0.3mm solid #d6e4f4;
+    border-left: 1.2mm solid #2878d0;
+    border-radius: 2mm;
+    background: #f1f7ff !important;
+  }
+  .print-schedule-week .print-schedule-eyebrow {
+    margin: 0 0 1mm;
+    color: #4b6e97;
+  }
+  .print-schedule-week strong {
+    color: #16365d;
+    font-size: 16pt;
+    font-weight: 750;
+    line-height: 1.1;
+  }
+  .print-schedule-week > span:last-child {
+    margin-top: 1.5mm;
+    color: #536b87;
+    font-size: 8pt;
+  }
+  .print-schedule-courses {
+    align-items: baseline;
+    gap: 2mm;
+    padding-top: 2mm;
+    border-top: 0.25mm solid #e4eaf1;
+  }
+  .print-schedule-courses > span {
+    flex: 0 0 auto;
+    font-weight: 700;
+    letter-spacing: 0.5pt;
+    text-transform: uppercase;
+  }
+  .print-schedule-courses strong {
+    color: #354a64;
+    font-size: 7.5pt;
+    font-weight: 600;
+  }
+  .print-schedule-page {
+    width: 100% !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+  .print-row-table-wrap {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+  .print-row-table thead {
+    display: table-header-group;
+  }
+  .print-row-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    border-collapse: collapse !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    color: #20334c !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 8pt !important;
+  }
+  .print-col-day { width: 15%; }
+  .print-col-time { width: 13%; }
+  .print-col-course { width: 44%; }
+  .print-col-section { width: 14%; }
+  .print-col-venue { width: 14%; }
+  .print-row-table th {
+    padding: 2mm 2.5mm !important;
+    border: 0 !important;
+    border-bottom: 0.4mm solid #dce4ee !important;
+    background: #19324f !important;
+    color: #ffffff !important;
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.2pt;
+    text-align: left !important;
+    text-transform: uppercase;
+  }
+  .print-row-table td {
+    padding: 1.4mm 2.5mm !important;
+    border: 0 !important;
+    border-bottom: 0.2mm solid #e7edf4 !important;
+    background: #ffffff !important;
+    color: #354a64 !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+    vertical-align: middle !important;
+  }
+  .print-row-table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .print-row-table tbody tr.print-row-class:nth-child(even) td {
+    background: #f6f8fb !important;
+  }
+  .print-row-table .print-row-class td:first-child {
+    color: #203b5b !important;
+    font-weight: 700 !important;
+  }
+  .print-row-table .print-row-class td:nth-child(2) {
+    white-space: nowrap;
+  }
+  .print-row-table .print-row-class td:nth-child(3) strong {
+    color: #1e3552 !important;
+    font-size: 8.5pt !important;
+    font-weight: 750 !important;
+  }
+  .print-row-session {
+    display: inline-block;
+    margin-left: 2mm;
+    padding: 0.7mm 2mm;
+    border-radius: 1.5mm;
+    background: #e9f2fc !important;
+    color: #3979bd !important;
+    font-size: 7pt !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .print-row-section {
+    display: inline-block;
+    padding: 0.8mm 2mm;
+    border-radius: 1.5mm;
+    background: #edf2f8 !important;
+    color: #38536f !important;
+    font-size: 7pt !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .print-row-table .print-row-no-classes td {
+    border-top-color: #d5eade !important;
+    border-bottom-color: #d5eade !important;
+    background: #eaf6ef !important;
+    color: #347b59 !important;
+  }
+  .print-row-table .print-row-no-classes td:first-child {
+    color: #286947 !important;
+    font-weight: 700 !important;
+  }
+  .print-row-table .print-row-no-classes strong {
+    color: #27734f !important;
+    font-size: 8.5pt !important;
+  }
+  .print-row-table .print-row-activity td {
+    border-top-color: #f0dfbd !important;
+    border-bottom-color: #f0dfbd !important;
+    background: #fff5df !important;
+    color: #966117 !important;
+  }
+  .print-row-table .print-row-activity td:first-child {
+    color: #855611 !important;
+    font-weight: 700 !important;
+  }
+  .print-row-table .print-row-activity strong {
+    color: #895810 !important;
+    font-size: 8.5pt !important;
+  }
+  .print-row-table .print-row-activity .print-row-session {
+    background: #ffe9ba !important;
+    color: #946114 !important;
+  }
+  .print-schedule-footer {
+    display: flex !important;
+    flex-direction: column;
+    gap: 2mm;
+    margin-top: 4mm;
+    padding-top: 2mm;
+    border-top: 0.25mm solid #dce4ee;
+    color: #74839a;
+    font-size: 7pt;
+  }
+  .print-schedule-legend,
+  .print-schedule-footer-note {
+    display: flex;
+    align-items: center;
+    gap: 7mm;
+  }
+  .print-schedule-legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5mm;
+    color: #738299;
+    font-size: 7pt;
+  }
+  .print-schedule-legend i {
+    display: inline-block;
+    width: 3mm;
+    height: 3mm;
+    border-radius: 0.7mm;
+  }
+  .print-legend-class { background: #347dc3; }
+  .print-legend-activity { background: #b87a1f; }
+  .print-legend-no-classes { background: #388c62; }
+  .print-schedule-footer-note {
+    justify-content: space-between;
+    padding-top: 2mm;
+    border-top: 0.25mm solid #e4eaf1;
+    color: #8190a4;
+    font-size: 7pt;
+  }
+  html body .print-schedule-heading *,
+  html body .print-row-table,
+  html body .print-row-table *,
+  html body .print-schedule-footer * {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
   }
   .no-print {
     display: none !important;
   }
-  .print-fullscreen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .print-no-border {
-    border: none !important;
-    box-shadow: none !important;
-  }
-  .print-no-shadow {
-    box-shadow: none !important;
-  }
-  .print-overflow-visible {
-    overflow: visible !important;
-  }
-  .print-no-sticky {
-    position: static !important;
-  }
-  nav, footer {
+  nav, footer:not(.print-schedule-footer) {
     display: none !important;
   }
 }

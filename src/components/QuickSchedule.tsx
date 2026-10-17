@@ -7,7 +7,10 @@ import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { useRouter } from "next/navigation";
 import { DisclaimerModal } from "./DisclaimerModal";
+import { PrintScheduleFooter, PrintScheduleHeader } from "./PrintScheduleHeader";
+import PrintableScheduleTable from "./PrintableScheduleTable";
 import type { StudentDirectoryRecord } from "@/lib/student-directory-types";
+import { downloadSchedulePdf } from "@/lib/schedule-pdf";
 
 interface ParsedClass {
   courseAbb: string;
@@ -103,13 +106,15 @@ export default function QuickSchedule() {
       if (!targetWeek || !weeks.includes(targetWeek)) throw new Error("No current schedule is available for your program.");
       setActiveWeek(targetWeek);
       
-      const master = await fetchMasterTimetable(targetWeek, program) as ParsedClass[];
+      const courseNames = (lookupResult.courseNames ?? {}) as Record<string, string>;
+      const master = (await fetchMasterTimetable(targetWeek, program) as ParsedClass[]).map((cls) => ({
+        ...cls,
+        courseName: cls.courseName?.trim() || courseNames[cls.courseAbb?.toUpperCase()] || cls.courseAbb,
+      }));
       const enrolledCourses = [...resolvedStudent.courses];
       if (program === "2nd-core" && includeFinPrep) {
         enrolledCourses.push({ courseCode: "FINPrep", section: "" });
       }
-      setStudent(resolvedStudent);
-
       // Filter master schedule
       const isFirstYear = program.startsWith("1st-");
       const filtered = isFirstYear ? master.filter(cls => {
@@ -238,9 +243,24 @@ export default function QuickSchedule() {
   };
 
   const handlePrint = () => {
-    window.print();
+    if (!student) return;
+    void downloadSchedulePdf({
+      weekId: activeWeek,
+      weekLabel: printWeekLabel,
+      days: allDays,
+      classes: myClasses,
+      studentName: student.name,
+      rollNo,
+      program: student.program,
+      section: student.section,
+      courses: student.courses.map((course) => course.courseCode),
+    });
   };
-
+  const printWeekLabel = activeWeek === "week-1-2026"
+    ? (student?.program.startsWith("2nd-") ? "Week 1 Term 5" : "Week 1 Term 2")
+    : activeWeek === "week-2-2026"
+      ? (student?.program.startsWith("2nd-") ? "Week 2 Term 5" : "Week 2 Term 2")
+      : activeWeek.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
   if (step === 2) {
     return (
       <div className="w-full max-w-6xl mx-auto mt-16 print:mt-0 print-fullscreen print:bg-white print:text-black flex flex-col justify-center">
@@ -258,20 +278,27 @@ export default function QuickSchedule() {
         </div>
 
         {/* Print wrapper */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-slate-200 dark:border-slate-800 print:shadow-none print:border-slate-200 relative overflow-hidden flex flex-col print:max-h-screen print:h-fit box-border">
+        <div className="print-schedule-page bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-slate-200 dark:border-slate-800 print:shadow-none print:border-slate-200 relative overflow-hidden flex flex-col box-border">
           
           {/* Header Section */}
-          <div className="p-4 sm:p-8 pb-4 sm:pb-6 relative z-10 print:p-6 print:pb-4">
-             {/* Top info row */}
-             <div className="hidden print:flex justify-between items-center mb-4">
-                <span className="font-extrabold text-sm tracking-widest text-slate-700">BunkWise</span>
-                <span className="text-sm font-medium text-slate-500">{new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })}</span>
-             </div>
+          <div className="p-4 sm:p-8 pb-4 sm:pb-6 relative z-10 print:p-0">
+             <PrintScheduleHeader
+               weekId={activeWeek}
+               weekLabel={printWeekLabel}
+               days={allDays}
+               studentName={student?.name}
+               rollNo={rollNo}
+               program={student?.program}
+               section={student?.section}
+               courses={student?.courses}
+             />
+
+             <PrintableScheduleTable days={allDays} classes={myClasses} />
 
              {/* Title & View Toggle */}
              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-4 sm:mb-6 relative">
                <div className="relative inline-block">
-                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight print:text-4xl flex flex-col">
+                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight print:text-4xl flex flex-col print:hidden">
                      <span className="text-slate-900 dark:text-white">Hi {student?.name || "there"}</span>
                      <span className="text-blue-600 text-xl sm:text-2xl print:text-2xl">Here&apos;s your quick schedule</span>
                   </h2>
@@ -294,7 +321,7 @@ export default function QuickSchedule() {
              </div>
 
              {/* Pills row */}
-             <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2">
+             <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 print:hidden">
                 <div className="flex items-center gap-2 sm:gap-3">
                    {/* Week Pill */}
                    <div className="flex items-center gap-2 bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">
@@ -334,13 +361,13 @@ export default function QuickSchedule() {
           
           <div className="px-4 sm:px-8 pb-4 sm:pb-8 relative z-10 flex-1 print:px-6 print:pb-6 print:flex-none">
             {/* Table View (Hidden on screen if in list mode, ALWAYS visible on print) */}
-            <div className={`rounded-xl sm:rounded-2xl overflow-x-auto print:overflow-hidden border border-slate-200 print:border-slate-200 ${viewMode === "table" ? "block" : "hidden print:block"}`}>
-               <table className="w-full text-left border-collapse bg-white min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
+            <div className={`print:hidden rounded-xl sm:rounded-2xl overflow-x-auto border border-slate-200 dark:border-slate-800 ${viewMode === "table" ? "block" : "hidden"}`}>
+               <table className="w-full text-left border-collapse bg-white dark:bg-slate-900 min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
-                     <th className="p-4 print:p-1 font-bold text-white w-32 print:w-16 border-r border-slate-200 print:border-slate-200 bg-slate-700 print:bg-[#2c4062] sticky left-0 z-20 text-sm print:text-[10px] print-no-sticky text-center align-middle">Day / Time</th>
+                     <th className="p-4 print:p-1 font-bold text-white w-32 print:w-16 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 bg-slate-700 dark:bg-[#1e293b] print:bg-[#2c4062] sticky left-0 z-20 text-sm print:text-[10px] print-no-sticky text-center align-middle">Day / Time</th>
                      {allTimeSlots.map(slot => (
-                       <th key={slot} className="p-3 print:p-1 font-bold text-slate-800 border-r border-slate-200 print:border-slate-200 text-center bg-blue-50/50 print:bg-[#f4f7fb] text-sm print:text-[9px] print-no-sticky align-middle">
+                       <th key={slot} className="p-3 print:p-1 font-bold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 text-center bg-blue-50/50 dark:bg-[#1e293b] print:bg-[#f4f7fb] text-sm print:text-[9px] print-no-sticky align-middle">
                          <span className="print:hidden">{slot}</span>
                          <span className="hidden print:block whitespace-pre-line">{slot.replace('-', '\n')}</span>
                        </th>
@@ -349,10 +376,10 @@ export default function QuickSchedule() {
                  </thead>
                  <tbody>
                    {allDays.map(day => (
-                     <tr key={day} className="border-t border-slate-200 print:border-slate-200">
-                       <td className="p-4 print:p-1 border-r border-slate-200 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-slate-900 print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center align-middle">
-                         <span className="font-extrabold text-base print:text-[10px] block text-blue-900">{day.split(',')[0]}</span>
-                         <span className="text-xs font-medium text-slate-500 mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
+                     <tr key={day} className="border-t border-slate-200 dark:border-slate-800 print:border-slate-200">
+                       <td className="p-4 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 whitespace-nowrap bg-slate-50 dark:bg-[#1e293b] print:bg-[#f8fafd] sticky left-0 z-10 print-no-sticky text-center align-middle">
+                         <span className="font-extrabold text-base print:text-[10px] block text-blue-900 dark:text-slate-200">{day.split(',')[0]}</span>
+                         <span className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
                        </td>
                        {(() => {
                          const isSSRThursday = student?.program === "2nd-core" && day.toLowerCase().includes("thursday");
@@ -364,11 +391,11 @@ export default function QuickSchedule() {
 
                          if (hasNoEvents && allTimeSlots.length > 0) {
                             cells.push(
-                              <td key="no-classes" colSpan={allTimeSlots.length} className="p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
-                                 <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[2.5rem] bg-green-50 rounded-xl border border-green-100/50 mx-1">
+                              <td key="no-classes" colSpan={allTimeSlots.length} className="p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 align-middle">
+                                 <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[2.5rem] bg-green-50 dark:bg-[#064e3b]/30 rounded-xl border border-green-100/50 dark:border-[#064e3b]/50 mx-1">
                                    <div className="flex items-center gap-2">
                                       <span className="text-xl print:text-[10px]">🎉</span>
-                                      <span className="font-extrabold text-green-700 tracking-wide text-lg print:text-[10px]">
+                                      <span className="font-extrabold text-green-700 dark:text-emerald-400 tracking-wide text-lg print:text-[10px]">
                                         <span className="md:hidden print:hidden">No Classes🎉</span>
                                         <span className="hidden md:inline print:inline">Yayy! No Classes</span>
                                       </span>
@@ -391,11 +418,11 @@ export default function QuickSchedule() {
                                 const ssrColSpan = j - i;
                                 
                                 cells.push(
-                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-middle">
-                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[2.5rem] bg-amber-50 rounded-xl border border-amber-100/50 mx-1">
+                                  <td key={`ssr-${slot}`} colSpan={ssrColSpan} className="p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 align-middle">
+                                     <div className="flex items-center justify-center h-full min-h-[4.5rem] print:min-h-[2.5rem] bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100/50 dark:border-amber-800/50 mx-1">
                                        <div className="flex items-center gap-2">
                                           <Users className="w-5 h-5 print:w-3 print:h-3 text-amber-500" />
-                                          <span className="font-extrabold text-slate-800 tracking-wide text-lg print:text-[10px]">
+                                          <span className="font-extrabold text-slate-800 dark:text-amber-400 tracking-wide text-lg print:text-[10px]">
                                             SSR Visit
                                           </span>
                                        </div>
@@ -405,30 +432,30 @@ export default function QuickSchedule() {
                                 i = j - 1; 
                               } else {
                                 cells.push(
-                                  <td key={slot} className="p-3 print:p-1 border-r border-slate-200 print:border-slate-200">
+                                  <td key={slot} className="p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200">
                                     <div className="min-h-[4.5rem] print:min-h-[2.5rem] w-full" />
                                   </td>
                                 );
                               }
                            } else {
                              cells.push(
-                               <td key={slot} className="p-2 sm:p-3 print:p-1 border-r border-slate-200 print:border-slate-200 align-top bg-white">
+                               <td key={slot} className="p-2 sm:p-3 print:p-1 border-r border-slate-200 dark:border-slate-800 print:border-slate-200 align-top bg-white dark:bg-transparent">
                                  {classesInSlot.length === 0 ? (
                                    <div className="min-h-[4.5rem] print:min-h-[2.5rem] w-full" />
                                  ) : (
                                    <div className="flex flex-col gap-1.5 h-full">
                                      {classesInSlot.map((cls, idx) => (
-                                       <div key={idx} className="p-2 sm:p-3 print:p-1 print:px-1.5 rounded-xl print:rounded border border-blue-100 print:border-slate-200 border-l-4 border-l-blue-600 bg-white shadow-sm print:shadow-none h-full flex flex-col justify-between">
+                                       <div key={idx} className="p-2 sm:p-3 print:p-1 print:px-1.5 rounded-xl print:rounded border border-blue-100 dark:border-slate-700 print:border-slate-200 border-l-4 border-l-blue-600 bg-white dark:bg-slate-900 shadow-sm print:shadow-none h-full flex flex-col justify-between">
                                          <div>
-                                            <div className="font-extrabold text-sm print:text-[9px] text-slate-900 leading-tight">
+                                            <div className="font-extrabold text-sm print:text-[9px] text-blue-700 dark:text-blue-400 leading-tight">
                                               {cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''}
                                             </div>
-                                            <div className="text-xs print:text-[8px] text-slate-500 mt-1 print:mt-0 font-medium break-words leading-tight">
+                                            <div className="text-xs print:text-[8px] text-slate-500 dark:text-slate-400 mt-1 print:mt-0 font-medium break-words leading-tight">
                                               {cls.venue || 'TBA'}
                                             </div>
                                          </div>
                                          <div className="mt-2 print:mt-1 flex">
-                                            <span className="bg-blue-50 text-blue-700 font-bold text-[10px] sm:text-xs print:text-[7px] px-2.5 py-1 print:px-1 print:py-0.5 rounded-full border border-blue-100/50 whitespace-nowrap inline-block">
+                                            <span className="bg-blue-50 text-blue-700 dark:bg-slate-800 dark:text-slate-300 font-bold text-[10px] sm:text-xs print:text-[7px] px-2.5 py-1 print:px-1 print:py-0.5 rounded-full border border-blue-100/50 dark:border-slate-700 whitespace-nowrap inline-block print:bg-transparent print:border-slate-300 print:text-slate-600">
                                               {cls.courseAbb.startsWith('DTI') && cls.dtiGroup ? `Group ${cls.dtiGroup}` : `Sec ${cls.section}`}
                                             </span>
                                          </div>
@@ -447,6 +474,8 @@ export default function QuickSchedule() {
                </tbody>
              </table>
             </div>
+
+            <PrintScheduleFooter />
 
             {/* List View (Hidden on screen if in table mode, NEVER visible on print) */}
             <div className={`flex flex-col gap-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
@@ -506,7 +535,7 @@ export default function QuickSchedule() {
                             </div>
                             <div className="flex-1">
                               <h4 className="font-extrabold text-slate-800 dark:text-white text-lg print:text-slate-800">
-                                {cls.courseName} <span className="text-slate-400 font-medium text-sm">({cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''})</span>
+                                {cls.courseName || cls.courseAbb || "Class"} <span className="text-slate-400 font-medium text-sm">({cls.courseAbb}{cls.sessionNo ? `-${cls.sessionNo}` : ''})</span>
                               </h4>
                               <div className="flex flex-wrap items-center gap-3 mt-2">
                                 <span className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md print:bg-slate-50 print:text-slate-600">
