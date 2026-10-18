@@ -417,13 +417,13 @@ export default function DashboardPage() {
   if (!user) return <div className="text-center mt-20">Please sign in to view your dashboard.</div>;
   if (loading) return <div className="text-center mt-20 text-slate-500">Loading your personalized schedule...</div>;
 
-  const handleAttendance = async (classId: string, status: "attended" | "missed") => {
+  const handleAttendance = async (classId: string, status: "attended" | "missed", weekId = selectedWeek) => {
     if (!user) return;
     setAttendance(prev => ({
       ...prev,
       [classId]: { status, timestamp: new Date().toISOString() }
     }));
-    await markAttendance(user.uid, selectedWeek, classId, status);
+    await markAttendance(user.uid, weekId, classId, status);
     const stats = await fetchAllAttendanceStats(user.uid);
     setAttendanceStats(stats);
   };
@@ -875,14 +875,6 @@ export default function DashboardPage() {
                          const isAttended = attendance[cId]?.status === 'attended' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'attended';
                          const isMissed = attendance[cId]?.status === 'missed' || attendanceStats.records.find((r: any) => r.classId === cId)?.status === 'missed';
                          
-                         let isFuture = false;
-                         const dateStr = cls.date || (cls.day ? cls.day.split(',')[1]?.trim() : "");
-                         const endTimeStr = cls.endTime || (cls.timeSlot ? cls.timeSlot.split('-')[1]?.trim() : "");
-                         if (dateStr && endTimeStr) {
-                            const endDateTime = new Date(`${dateStr}T${endTimeStr}:00+05:30`).getTime();
-                            isFuture = Date.now() < endDateTime;
-                         }
-
                          return (
                         <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-white dark:bg-slate-900 p-4 rounded-xl border border-blue-100 dark:border-slate-700 border-l-4 border-l-blue-500 shadow-sm transition-all hover:shadow-md break-inside-avoid relative">
                           <div className="flex-shrink-0 min-w-[120px]">
@@ -914,14 +906,10 @@ export default function DashboardPage() {
 
                             <div className="flex gap-2">
                               {cls.courseAbb !== "SSR" && !isEditMode && (
-                                isFuture ? (
-                                  <span className="text-xs font-bold text-slate-500 bg-slate-200 dark:bg-slate-800 px-4 py-2 rounded-xl uppercase tracking-wider flex items-center gap-1.5"><Calendar className="w-4 h-4"/> Upcoming</span>
-                                ) : (
-                                  <>
-                                    <button onClick={() => handleAttendance(cId, "attended")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${isAttended ? 'bg-emerald-500 text-white border-emerald-600' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}><CheckCircle2 className="w-4 h-4" /> Attended</button>
-                                    <button onClick={() => handleAttendance(cId, "missed")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${isMissed ? 'bg-red-500 text-white border-red-600' : 'border-red-200 text-red-700 hover:bg-red-50'}`}><XCircle className="w-4 h-4" /> Missed</button>
-                                  </>
-                                )
+                                <>
+                                  <button onClick={() => handleAttendance(cId, "attended")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${isAttended ? 'bg-emerald-500 text-white border-emerald-600' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}><CheckCircle2 className="w-4 h-4" /> Attended</button>
+                                  <button onClick={() => handleAttendance(cId, "missed")} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium ${isMissed ? 'bg-red-500 text-white border-red-600' : 'border-red-200 text-red-700 hover:bg-red-50'}`}><XCircle className="w-4 h-4" /> Missed</button>
+                                </>
                               )}
                               {isEditMode && (
                                 <>
@@ -1015,14 +1003,8 @@ export default function DashboardPage() {
                       
                       {isExpanded && (
                         <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 divide-y divide-slate-200 dark:divide-slate-800">
-                          {sessionsWithStatus.map((rec: any, rIdx: number) => {
-                            let isFuture = false;
-                            if (rec.status === 'unmarked' && rec.date && rec.endTime) {
-                               const endDateTime = new Date(`${rec.date}T${rec.endTime}:00+05:30`).getTime();
-                               isFuture = Date.now() < endDateTime;
-                            }
-                            return (
-                            <div key={rIdx} className={`p-5 sm:px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:bg-slate-100 dark:hover:bg-slate-900 ${isFuture ? 'opacity-60' : ''}`}>
+                          {sessionsWithStatus.map((rec: any, rIdx: number) => (
+                            <div key={rIdx} className="p-5 sm:px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors hover:bg-slate-100 dark:hover:bg-slate-900">
                               <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 shrink-0 bg-slate-200 dark:bg-slate-800 rounded-lg flex items-center justify-center font-bold text-slate-500">
                                    #{rec.sessionNumber}
@@ -1035,28 +1017,21 @@ export default function DashboardPage() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 sm:ml-auto">
-                                {isFuture ? (
-                                  <span className="text-xs font-bold text-slate-500 bg-slate-200 dark:bg-slate-800 px-4 py-2 rounded-xl uppercase tracking-wider flex items-center gap-1.5"><Calendar className="w-4 h-4"/> Upcoming Class</span>
-                                ) : (
-                                  <>
-                                    <button 
-                                      onClick={() => handleAttendance(rec.classId, "attended")} 
-                                      className={`px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${rec.status === 'attended' ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600'}`}
-                                    >
-                                      Present
-                                    </button>
-                                    <button 
-                                      onClick={() => handleAttendance(rec.classId, "missed")} 
-                                      className={`px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${rec.status === 'missed' ? 'bg-red-500 text-white shadow-red-500/20' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-red-500 hover:text-red-600'}`}
-                                    >
-                                      Absent
-                                    </button>
-                                  </>
-                                )}
+                                <button
+                                  onClick={() => handleAttendance(rec.classId, "attended", rec.weekId)}
+                                  className={`px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${rec.status === 'attended' ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600'}`}
+                                >
+                                  Present
+                                </button>
+                                <button
+                                  onClick={() => handleAttendance(rec.classId, "missed", rec.weekId)}
+                                  className={`px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${rec.status === 'missed' ? 'bg-red-500 text-white shadow-red-500/20' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-red-500 hover:text-red-600'}`}
+                                >
+                                  Absent
+                                </button>
                               </div>
                             </div>
-                            );
-                          })}
+                          ))}
                         </div>
                       )}
                     </div>
