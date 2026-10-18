@@ -32,6 +32,12 @@ function normalizeDtiGroup(value: string | undefined) {
   return /^[A-C]$/.test(group) ? String(group.charCodeAt(0) - 64) : group;
 }
 
+function formatQuickWeekLabel(weekId: string, program?: string) {
+  if (weekId === "week-1-2026") return program?.startsWith("2nd-") ? "Week 1 Term 5" : "Week 1 Term 2";
+  if (weekId === "week-2-2026") return program?.startsWith("2nd-") ? "Week 2 Term 5" : "Week 2 Term 2";
+  return weekId.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 export default function QuickSchedule() {
   const { user, signInWithGoogle } = useAuth();
   const router = useRouter();
@@ -77,8 +83,9 @@ export default function QuickSchedule() {
   const [allDays, setAllDays] = useState<string[]>([]);
   const [allTimeSlots, setAllTimeSlots] = useState<string[]>([]);
   const [activeWeek, setActiveWeek] = useState("");
+  const [availableWeeks, setAvailableWeeks] = useState<string[]>([]);
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (requestedWeek?: string) => {
     setError("");
     setLoading(true);
 
@@ -101,8 +108,11 @@ export default function QuickSchedule() {
       if (weeks.length === 0) {
         throw new Error("No schedule uploaded for this program yet.");
       }
+      setAvailableWeeks(weeks);
 
-      const targetWeek = await resolveOngoingWeek(program, weeks);
+      const targetWeek = requestedWeek && weeks.includes(requestedWeek)
+        ? requestedWeek
+        : await resolveOngoingWeek(program, weeks);
       if (!targetWeek || !weeks.includes(targetWeek)) throw new Error("No current schedule is available for your program.");
       setActiveWeek(targetWeek);
       
@@ -256,11 +266,7 @@ export default function QuickSchedule() {
       courses: student.courses.map((course) => course.courseCode),
     });
   };
-  const printWeekLabel = activeWeek === "week-1-2026"
-    ? (student?.program.startsWith("2nd-") ? "Week 1 Term 5" : "Week 1 Term 2")
-    : activeWeek === "week-2-2026"
-      ? (student?.program.startsWith("2nd-") ? "Week 2 Term 5" : "Week 2 Term 2")
-      : activeWeek.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const printWeekLabel = formatQuickWeekLabel(activeWeek, student?.program);
   if (step === 2) {
     return (
       <div className="w-full max-w-6xl mx-auto mt-16 print:mt-0 print-fullscreen print:bg-white print:text-black flex flex-col justify-center">
@@ -324,10 +330,23 @@ export default function QuickSchedule() {
              <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 print:hidden">
                 <div className="flex items-center gap-2 sm:gap-3">
                    {/* Week Pill */}
-                   <div className="flex items-center gap-2 bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:shadow-none text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">
-                     <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 print:w-3.5 print:h-3.5" />
-                     {activeWeek === "week-1-2026" ? (student?.program.startsWith("2nd-") ? "Week 1 Term 5" : "Week 1 Term 2") : activeWeek === "week-2-2026" ? (student?.program.startsWith("2nd-") ? "Week 2 Term 5" : "Week 2 Term 2") : activeWeek.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                   </div>
+                   <label className="flex items-center gap-2 bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold shadow-md shadow-blue-500/20 print:hidden text-xs sm:text-base">
+                     <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                     <span className="shrink-0">Week</span>
+                     <select
+                       aria-label="Choose timetable week"
+                       value={activeWeek}
+                       disabled={loading}
+                       onChange={(event) => void handleGenerate(event.target.value)}
+                       className="max-w-[12rem] cursor-pointer bg-transparent text-white outline-none disabled:cursor-wait"
+                     >
+                       {availableWeeks.map((week) => (
+                         <option key={week} value={week} className="bg-white text-slate-900">
+                           {formatQuickWeekLabel(week, student?.program)}
+                         </option>
+                       ))}
+                     </select>
+                   </label>
                    {/* Specialization Pill */}
                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold border border-slate-200 dark:border-slate-700 text-xs sm:text-base print:text-sm print:px-3 print:py-1.5">
                      <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 print:w-3.5 print:h-3.5" />
