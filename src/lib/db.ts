@@ -157,45 +157,48 @@ export async function fetchMasterTimetable(weekId: string, program: string = "2n
 
 export async function resolveOngoingWeek(program: string, weeks: string[]): Promise<string> {
   if (!weeks || weeks.length === 0) return "";
-  
-  let targetWeek = weeks[weeks.length - 1]; // default to latest
-  const now = new Date().getTime();
 
-  for (let i = weeks.length - 1; i >= 0; i--) {
-     const wMaster = await fetchMasterTimetable(weeks[i], program);
-     if (wMaster.length > 0) {
-        let minDate = new Date("2099-01-01").getTime();
-        let maxDate = new Date("2000-01-01").getTime();
-        
-        wMaster.forEach(cls => {
-           const dateStr = cls.date || (cls.day ? cls.day.split(',')[1]?.trim() : "");
-           if (dateStr) {
-              const d = new Date(dateStr).getTime();
-              if (!isNaN(d)) {
-                 if (d < minDate) minDate = d;
-                 if (d > maxDate) maxDate = d;
-              }
-           }
-        });
-        
-        // Add one full day to maxDate to cover Sunday entirely
-        const endOfWeek = maxDate + (24 * 60 * 60 * 1000);
-        
-        if (now >= minDate && now <= endOfWeek) {
-           targetWeek = weeks[i];
-           break; // Found the active week
-        }
-        
-        if (now > endOfWeek) {
-           // We are scanning backwards. If the current week we are checking is ALREADY in the past,
-           // all previous weeks will also be in the past. This means no future week is active,
-           // and the closest past week is the best default. We break early.
-           targetWeek = weeks[i];
-           break;
-        }
-     }
-  }
-  return targetWeek;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayTime = today.getTime();
+  const ranges = await Promise.all(weeks.map(async (weekId) => {
+    const classes = await fetchMasterTimetable(weekId, program);
+    const classDates = classes.flatMap((cls) => {
+      const dateStr = cls.date || (cls.day ? cls.day.split(",")[1]?.trim() : "");
+      if (!dateStr) return [];
+
+      // Parse ISO calendar dates as local dates so midnight UTC cannot shift the week in other timezones.
+      const isoDate = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const parsedDate = isoDate
+        ? new Date(Number(isoDate[1]), Number(isoDate[2]) - 1, Number(isoDate[3]))
+        : new Date(dateStr);
+      if (Number.isNaN(parsedDate.getTime())) return [];
+
+      parsedDate.setHours(0, 0, 0, 0);
+      return [parsedDate.getTime()];
+    });
+
+    if (classDates.length === 0) return null;
+    return {
+      weekId,
+      start: Math.min(...classDates),
+      end: Math.max(...classDates),
+    };
+  }));
+
+  const datedRanges = ranges.filter((range): range is { weekId: string; start: number; end: number } => range !== null);
+  const ongoingWeek = datedRanges
+    .filter((range) => range.start <= todayTime && range.end >= todayTime)
+    .sort((a, b) => b.start - a.start)[0];
+  if (ongoingWeek) return ongoingWeek.weekId;
+
+  const nextWeek = datedRanges
+    .filter((range) => range.start > todayTime)
+    .sort((a, b) => a.start - b.start)[0];
+  if (nextWeek) return nextWeek.weekId;
+
+  const mostRecentPastWeek = datedRanges.sort((a, b) => b.end - a.end)[0];
+  return mostRecentPastWeek?.weekId || weeks[weeks.length - 1];
 }
 
 export async function saveClashSchedule(weekId: string, data: any[]) {

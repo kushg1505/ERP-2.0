@@ -57,6 +57,20 @@ function slotRangeLabel(slots: string[]) {
   return first && last ? `${first} – ${last}` : "All day";
 }
 
+function weekDateRangeLabel(days: string[]) {
+  const dates = [...new Set(days.map((day) => day.split(",")[1]?.trim()).filter((date): date is string => Boolean(date)))].sort();
+  if (dates.length === 0) return "Dates follow the selected timetable";
+
+  const formatDate = (date: string) => {
+    const [year, month, day] = date.split("-").map(Number);
+    return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" })
+      .format(new Date(year, month - 1, day));
+  };
+  const firstDate = formatDate(dates[0]);
+  const lastDate = formatDate(dates[dates.length - 1]);
+  return firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`;
+}
+
 export default function DashboardPage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
@@ -541,7 +555,7 @@ export default function DashboardPage() {
                 )}
               </select>
               <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                {selectedWeek === "week-2-2026" ? "12 Oct 2026 - 18 Oct 2026" : "5 Oct 2026 - 11 Oct 2026"}
+                {weekDateRangeLabel(allDays)}
               </div>
             </div>
             {/* Arrows for Next/Prev Week */}
