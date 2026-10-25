@@ -134,51 +134,13 @@ export default function QuickSchedule() {
          }
          return !cls.section || Boolean(resolvedStudent.section && cls.section.includes(resolvedStudent.section));
       }) : master.filter(cls => 
-        enrolledCourses.some(c => {
+        (program === "2nd-core" && cls.courseAbb?.toUpperCase() === "SSR") || enrolledCourses.some(c => {
           const code = c.courseCode ? c.courseCode.toLowerCase().replace(/[\s-]/g, '') : '';
           const abb = cls.courseAbb ? cls.courseAbb.toLowerCase().replace(/[\s-]/g, '') : '';
           return (code === abb || (code === "finprep" && abb.startsWith("finprep"))) && 
           (code.startsWith("finprep") || code === "bf" || code === "serm" || c.section === cls.section || !cls.section || cls.section.includes(c.section));
         })
       );
-
-      // Add SSR Visit for 2nd core
-      if (program === "2nd-core") {
-        const uniqueDays = Array.from(new Set(master.map(c => c.day))).filter(Boolean);
-        
-        let thursdays = uniqueDays.filter(d => d.toLowerCase().includes("thursday"));
-        
-        // If Thursday is completely missing from the master timetable, synthesize it
-        if (thursdays.length === 0 && uniqueDays.length > 0) {
-           const anyDay = uniqueDays[0];
-           const dateStr = anyDay.split(',')[1]?.trim();
-           let thursdayStr = "Thursday";
-           if (dateStr) {
-              const d = new Date(dateStr);
-              if (!isNaN(d.getTime())) {
-                 const diff = 4 - d.getDay(); // 4 is Thursday
-                 d.setDate(d.getDate() + diff);
-                 thursdayStr = `Thursday, ${d.toISOString().split('T')[0]}`;
-              }
-           }
-           thursdays.push(thursdayStr);
-        }
-
-        thursdays.forEach(day => {
-          filtered.push({
-             courseAbb: "SSR",
-             courseName: "SSR Visit",
-             section: "All",
-             day: day,
-             timeSlot: "Full Day",
-             startTime: "09:00",
-             endTime: "18:00",
-             venue: "Off-campus",
-             faculty: "",
-             date: day.split(",")[1]?.trim() || ""
-          });
-        });
-      }
 
       const daysSet = new Set<string>();
       const slotsSet = new Set<string>();
@@ -401,12 +363,12 @@ export default function QuickSchedule() {
                          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1 block print:mt-0.5 print:text-[8px]">{day.split(',')[1]?.trim()}</span>
                        </td>
                        {(() => {
-                         const isSSRThursday = student?.program === "2nd-core" && day.toLowerCase().includes("thursday");
+                         const hasScheduledSsrVisit = myClasses.some(c => c.day === day && c.courseAbb.toUpperCase() === "SSR" && c.timeSlot.toLowerCase() === "full day");
                          const cells = [];
                          let ssrStarted = false;
                          const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
                          
-                         const hasNoEvents = myClasses.filter(c => c.day === day).length === 0 && !isSSRThursday;
+                         const hasNoEvents = myClasses.filter(c => c.day === day).length === 0;
 
                          if (hasNoEvents && allTimeSlots.length > 0) {
                             cells.push(
@@ -429,7 +391,7 @@ export default function QuickSchedule() {
                            const slot = allTimeSlots[i];
                            const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
                            
-                           if (isSSRThursday && !slotHasClass[i]) {
+                           if (hasScheduledSsrVisit && !slotHasClass[i]) {
                               if (!ssrStarted) {
                                 ssrStarted = true;
                                 let j = i;
@@ -499,10 +461,9 @@ export default function QuickSchedule() {
             {/* List View (Hidden on screen if in table mode, NEVER visible on print) */}
             <div className={`flex flex-col gap-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
                 {allDays.map(day => {
-                  const isSSRThursday = student?.program === "2nd-core" && day.toLowerCase().includes("thursday");
                   const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
                   
-                  const hasNoEvents = dayClasses.length === 0 && !isSSRThursday;
+                  const hasNoEvents = dayClasses.length === 0;
 
                   return (
                     <div key={day} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden print:border-slate-300 print:bg-transparent break-inside-avoid">
@@ -519,28 +480,6 @@ export default function QuickSchedule() {
                               <span className="text-4xl block mb-3">🎉</span>
                               <h4 className="font-extrabold text-green-700 text-lg">Yayy! No Classes 🎉</h4>
                               <p className="text-green-600/80 text-sm font-medium mt-1">Enjoy your day off!</p>
-                            </div>
-                          </div>
-                        )}
-                        {isSSRThursday && dayClasses.length === 0 && (
-                          <div className="flex items-center gap-4 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30 print:border-amber-200">
-                            <div className="bg-amber-100 dark:bg-amber-800/50 p-3 rounded-lg print:bg-amber-50">
-                              <Users className="w-6 h-6 text-amber-600 dark:text-amber-400 print:text-amber-600" />
-                            </div>
-                            <div>
-                              <h4 className="font-extrabold text-slate-800 dark:text-amber-100 text-lg print:text-slate-800">SSR Visit</h4>
-                              <p className="text-amber-700 dark:text-amber-300/80 text-sm font-medium print:text-amber-700">All day field visit</p>
-                            </div>
-                          </div>
-                        )}
-                        {isSSRThursday && dayClasses.length > 0 && (
-                          <div className="flex items-center gap-4 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30 print:border-amber-200">
-                            <div className="bg-amber-100 dark:bg-amber-800/50 p-3 rounded-lg print:bg-amber-50">
-                              <Users className="w-6 h-6 text-amber-600 dark:text-amber-400 print:text-amber-600" />
-                            </div>
-                            <div>
-                              <h4 className="font-extrabold text-slate-800 dark:text-amber-100 text-lg print:text-slate-800">SSR Visit</h4>
-                              <p className="text-amber-700 dark:text-amber-300/80 text-sm font-medium print:text-amber-700">Field Visit</p>
                             </div>
                           </div>
                         )}

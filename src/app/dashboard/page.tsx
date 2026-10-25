@@ -210,7 +210,7 @@ export default function DashboardPage() {
               return !cls.section || (p.section && cls.section.includes(p.section));
           })
           : master.filter(cls => 
-            p.courses?.some(c => {
+            (p.program === "2nd-core" && cls.courseAbb?.toUpperCase() === "SSR") || p.courses?.some(c => {
               const code = c.courseCode ? c.courseCode.toLowerCase().replace(/[\s-]/g, '') : '';
               const abb = cls.courseAbb ? cls.courseAbb.toLowerCase().replace(/[\s-]/g, '') : '';
               return (code === abb || (code === "finprep" && abb.startsWith("finprep"))) && 
@@ -309,26 +309,6 @@ export default function DashboardPage() {
         const dayPlans: DayPlan[] = sortedDays.map(day => {
           let classesForDay = grouped[day] ? grouped[day].sort((a, b) => a.timeSlot.localeCompare(b.timeSlot)) : [];
           
-          if (p.program === "2nd-core" && day.toLowerCase().includes("thursday")) {
-            classesForDay.push({
-               courseAbb: "SSR",
-               courseName: "SSR Visit",
-               section: "All",
-               day: day,
-               timeSlot: "Full Day",
-               startTime: "09:00",
-               endTime: "18:00",
-               venue: "Off-campus",
-               faculty: "",
-               date: day.split(",")[1]?.trim() || ""
-            });
-            classesForDay = classesForDay.sort((a, b) => {
-               if (a.timeSlot === "Full Day") return -1;
-               if (b.timeSlot === "Full Day") return 1;
-               return a.timeSlot.localeCompare(b.timeSlot);
-            });
-          }
-
           return {
             day,
             classes: classesForDay
@@ -657,7 +637,7 @@ export default function DashboardPage() {
                        </td>
                        {(() => {
                          const actualProgram = profile?.program || "2nd-core";
-                         const isSSRThursday = actualProgram === "2nd-core" && day.toLowerCase().includes("thursday");
+                         const hasScheduledSsrVisit = actualProgram === "2nd-core" && myClasses.some(c => c.day === day && c.courseAbb.toUpperCase() === "SSR" && c.timeSlot.toLowerCase() === "full day");
                          const isADPThursday = actualProgram === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");
                          
                          const getStartHour = (s: string) => {
@@ -670,7 +650,7 @@ export default function DashboardPage() {
                          let adpStarted = false;
                          const slotHasClass = allTimeSlots.map(slot => myClasses.some(c => c.day === day && c.timeSlot === slot));
                          
-                         const hasNoEvents = myClasses.filter(c => c.day === day).length === 0 && !isSSRThursday && !isADPThursday;
+                         const hasNoEvents = myClasses.filter(c => c.day === day).length === 0 && !isADPThursday;
 
                           if (hasNoEvents && allTimeSlots.length > 0) {
                             cells.push(
@@ -695,7 +675,7 @@ export default function DashboardPage() {
                            const isADPRange = slotStart >= 8.5 && slotStart < 11.5;
                            const classesInSlot = myClasses.filter(c => c.day === day && c.timeSlot === slot);
                            
-                           if (isSSRThursday && !slotHasClass[i]) {
+                           if (hasScheduledSsrVisit && !slotHasClass[i]) {
                               if (!ssrStarted) {
                                 ssrStarted = true;
                                 let j = i;
@@ -834,7 +814,6 @@ export default function DashboardPage() {
             <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
               {allDays.map(day => {
                 const actualProgram = profile?.program || "2nd-core";
-                const isSSRThursday = actualProgram === "2nd-core" && day.toLowerCase().includes("thursday");
                 const isADPThursday = actualProgram === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");
                 const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
                 
@@ -844,7 +823,7 @@ export default function DashboardPage() {
                    return start >= 8.5 && start < 11.5;
                 });
                 
-                const hasNoEvents = dayClasses.length === 0 && !isSSRThursday && !isADPThursday;
+                const hasNoEvents = dayClasses.length === 0 && !isADPThursday;
 
                 return (
                   <div key={day} className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden break-inside-avoid">
@@ -861,17 +840,6 @@ export default function DashboardPage() {
                             <h4 className="text-xl font-extrabold text-green-700 dark:text-green-400">Yayy! No Classes</h4>
                             <p className="text-sm font-medium text-green-600/70 dark:text-green-500/70 mt-1">Enjoy your free time!</p>
                          </div>
-                      )}
-                      {isSSRThursday && dayClasses.length === 0 && (
-                        <div className="flex items-center gap-4 bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800/30">
-                          <div className="bg-amber-100 dark:bg-amber-800/50 p-3 rounded-lg">
-                            <Users className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-                          </div>
-                          <div>
-                            <h4 className="font-extrabold text-slate-800 dark:text-amber-100 text-lg">SSR Visit</h4>
-                            <p className="text-amber-700 dark:text-amber-300/80 text-sm font-medium">All day field visit</p>
-                          </div>
-                        </div>
                       )}
                       {isADPThursday && !hasADPSlots && (
                         <div className="flex items-center gap-4 bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/30 mb-2">
