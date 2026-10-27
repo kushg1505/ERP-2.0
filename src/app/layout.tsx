@@ -9,7 +9,6 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileNav } from "@/components/MobileNav";
 import { AdminLink } from "@/components/AdminLink";
-import { EventPosterModal } from "@/components/EventPosterModal";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -99,7 +98,6 @@ export default function RootLayout({
                 </div>
               </div>
             </footer>
-            <EventPosterModal />
           </AuthProvider>
         </ThemeProvider>
       </body>
