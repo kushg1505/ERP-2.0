@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { DisclaimerModal } from "./DisclaimerModal";
 import { PrintScheduleFooter, PrintScheduleHeader } from "./PrintScheduleHeader";
 import PrintableScheduleTable from "./PrintableScheduleTable";
+import FinalPlacementNotice from "./FinalPlacementNotice";
 import type { StudentDirectoryRecord } from "@/lib/student-directory-types";
 import { downloadSchedulePdf } from "@/lib/schedule-pdf";
 
@@ -229,6 +230,7 @@ export default function QuickSchedule() {
     });
   };
   const printWeekLabel = formatQuickWeekLabel(activeWeek, student?.program);
+  const isFinalPlacementWeek = Boolean(student?.program?.startsWith("2nd-") && activeWeek === "week-5-2026");
   if (step === 2) {
     return (
       <div className="w-full max-w-6xl mx-auto mt-16 print:mt-0 print-fullscreen print:bg-white print:text-black flex flex-col justify-center">
@@ -261,7 +263,9 @@ export default function QuickSchedule() {
                courses={student?.courses}
              />
 
-             <PrintableScheduleTable days={allDays} classes={myClasses} />
+             <FinalPlacementNotice program={student?.program} isPlacementWeek={isFinalPlacementWeek} />
+
+             {!isFinalPlacementWeek && <PrintableScheduleTable days={allDays} classes={myClasses} />}
 
              {/* Title & View Toggle */}
              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-4 sm:mb-6 relative">
@@ -342,7 +346,7 @@ export default function QuickSchedule() {
           
           <div className="px-4 sm:px-8 pb-4 sm:pb-8 relative z-10 flex-1 print:px-6 print:pb-6 print:flex-none">
             {/* Table View (Hidden on screen if in list mode, ALWAYS visible on print) */}
-            <div className={`print:hidden rounded-xl sm:rounded-2xl overflow-x-auto border border-slate-200 dark:border-slate-800 ${viewMode === "table" ? "block" : "hidden"}`}>
+            <div className={`print:hidden rounded-xl sm:rounded-2xl overflow-x-auto border border-slate-200 dark:border-slate-800 ${isFinalPlacementWeek ? "hidden" : viewMode === "table" ? "block" : "hidden"}`}>
                <table className="w-full text-left border-collapse bg-white dark:bg-slate-900 min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
@@ -456,10 +460,10 @@ export default function QuickSchedule() {
              </table>
             </div>
 
-            <PrintScheduleFooter />
+            {!isFinalPlacementWeek && <PrintScheduleFooter />}
 
             {/* List View (Hidden on screen if in table mode, NEVER visible on print) */}
-            <div className={`flex flex-col gap-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
+            <div className={`flex flex-col gap-6 ${isFinalPlacementWeek ? "hidden" : viewMode === "list" ? "block" : "hidden"} print:hidden`}>
                 {allDays.map(day => {
                   const dayClasses = myClasses.filter(c => c.day === day).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
                   

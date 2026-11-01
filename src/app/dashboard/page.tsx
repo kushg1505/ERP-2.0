@@ -7,6 +7,7 @@ import { Clock, MapPin, CheckCircle2, XCircle, Calendar, CheckSquare, List, Edit
 import MessMenu from "@/components/MessMenu";
 import { PrintScheduleFooter, PrintScheduleHeader } from "@/components/PrintScheduleHeader";
 import PrintableScheduleTable, { type PrintableActivity } from "@/components/PrintableScheduleTable";
+import FinalPlacementNotice from "@/components/FinalPlacementNotice";
 import { downloadSchedulePdf } from "@/lib/schedule-pdf";
 
 interface ParsedClass {
@@ -117,6 +118,7 @@ export default function DashboardPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
+  const isFinalPlacementWeek = Boolean(profile?.program?.startsWith("2nd-") && selectedWeek === "week-5-2026");
 
   // Edit Modal State
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -611,10 +613,12 @@ export default function DashboardPage() {
               courses={profile?.courses}
             />
 
-            <PrintableScheduleTable days={allDays} classes={myClasses} activities={printableActivities} />
+            <FinalPlacementNotice program={profile?.program} isPlacementWeek={isFinalPlacementWeek} />
+
+            {!isFinalPlacementWeek && <PrintableScheduleTable days={allDays} classes={myClasses} activities={printableActivities} />}
 
             {/* Table View (Hidden on screen if in list mode, NEVER visible on print if in list mode) */}
-            <div className={`print:hidden rounded-xl sm:rounded-2xl overflow-x-auto border border-slate-200 dark:border-slate-800 mt-4 sm:mt-6 ${viewMode === "table" ? "block" : "hidden"}`}>
+            <div className={`print:hidden rounded-xl sm:rounded-2xl overflow-x-auto border border-slate-200 dark:border-slate-800 mt-4 sm:mt-6 ${isFinalPlacementWeek ? "hidden" : viewMode === "table" ? "block" : "hidden"}`}>
                <table className="w-full text-left border-collapse bg-white dark:bg-slate-950 dark:bg-slate-950 min-w-[max-content] md:min-w-[800px] xl:min-w-0 print:min-w-0 print:w-full print:table-fixed">
                  <thead>
                    <tr>
@@ -808,10 +812,10 @@ export default function DashboardPage() {
              </table>
             </div>
 
-            <PrintScheduleFooter />
+            {!isFinalPlacementWeek && <PrintScheduleFooter />}
 
             {/* List View */}
-            <div className={`space-y-6 mt-6 ${viewMode === "list" ? "block" : "hidden"} print:hidden`}>
+            <div className={`space-y-6 mt-6 ${isFinalPlacementWeek ? "hidden" : viewMode === "list" ? "block" : "hidden"} print:hidden`}>
               {allDays.map(day => {
                 const actualProgram = profile?.program || "2nd-core";
                 const isADPThursday = actualProgram === "2nd-bfs" && selectedWeek === "week-1-2026" && day.toLowerCase().includes("thursday");

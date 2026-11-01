@@ -82,6 +82,9 @@ export async function fetchAvailableWeeks(program: string = "2nd-core"): Promise
     const colRef = collection(db, `master_schedules_${program}`);
     const snap = await getDocs(colRef);
     const weeks = snap.docs.map(doc => doc.id).filter(id => id.includes("term-5") || id.includes("week"));
+    if (program.startsWith("2nd-") && !weeks.includes("week-5-2026")) {
+      weeks.push("week-5-2026");
+    }
     
     // Custom sort to ensure week-2 comes before week-10
     return weeks.sort((a, b) => {
@@ -161,6 +164,11 @@ export async function resolveOngoingWeek(program: string, weeks: string[]): Prom
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayTime = today.getTime();
+  if (program.startsWith("2nd-")) {
+    const placementWeekStart = new Date(2026, 10, 2).getTime();
+    const placementWeekEnd = new Date(2026, 10, 8).getTime();
+    if (todayTime >= placementWeekStart && todayTime <= placementWeekEnd) return "week-5-2026";
+  }
   const ranges = await Promise.all(weeks.map(async (weekId) => {
     const classes = await fetchMasterTimetable(weekId, program);
     const classDates = classes.flatMap((cls) => {
